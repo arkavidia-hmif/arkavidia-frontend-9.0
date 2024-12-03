@@ -7,19 +7,22 @@ const BelanosimaFont = Belanosima({
   weight: '400',
   subsets: ['latin'],
   fallback: ['sans-serif'],
-  variable: '--font-belanosima'
+  variable: '--font-belanosima',
+  display: 'swap'
 })
 
 const TeachersFont = Teachers({
   subsets: ['latin'],
   fallback: ['sans-serif'],
-  variable: '--font-teachers'
+  variable: '--font-teachers',
+  display: 'swap'
 })
 
 const DM_SansFont = DM_Sans({
   subsets: ['latin'],
   fallback: ['sans-serif'],
-  variable: '--font-dmsans'
+  variable: '--font-dmsans',
+  display: 'swap'
 })
 
 export const metadata: Metadata = {
