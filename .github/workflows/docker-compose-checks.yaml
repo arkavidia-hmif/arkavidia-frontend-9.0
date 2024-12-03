@@ -12,19 +12,14 @@ jobs:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
-      
+
       - name: Make sure docker compose is installed
         run: docker-compose --version || sudo apt-get install -y docker-compose
 
       - name: Determine .env file to use
         id: env-file
-        run: 
-        |
-          if [ "${{ github.ref_name }}" == "main" ]; then
-            echo "ENV_FILE=fe-env.main" >> $GITHUB_ENV
-          elif [ "${{ github.ref_name }}" == "staging" ]; then
-            echo "ENV_FILE=fe-env.staging" >> $GITHUB_ENV
-      
+        run: echo "ENV_FILE=fe-env" >> $GITHUB_ENV
+
       - name: Validate env file
         run: echo "Using env file:" && echo ${{ env.ENV_FILE }}
 
@@ -37,5 +32,3 @@ jobs:
       - name: Stop and Remove Containers
         if: always()
         run: docker-compose down
-
-      
