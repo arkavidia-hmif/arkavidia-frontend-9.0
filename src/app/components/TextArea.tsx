@@ -15,7 +15,7 @@ function TextArea({
   state = 'default',
   onChange,
   required,
-  helperText = 'Helper',
+  helperText = '',
   disabled,
   ...props
 }: TextAreaProps) {
@@ -42,18 +42,20 @@ function TextArea({
         disabled={disabled}
         {...props}
       />
-      <label
-        className={`text-pretty text-sm ${
-          state === 'error'
-            ? 'text-red-500'
-            : state === 'success'
-              ? 'text-green-500'
-              : state === 'warn'
-                ? 'text-yellow-500'
-                : 'text-purple-100'
-        }`}>
-        {helperText}
-      </label>
+      {helperText && (
+        <label
+          className={`text-pretty text-sm ${
+            state === 'error'
+              ? 'text-red-500'
+              : state === 'success'
+                ? 'text-green-500'
+                : state === 'warn'
+                  ? 'text-yellow-500'
+                  : 'text-purple-100'
+          }`}>
+          {helperText}
+        </label>
+      )}
     </div>
   )
 }
