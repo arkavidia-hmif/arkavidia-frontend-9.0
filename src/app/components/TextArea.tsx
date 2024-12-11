@@ -35,7 +35,7 @@ function TextArea({
               : state === 'warn'
                 ? 'border-yellow-500 text-yellow-500'
                 : 'border-purple-400 text-purple-800'
-        } bg-lilac-100 placeholder-opacity-100 placeholder:text-purple-400 hover:border-purple-300 hover:bg-lilac-200 focus:border-purple-500 focus:outline-none focus:ring focus:ring-purple-500 focus:ring-opacity-50 disabled:cursor-not-allowed disabled:border-neutral-650 disabled:bg-neutral-200 disabled:opacity-50 disabled:hover:bg-neutral-300`}
+        } bg-lilac-100 placeholder-opacity-100 placeholder:text-purple-400 hover:border-purple-300 hover:bg-lilac-200 focus:border-purple-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-200 focus-visible:ring-opacity-50 disabled:cursor-not-allowed disabled:border-neutral-650 disabled:bg-neutral-200 disabled:opacity-50 disabled:hover:bg-neutral-300`}
         value={value}
         onChange={onChange}
         required={required}
