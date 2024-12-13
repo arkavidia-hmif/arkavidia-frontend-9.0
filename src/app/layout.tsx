@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import { Belanosima, Teachers, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './providers/ThemeProvider'
+import '~/api/axiosClient'
+import { ApiProvider } from './contexts/ApiContext'
+import { AuthProvider } from './contexts/AuthContext'
 
 const BelanosimaFont = Belanosima({
   weight: '400',
@@ -39,13 +42,17 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange>
-          {children}
-        </ThemeProvider>
+        <ApiProvider>
+          <AuthProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange>
+              {children}
+            </ThemeProvider>
+          </AuthProvider>
+        </ApiProvider>
       </body>
     </html>
   )
