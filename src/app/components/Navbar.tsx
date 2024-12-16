@@ -9,7 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from './ui/dropdown-menu'
 
@@ -66,7 +65,6 @@ function Navbar() {
                 </Link>
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator className="bg-transparent" />
             {LOGGED_IN ? (
               <>
                 <DropdownMenuItem
