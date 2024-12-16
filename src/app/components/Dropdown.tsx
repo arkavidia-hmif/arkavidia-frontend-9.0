@@ -7,11 +7,21 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import ExpandedMenu from './ui/expanded-menu'
 
-export default function Dropdown() {
+interface MenuItem {
+  id: number
+  option: string
+  iconLeft?: boolean
+  iconRight?: boolean
+  disabled?: boolean
+}
+
+export default function Dropdown({ data }: { data: MenuItem[] }) {
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false) // State untuk mengatur menu
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
+  const [filteredItems, setFilteredItems] = useState<MenuItem[]>(data)
 
+  // Simulated loading state
   useEffect(() => {
     if (inputValue) {
       setIsLoading(true)
@@ -23,14 +33,13 @@ export default function Dropdown() {
     setIsLoading(false)
   }, [inputValue])
 
-  // Data untuk ExpandedMenu
-  const menuItems = [
-    { id: 1, option: 'Option 1', iconLeft: true, iconRight: true, disabled: false },
-    { id: 2, option: 'Option 2', iconLeft: true, iconRight: true, disabled: false },
-    { id: 3, option: 'Option 3', iconLeft: true, iconRight: true, disabled: false },
-    { id: 4, option: 'Option 4', iconLeft: true, iconRight: true, disabled: false },
-    { id: 5, option: 'Option 5', iconLeft: true, iconRight: true, disabled: false }
-  ]
+  // Filter the items based on input value
+  useEffect(() => {
+    const filtered = data.filter(item =>
+      item.option.toLowerCase().includes(inputValue.toLowerCase())
+    )
+    setFilteredItems(filtered)
+  }, [inputValue, data])
 
   return (
     <div className="mx-auto w-full max-w-[350px] space-y-2">
@@ -39,11 +48,14 @@ export default function Dropdown() {
         className="mb-2 block font-dmsans text-base font-normal text-lilac-100">
         Label <span className="text-red-500">*</span>
       </Label>
+
+      {/* Input and Expanded Menu */}
       <div className="relative w-full">
+        {/* Search Input */}
         <input
           id="input-27"
           className="peer h-fit w-full appearance-none rounded-xl border-[1.5px] border-purple-400 bg-lilac-200 p-3 pe-12 ps-12 font-dmsans text-base font-normal leading-6 text-purple-500 shadow-[0_0_0_3px_rgba(113,56,192,1)] placeholder:font-dmsans placeholder:text-base placeholder:font-normal placeholder:leading-6 placeholder:text-purple-500 placeholder:opacity-100 focus:outline-none"
-          placeholder="Placeholder"
+          placeholder="Search options..."
           type="search"
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
@@ -71,8 +83,8 @@ export default function Dropdown() {
 
         {/* Arrow Down Button */}
         <button
-          onClick={() => setIsMenuOpen(prev => !prev)} // Toggle state
-          className="absolute inset-y-0 end-0 flex h-full w-12 items-center justify-center rounded-e-lg outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+          onClick={() => setIsMenuOpen(prev => !prev)}
+          className="absolute inset-y-0 end-0 flex h-full w-12 items-center justify-center rounded-e-lg outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70"
           aria-label="Toggle Menu"
           type="button">
           <Image
@@ -85,14 +97,19 @@ export default function Dropdown() {
             }`}
           />
         </button>
+
+        {/* Expanded Menu */}
+        {isMenuOpen && (
+          <div className="absolute z-50 mt-[38px] w-full rounded-md bg-lilac-100 shadow-lg">
+            <ExpandedMenu items={filteredItems} />
+          </div>
+        )}
       </div>
 
-      <span className="mb-[10px] mt-2 text-[14px] leading-5 text-lilac-100">
-        Helper Text
-      </span>
-
-      {/* Expanded Menu */}
-      {isMenuOpen && <ExpandedMenu items={menuItems} />}
+      {/* Helper Text */}
+      <div className="relative">
+        <span className="text-[14px] leading-5 text-lilac-100">Helper Text</span>
+      </div>
     </div>
   )
 }

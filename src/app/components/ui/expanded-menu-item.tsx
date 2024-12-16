@@ -24,7 +24,7 @@ function ExpandedMenuItem({
 }: ExpandedMenuItemProps) {
   return (
     <div
-      className={`flex w-[350px] items-center justify-between rounded-sm py-3 pl-3 pr-4 transition-all duration-100 ease-linear ${
+      className={`flex w-[100%] items-center justify-between rounded-sm py-3 pl-3 pr-4 transition-all duration-100 ease-linear ${
         disabled ? 'cursor-not-allowed' : 'hover:bg-purple-100'
       }`}>
       {/* Left Content */}
