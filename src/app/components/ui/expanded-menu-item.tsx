@@ -39,7 +39,7 @@ function ExpandedMenuItem({
           />
         )}
         <span
-          className={`font-dmsans text-xl ${
+          className={`font-dmsans text-base ${
             disabled ? 'text-gray-400' : 'text-purple-500'
           }`}>
           {option}
