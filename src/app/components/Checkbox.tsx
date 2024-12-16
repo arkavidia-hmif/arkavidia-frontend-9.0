@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Checkbox as RadixCheckbox } from './ui/checkbox'
-import { Label } from '@radix-ui/react-dropdown-menu'
+import { Label } from './ui/label'
 import clsx from 'clsx'
 
 export interface CheckboxProps {
