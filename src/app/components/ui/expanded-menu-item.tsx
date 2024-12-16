@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import { Checkbox } from './checkbox'
+import Checkbox from '../Checkbox'
 
 interface ExpandedMenuItemProps {
   /** Whether to display the left icon */
@@ -47,7 +47,7 @@ function ExpandedMenuItem({
       </div>
 
       {/* Right Content */}
-      {iconRight && <Checkbox className="h-6 w-6 rounded-lg" />}
+      {iconRight && <Checkbox />}
     </div>
   )
 }
