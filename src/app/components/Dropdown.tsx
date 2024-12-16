@@ -5,10 +5,12 @@ import { Label } from './ui/label'
 import { LoaderCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import ExpandedMenu from './ui/expanded-menu'
 
 export default function Dropdown() {
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false) // State untuk mengatur menu
 
   useEffect(() => {
     if (inputValue) {
@@ -20,6 +22,15 @@ export default function Dropdown() {
     }
     setIsLoading(false)
   }, [inputValue])
+
+  // Data untuk ExpandedMenu
+  const menuItems = [
+    { id: 1, option: 'Option 1', iconLeft: true, iconRight: true, disabled: false },
+    { id: 2, option: 'Option 2', iconLeft: true, iconRight: true, disabled: false },
+    { id: 3, option: 'Option 3', iconLeft: true, iconRight: true, disabled: false },
+    { id: 4, option: 'Option 4', iconLeft: true, iconRight: true, disabled: false },
+    { id: 5, option: 'Option 5', iconLeft: true, iconRight: true, disabled: false }
+  ]
 
   return (
     <div className="mx-auto w-full max-w-[350px] space-y-2">
@@ -38,6 +49,7 @@ export default function Dropdown() {
           onChange={e => setInputValue(e.target.value)}
         />
 
+        {/* Search Icon */}
         <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
           {isLoading ? (
             <LoaderCircle
@@ -56,20 +68,31 @@ export default function Dropdown() {
             />
           )}
         </div>
+
+        {/* Arrow Down Button */}
         <button
+          onClick={() => setIsMenuOpen(prev => !prev)} // Toggle state
           className="absolute inset-y-0 end-0 flex h-full w-12 items-center justify-center rounded-e-lg outline-offset-2 transition-colors hover:text-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label="Press to speak"
-          type="submit">
+          aria-label="Toggle Menu"
+          type="button">
           <Image
             src="/arrow-down.svg"
             alt="Arrow Down"
             width={12}
             height={6}
-            className="h-[6px] w-[12px]"
+            className={`h-[6px] w-[12px] transition-transform duration-200 ${
+              isMenuOpen ? 'rotate-180' : ''
+            }`}
           />
         </button>
       </div>
-      <span className="mb-[10px] mt-2 text-[14px] leading-5 text-lilac-100">Helper</span>
+
+      <span className="mb-[10px] mt-2 text-[14px] leading-5 text-lilac-100">
+        Helper Text
+      </span>
+
+      {/* Expanded Menu */}
+      {isMenuOpen && <ExpandedMenu items={menuItems} />}
     </div>
   )
 }
