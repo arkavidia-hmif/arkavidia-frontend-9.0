@@ -18,7 +18,7 @@ function ExpandedMenuItem({
 }: ExpandedMenuItemProps) {
   return (
     <div
-      className={`flex w-[350px] items-center justify-between rounded-sm py-3 pl-3 pr-4 transition-all duration-100 ease-linear ${disabled ? 'cursor-not-allowed bg-gray-200' : 'hover:bg-purple-100'}`}>
+      className={`flex w-[350px] items-center justify-between rounded-sm py-3 pl-3 pr-4 transition-all duration-100 ease-linear ${disabled ? 'cursor-not-allowed' : 'hover:bg-purple-100'}`}>
       <div className="flex items-center gap-3">
         {iconLeft && (
           <Image
