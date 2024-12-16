@@ -14,7 +14,7 @@ interface ExpandedMenuProps {
 
 function ExpandedMenu({ items }: ExpandedMenuProps) {
   return (
-    <div className="custom-scrollbar flex max-h-[330px] w-[100%] flex-col gap-2 overflow-y-auto rounded-sm bg-lilac-100 p-2">
+    <div className="custom-scrollbar-expanded-menu flex max-h-[330px] w-[100%] flex-col gap-2 overflow-y-auto rounded-sm bg-lilac-100 p-2">
       {items.map(item => (
         <ExpandedMenuItem
           key={item.id}

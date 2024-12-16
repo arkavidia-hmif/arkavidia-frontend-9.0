@@ -15,7 +15,15 @@ interface MenuItem {
   disabled?: boolean
 }
 
-export default function Dropdown({ data }: { data: MenuItem[] }) {
+export default function Dropdown({
+  data,
+  label,
+  helper_text
+}: {
+  data: MenuItem[]
+  label: string
+  helper_text: string
+}) {
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
@@ -43,11 +51,13 @@ export default function Dropdown({ data }: { data: MenuItem[] }) {
 
   return (
     <div className="mx-auto w-full max-w-[350px] space-y-2">
-      <Label
-        htmlFor="input-27"
-        className="mb-2 block font-dmsans text-base font-normal text-lilac-100">
-        Label <span className="text-red-500">*</span>
-      </Label>
+      {label && (
+        <Label
+          htmlFor="input-27"
+          className="mb-2 block font-dmsans text-base font-normal text-lilac-100">
+          {label} <span className="text-red-500">*</span>
+        </Label>
+      )}
 
       {/* Input and Expanded Menu */}
       <div className="relative w-full">
@@ -100,7 +110,10 @@ export default function Dropdown({ data }: { data: MenuItem[] }) {
 
         {/* Expanded Menu */}
         {isMenuOpen && (
-          <div className="absolute z-50 mt-[38px] w-full rounded-md bg-lilac-100 shadow-lg">
+          <div
+            className={`absolute z-50 w-full rounded-md bg-lilac-100 shadow-lg ${
+              helper_text ? 'mt-[38px]' : 'mt-[10px]'
+            }`}>
             <ExpandedMenu items={filteredItems} />
           </div>
         )}
@@ -108,7 +121,7 @@ export default function Dropdown({ data }: { data: MenuItem[] }) {
 
       {/* Helper Text */}
       <div className="relative">
-        <span className="text-[14px] leading-5 text-lilac-100">Helper Text</span>
+        <span className="text-[14px] leading-5 text-lilac-100">{helper_text}</span>
       </div>
     </div>
   )
