@@ -4,7 +4,7 @@ import { cn } from "~/lib/utils"
 import { cva } from "class-variance-authority"
 
 const ButtonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm " +
+  "relative inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm " +
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none " +
   "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 font-semibold disabled:opacity-100",
   {
@@ -14,7 +14,7 @@ const ButtonVariants = cva(
           "bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white " +
           "hover:shadow-[0px_4px_15px_0px_#CE6AFF] transition-shadow duration-300 ease-out " +
           "focus:border-[#CE6AFF] focus:outline-none focus:border-[2px] focus:shadow-[0px_4px_15px_0px_#CE6AFF] " +
-          "active:bg-[#CE6AFF]/50 active:bg-none active:shadow-[0px_4px_15px_0px_#CE6AFF] " +
+          "active:bg-[#CE6AFF]/[0.96] active:bg-none active:shadow-[0px_4px_15px_0px_#CE6AFF] " +
           "disabled:bg-[#CCCCCC] disabled:bg-none disabled:text-white disabled:shadow-none",
         ghost:
           "bg-primary text-white " +
@@ -23,12 +23,10 @@ const ButtonVariants = cva(
           "active:bg-gray-700 " +
           "disabled:bg-[#CCCCCC] disabled:text-white ",
         outline:
-          "border-2 border-transparent text-transparent bg-clip-text " +
-          "after:rounded-md bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] " +
-          "hover:shadow-[0px_4px_15px_0px_#CE6AFF] hover:border-[#CE6AFF] transition-all duration-300 ease-out " +
-          "focus:outline-none focus:border-[#CE6AFF] focus:shadow-[0px_4px_15px_0px_#CE6AFF] " +
-          "active:bg-none active:text-white active:bg-clip-border active:bg-[#CE6AFF]/50 " +
-          "disabled:text-[#CCCCCC] disabled:border-[#CCCCCC] disabled:cursor-not-allowed disabled:shadow-none",
+          "hover:shadow-[0px_4px_15px_0px_#CE6AFF] transition-all duration-300 ease-out " +
+          "focus:outline-none focus:shadow-[0px_4px_15px_0px_#CE6AFF] " +
+          "active:bg-[#CE6AFF] active:shadow-[0px_4px_15px_0px_#CE6AFF] " +
+          "disabled:text-[#CCCCCC] disabled:cursor-not-allowed disabled:shadow-none " ,
         secondary:
           "bg-[#CE6AFF] text-white " +
           "hover:bg-[#A555CC] transition-color duration-300 ease-out " +
@@ -69,29 +67,29 @@ interface ButtonProps extends Omit<RadixButtonProps, 'size' | 'variant'> {
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant , size = "default", ...props }, ref) => {
-
-    const inlineStyle =
-      variant === "outline"
-        ? {
-          border: "2px solid transparent",
-          borderImageSource:
-            "linear-gradient(113.98deg, #48E6FF -34.84%, #9274FF 45.46%, #C159D8 125.76%)",
-          borderImageSlice: 1,
-          clipPath: "inset(0 round 4px)",
-          // If disabled, remove the border image
-          ...(props.disabled && { borderImageSource: "none", border: "2px solid #CCCCCC" }),
-        }
-        : undefined
+  ({ className, variant, size = "default", ...props }, ref) => {
+    const inlineStyles = variant === "outline" ?
+      {
+        border: "2px solid transparent",
+        background: "linear-gradient(black, black) padding-box, linear-gradient(113.98deg, #48E6FF -34.84%, #9274FF 45.46%, #C159D8 125.76%) border-box",
+      }
+      : {}
 
     return (
       <RadixButton
         ref={ref}
         className={cn(ButtonVariants({ variant, size, className }))}
+        style={inlineStyles}
         {...props}
-        variant={undefined}
-        style={inlineStyle}
-      />
+      >
+        {variant === "outline" ? (
+          <div className="relative bg-clip-text text-transparent bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8]">
+            {props.children}
+          </div>
+        ) : (
+          props.children
+        )}
+      </RadixButton>
     )
   }
 )
@@ -99,3 +97,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button"
 
 export { Button, ButtonVariants }
+
