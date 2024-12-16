@@ -3,22 +3,31 @@ import Image from 'next/image'
 import { Checkbox } from './checkbox'
 
 interface ExpandedMenuItemProps {
+  /** Whether to display the left icon */
   iconLeft?: boolean
+
+  /** Whether to display the checkbox on the right */
   iconRight?: boolean
-  Option: string
-  icon?: boolean // This prop is defined but not used. Remove it if not needed.
+
+  /** Label for the menu item */
+  option: string
+
+  /** Whether the menu item is disabled */
   disabled?: boolean
 }
 
 function ExpandedMenuItem({
   iconLeft,
   iconRight,
-  Option,
+  option,
   disabled = false
 }: ExpandedMenuItemProps) {
   return (
     <div
-      className={`flex w-[350px] items-center justify-between rounded-sm py-3 pl-3 pr-4 transition-all duration-100 ease-linear ${disabled ? 'cursor-not-allowed' : 'hover:bg-purple-100'}`}>
+      className={`flex w-[350px] items-center justify-between rounded-sm py-3 pl-3 pr-4 transition-all duration-100 ease-linear ${
+        disabled ? 'cursor-not-allowed' : 'hover:bg-purple-100'
+      }`}>
+      {/* Left Content */}
       <div className="flex items-center gap-3">
         {iconLeft && (
           <Image
@@ -33,9 +42,11 @@ function ExpandedMenuItem({
           className={`font-dmsans text-xl ${
             disabled ? 'text-gray-400' : 'text-purple-500'
           }`}>
-          {Option}
+          {option}
         </span>
       </div>
+
+      {/* Right Content */}
       {iconRight && <Checkbox className="h-6 w-6 rounded-lg" />}
     </div>
   )
