@@ -15,7 +15,6 @@ import {
 import { Input } from '~/app/components/ui/input'
 import { FaArrowLeft } from 'react-icons/fa'
 import { Button } from '~/app/components/ui/button'
-import { InvalidModal } from './InvalidModal'
 import { SuccessModal } from './SuccessModal'
 
 const loginSchema = z.object({
@@ -47,7 +46,7 @@ export const FormForgetPassword = () => {
   }
 
   return (
-    <>
+    <div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -96,10 +95,6 @@ export const FormForgetPassword = () => {
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
       />
-      <InvalidModal
-        isOpen={isErrorModalOpen}
-        onClose={() => setIsErrorModalOpen(false)}
-      />
-    </>
+    </div>
   )
 }

@@ -24,10 +24,7 @@ function ForgetPassword() {
         <div className="z-10">
           <FormForgetPassword />
         </div>
-        {/* Background Placeholder */}
       </div>
-      {/* NOTE: Might consider put this on main pages */}
-      <Toaster />
     </div>
   )
 }
