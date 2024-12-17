@@ -15,8 +15,8 @@ const ButtonVariants = cva(
         default:
           "bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white " +
           "hover:shadow-[0px_4px_15px_0px_#CE6AFF] transition-shadow duration-300 ease-out " +
-          "focus:outline-none focus:border-[2px] focus:shadow-[0px_4px_15px_0px_#CE6AFF] " +
-          "active:bg-[#CE6AFF]/[0.96] active:shadow-[0px_4px_15px_0px_#CE6AFF] " +
+          "focus:outline-none focus:border-[2px] focus:border-[#CE6AFF] focus:shadow-[0px_4px_15px_0px_#CE6AFF] " +
+          "active:bg-[#CE6AFF] active:bg-none active:shadow-[0px_4px_15px_0px_#CE6AFF] " +
           "disabled:bg-[#CCCCCC] disabled:bg-none disabled:text-white disabled:shadow-none",
         ghost:
           "bg-primary text-white " +
@@ -26,7 +26,7 @@ const ButtonVariants = cva(
           "disabled:bg-[#CCCCCC] disabled:text-white ",
         outline:
           "px-0 py-0 " +
-          "hover:shadow-[0px_4px_15px_0px_#CE6AFF] transition-all duration-300 ease-out " +
+          "hover:shadow-[0px_4px_15px_0px_#CE6AFF] transition-shadow duration-300 ease-out " +
           "focus:outline-none focus:shadow-[0px_4px_15px_0px_#CE6AFF] " +
           "active:bg-[#CE6AFF]/50 active:shadow-[0px_4px_15px_0px_#CE6AFF] " +
           "disabled:text-[#CCCCCC] disabled:cursor-not-allowed disabled:shadow-none ",
@@ -40,21 +40,21 @@ const ButtonVariants = cva(
           "bg-red-500 text-white " +
           "hover:bg-red-400 transition-color duration-300 ease-out " +
           "focus:outline-none focus:bg-red-600 focus:border focus:border-2 focus:border-red-400 " +
-          "active:bg-red-700 " +
+          "active:bg-red-700 active:border-0 " +
           "disabled:bg-[#CCCCCC] disabled:bg-none disabled:text-white ",
         link:
-          "text-white bg-none underline-offset-4 " +
+          "text-white bg-none underline-offset-[5px] " +
           "hover:underline active:underline " +
           "disabled:cursor-not-allowed",
       },
       size: {
-        default: "h-9 px-4 py-2",
+        default: "h-[170px] w-[50px] px-[18] py-[16px] min-w-[100px] text-lg",
         xl: "w-[197px] h-[56px] px-[32px] py-[16px] min-w-[96px] text-lg",
         lg: "w-[173px] h-[52px] px-[20px] py-[14px] min-w-[64px] text-base",
         md: "w-[165px] h-[48px] px-[16px] py-[12px] min-w-[56px] text-base",
         sm: "w-[161px] h-[44px] px-[14px] py-[10px] min-w-[48px] text-sm",
         xs: "w-[157px] h-[40px] px-[12px] py-[8px] min-w-[42px] text-xs",
-        icon: "w-4 h-3 test-xs",
+        icon: "w-4 h-3 px-[10px] py-[6px] test-xs",
       },
     },
     defaultVariants: {
