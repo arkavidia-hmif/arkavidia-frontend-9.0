@@ -48,14 +48,15 @@ const ButtonVariants = cva(
           "disabled:cursor-not-allowed",
       },
       size: {
-        default: "h-[170px] w-[50px] px-[18] py-[16px] min-w-[100px] text-lg",
-        xl: "w-[197px] h-[56px] px-[32px] py-[16px] min-w-[96px] text-lg",
-        lg: "w-[173px] h-[52px] px-[20px] py-[14px] min-w-[64px] text-base",
-        md: "w-[165px] h-[48px] px-[16px] py-[12px] min-w-[56px] text-base",
-        sm: "w-[161px] h-[44px] px-[14px] py-[10px] min-w-[48px] text-sm",
-        xs: "w-[157px] h-[40px] px-[12px] py-[8px] min-w-[42px] text-xs",
-        icon: "w-4 h-3 px-[10px] py-[6px] test-xs",
+        default: "min-h-[170px] px-[18px] py-[16px] text-lg whitespace-normal",
+        xl: "min-h-[56px] px-[32px] py-[16px] text-xl whitespace-normal",
+        lg: "min-h-[52px] px-[20px] py-[14px] text-lg whitespace-normal",
+        md: "min-h-[48px] px-[16px] py-[12px] text-base whitespace-normal",
+        sm: "min-h-[44px] px-[14px] py-[10px] text-sm whitespace-normal",
+        xs: "min-h-[40px] px-[12px] py-[8px] text-xs whitespace-normal",
+        icon: "w-10 h-10 p-2.5 whitespace-normal",
       },
+
     },
     defaultVariants: {
       variant: "default",
@@ -76,7 +77,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const inlineStyles =
       variant === "outline"
         ? {
-          border: isActive ? "2px solid #CE6AFF" : "2px solid transparent", // Red border when active
+          border: isActive ? "2px solid #CE6AFF" : "2px solid transparent",
           background: !isActive
             ? "linear-gradient(black, black) padding-box, linear-gradient(113.98deg, #48E6FF -34.84%, #9274FF 45.46%, #C159D8 125.76%) border-box"
             : undefined,
