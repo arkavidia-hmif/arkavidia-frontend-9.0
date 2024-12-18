@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import ExpandedMenu from './ui/expanded-menu'
 
-interface MenuItem {
+export interface MenuItem {
   id: number
   option: string
   iconLeft?: boolean

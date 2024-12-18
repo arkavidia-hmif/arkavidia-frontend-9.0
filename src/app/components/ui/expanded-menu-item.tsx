@@ -16,7 +16,7 @@ interface ExpandedMenuItemProps {
   disabled?: boolean
 }
 
-function ExpandedMenuItem({
+function  ExpandedMenuItem({
   iconLeft,
   iconRight,
   option,
