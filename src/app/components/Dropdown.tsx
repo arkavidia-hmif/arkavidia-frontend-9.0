@@ -18,16 +18,21 @@ export interface MenuItem {
 export default function Dropdown({
   data,
   label,
-  helper_text
+  isRequired = true,
+  helper_text,
+  placeholder
 }: {
   data: MenuItem[]
   label: string
-  helper_text: string
+  isRequired?: boolean
+  helper_text?: string
+  placeholder?: string
 }) {
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = useState('') // For filtering only
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
   const [filteredItems, setFilteredItems] = useState<MenuItem[]>(data)
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
 
   // Simulated loading state
   useEffect(() => {
@@ -49,13 +54,20 @@ export default function Dropdown({
     setFilteredItems(filtered)
   }, [inputValue, data])
 
+  // Handle item selection
+  const handleItemClick = (item: MenuItem) => {
+    setSelectedItem(item) // Store the selected item
+    setInputValue('') // Reset the input for further searches
+    setIsMenuOpen(false) // Close the dropdown
+  }
+
   return (
     <div className="mx-auto w-full max-w-[350px] space-y-2">
       {label && (
         <Label
           htmlFor="input-27"
           className="mb-2 block font-dmsans text-base font-normal text-lilac-100">
-          {label} <span className="text-red-500">*</span>
+          {label} {isRequired && <span className="text-red-500">*</span>}
         </Label>
       )}
 
@@ -65,10 +77,13 @@ export default function Dropdown({
         <input
           id="input-27"
           className="peer h-fit w-full appearance-none rounded-xl border-[1.5px] border-purple-400 bg-lilac-200 p-3 pe-12 ps-12 font-dmsans text-base font-normal leading-6 text-purple-500 shadow-[0_0_0_3px_rgba(113,56,192,1)] placeholder:font-dmsans placeholder:text-base placeholder:font-normal placeholder:leading-6 placeholder:text-purple-500 placeholder:opacity-100 focus:outline-none"
-          placeholder="Search options..."
+          placeholder={selectedItem ? selectedItem.option : (placeholder ?? 'Search...')} // Show selected option in placeholder
           type="search"
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
+          value={inputValue} // Controlled value for filtering
+          onChange={e => {
+            setInputValue(e.target.value) // Set filtering input
+            setIsMenuOpen(true) // Open dropdown when searching
+          }}
         />
 
         {/* Search Icon */}
@@ -114,7 +129,13 @@ export default function Dropdown({
             className={`absolute z-50 w-full rounded-md bg-lilac-100 shadow-lg ${
               helper_text ? 'mt-[38px]' : 'mt-[10px]'
             }`}>
-            <ExpandedMenu items={filteredItems} />
+            <ExpandedMenu
+              items={filteredItems}
+              onChoiceClick={id => {
+                const chosenItem = data.find(item => item.id === id)
+                if (chosenItem) handleItemClick(chosenItem)
+              }}
+            />
           </div>
         )}
       </div>
