@@ -36,39 +36,63 @@ const ProfileData = (props: ProfileDataLayoutProps) => {
       <div className="flex w-full flex-row justify-between text-white">
         <div className="flex w-full flex-col gap-2">
           <h1 className="font-teachers text-2xl font-bold">{props.title}</h1>
-          {isEdit ? (
-            <div className="flex flex-row items-center gap-3">
-              {props.children}
-              <Button
-                onClick={handleCancel}
-                variant={'ghost'}
-                size={'icon'}
-                className="border-2 border-[#9274FF]">
-                <Image
-                  src={'/images/profile/close.svg'}
-                  alt={'Close Button'}
-                  width={24}
-                  height={24}
-                  className="mx-4 my-3 h-6 w-6"
-                />
-              </Button>
-              <Button
-                onClick={handleSave}
-                variant={'ghost'}
-                className="bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs"
-                size={'icon'}>
-                <Image
-                  src={'/images/profile/check.svg'}
-                  alt={'Close Button'}
-                  width={24}
-                  height={24}
-                  className="mx-5 my-3 h-6 w-6"
-                />
-              </Button>
+          <div className="relative">
+            {/* Editable Section */}
+            <div
+              className={`${
+                isEdit
+                  ? 'flex translate-y-0 opacity-100'
+                  : 'pointer-events-none -translate-y-2 opacity-0'
+              } w-full transition-all duration-300 ease-in-out`}>
+              <div className="flex flex-col items-start justify-normal gap-3 md:flex-row">
+                {isEdit && (
+                  <>
+                    {props.children}
+                    <div className="flex flex-row gap-3">
+                      <Button
+                        onClick={handleCancel}
+                        variant={'ghost'}
+                        size={'icon'}
+                        className="border-2 border-[#9274FF]">
+                        <Image
+                          src={'/images/profile/close.svg'}
+                          alt={'Close Button'}
+                          width={24}
+                          height={24}
+                          className="mx-4 my-3 h-6 w-6"
+                        />
+                      </Button>
+                      <Button
+                        onClick={handleSave}
+                        variant={'ghost'}
+                        className="bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs"
+                        size={'icon'}>
+                        <Image
+                          src={'/images/profile/check.svg'}
+                          alt={'Close Button'}
+                          width={24}
+                          height={24}
+                          className="mx-5 my-3 h-6 w-6"
+                        />
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-          ) : (
-            <h2 className="font-dmsans text-[1rem] text-lg font-normal">{props.value}</h2>
-          )}
+
+            {/* Display Value Section */}
+            <div
+              className={`${
+                isEdit
+                  ? 'pointer-events-none translate-y-2 opacity-0'
+                  : 'translate-y-0 opacity-100'
+              } transition-all duration-300 ease-in-out`}>
+              <h2 className="font-dmsans text-[1rem] text-lg font-normal">
+                {props.value}
+              </h2>
+            </div>
+          </div>
         </div>
         {!isEdit && (
           <Button variant={'ghost'} onClick={() => setIsEdit(!isEdit)}>
@@ -123,14 +147,16 @@ export const InputProfileData = (props: InputProfileDataProps) => {
   )
 }
 
-interface DropdownProfileDataProps extends InputProfileDataProps {
+interface DropdownProfileDataProps {
+  title: string
   dropdownData: MenuItem[]
+  selectedOption: MenuItem
 }
 
 export const DropdownProfileData = (props: DropdownProfileDataProps) => {
-  const [value, setValue] = useState<string>(props.default_value)
+  const [value, setValue] = useState<MenuItem>(props.selectedOption)
   //Save the
-  const [tempValue, setTempValue] = useState<string>(props.default_value)
+  const [tempValue, setTempValue] = useState<MenuItem>(props.selectedOption)
 
   function onSaveInput() {
     //TODO - Fetch a save api here
@@ -144,9 +170,15 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
     <ProfileData
       handleCancel={onCancelInput}
       title={props.title}
-      value={value}
+      value={value.option}
       handleSave={onSaveInput}>
-      <Dropdown data={props.dropdownData} label={''} helper_text={''} />
+      <Dropdown
+        data={props.dropdownData}
+        label={''}
+        helper_text={''}
+        value={tempValue}
+        onChange={selectedItem => setTempValue(selectedItem ?? value)}
+      />
     </ProfileData>
   )
 }
@@ -183,7 +215,7 @@ export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
         type="date"
         value={formatDate(tempDate)}
         onChange={e => setTempDate(new Date(e.target.value))}
-        className="rounded-md border p-2 w-full text-purple-400 bg-lilac-100 border-purple-400"
+        className="w-full rounded-md border border-purple-400 bg-lilac-100 p-2 text-purple-400"
       />
     </ProfileData>
   )

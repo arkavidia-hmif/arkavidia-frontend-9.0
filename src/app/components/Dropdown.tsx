@@ -20,19 +20,23 @@ export default function Dropdown({
   label,
   isRequired = true,
   helper_text,
-  placeholder
+  placeholder,
+  onChange,
+  value,
 }: {
   data: MenuItem[]
   label: string
   isRequired?: boolean
   helper_text?: string
   placeholder?: string
+  onChange?: (selectedItem: MenuItem | null) => void 
+  value?: MenuItem | null 
 }) {
   const [inputValue, setInputValue] = useState('') // For filtering only
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
   const [filteredItems, setFilteredItems] = useState<MenuItem[]>(data)
-  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(value ?? null)
 
   // Simulated loading state
   useEffect(() => {
@@ -56,7 +60,11 @@ export default function Dropdown({
 
   // Handle item selection
   const handleItemClick = (item: MenuItem) => {
-    setSelectedItem(item) // Store the selected item
+    if (onChange) {
+      onChange(item) // Notify parent when `onChange` is provided
+    } else {
+      setSelectedItem(item)
+    }
     setInputValue('') // Reset the input for further searches
     setIsMenuOpen(false) // Close the dropdown
   }

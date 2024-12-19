@@ -10,7 +10,7 @@ interface Props {
 export const ContentTabBar = ({ selected, setSelected }: Props) => {
   return (
     <div className="relative h-fit">
-      <div className="relative z-10 flex w-full flex-row justify-evenly h-fit">
+      <div className="relative z-10 flex w-full flex-row justify-between gap-12 h-fit">
         <Menu
           Selected={selected}
           setSelected={setSelected}

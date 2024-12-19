@@ -10,10 +10,19 @@ import { ProfileLayout } from '../components/profile/profile-content-layout'
 const DummyPersonalInfoData: ProfileInformationDefaultValue = {
   name: 'Ahdmad Jone Done',
   birthdate: new Date('2004-09-09'),
-  education: 'Institute',
-  instance: 'Ahdmad Jane',
+  education: {
+    id: 1,
+    option: 'Institute',
+  },
+  instance: {
+    id: 1,
+    option: 'Ahdmad Jane'
+  },
   phoneNumber: '+628211912891381',
-  howDoYouKnowArkavidia: 'example@gmail.com'
+  howDoYouKnowArkavidia: {
+    id: 1,
+    option: 'example@gmail.com'
+  },
 }
 
 const DummyDropdownOptions: ProfileInformationDropdownOptions = {
@@ -67,7 +76,7 @@ const DummyDropdownOptions: ProfileInformationDropdownOptions = {
 
 const ProfilePage = () => {
   return (
-    <div className="relative min-h-screen bg-gradient-to-r from-[#1F0246] to-[#2E046A]">
+    <div className="relative min-h-screen bg-gradient-to-r from-[#1F0246] to-[#2E046A] px-6">
       <ProfileLayout
         personalInformation={
           <PersonalInformationContent
