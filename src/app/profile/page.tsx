@@ -1,5 +1,3 @@
-import Image from 'next/image'
-import { ContentTabBar } from '../components/profile/content-tab-bar'
 import {
   PersonalInformationContent,
   ProfileInformationDefaultValue,
@@ -15,12 +13,12 @@ const DummyPersonalInfoData: ProfileInformationDefaultValue = {
     option: 'Institute',
   },
   instance: {
-    id: 1,
+    id: 2,
     option: 'Ahdmad Jane'
   },
   phoneNumber: '+628211912891381',
   howDoYouKnowArkavidia: {
-    id: 1,
+    id: 3,
     option: 'example@gmail.com'
   },
 }
@@ -50,11 +48,11 @@ const DummyDropdownOptions: ProfileInformationDropdownOptions = {
       option: 'Ahdmad Jane'
     },
     {
-      id: 1,
+      id: 2,
       option: 'Besok Minggu'
     },
     {
-      id: 1,
+      id: 3,
       option: 'Object Oriented Programming'
     }
   ],
@@ -76,7 +74,14 @@ const DummyDropdownOptions: ProfileInformationDropdownOptions = {
 
 const ProfilePage = () => {
   return (
-    <div className="relative min-h-screen bg-gradient-to-r from-[#1F0246] to-[#2E046A] px-6">
+    <div
+      className="relative md:min-h-screen bg-gradient-to-r from-[#1F0246] to-[#2E046A] px-6 max-h-fit"
+      style={{
+        backgroundImage: "url('/images/profile/bg.png')",
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
       <ProfileLayout
         personalInformation={
           <PersonalInformationContent
@@ -92,13 +97,6 @@ const ProfilePage = () => {
           />
         }
         socialMedia={<div></div>}
-      />
-      <Image
-        src={'/images/profile/bg.png'}
-        alt={'Profile Background'}
-        width={1920}
-        height={1080}
-        className="absolute h-screen w-screen"
       />
     </div>
   )
