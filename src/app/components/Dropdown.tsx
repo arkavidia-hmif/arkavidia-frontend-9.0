@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import ExpandedMenu from './ui/expanded-menu'
 
-interface MenuItem {
+export interface MenuItem {
   id: number
   option: string
   iconLeft?: boolean
@@ -62,9 +62,8 @@ export default function Dropdown({
   const handleItemClick = (item: MenuItem) => {
     if (onChange) {
       onChange(item) // Notify parent when `onChange` is provided
-    } else {
-      setSelectedItem(item)
     }
+    setSelectedItem(item)
     setInputValue('') // Reset the input for further searches
     setIsMenuOpen(false) // Close the dropdown
   }
