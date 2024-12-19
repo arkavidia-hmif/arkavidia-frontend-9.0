@@ -18,7 +18,8 @@ type MediaResponse = {
 }
 
 type ComponentProps = {
-    onUpload?: (e: string | null ) => void
+    onUpload?: (e: string | null ) => void,
+    className?: string
 }
 
 function fileExt(filename: string) {
@@ -44,10 +45,11 @@ function uploadedStatus(success?: boolean) {
 }
 
 
-export default function FileInput({onUpload}: ComponentProps) {
+export default function FileInput({onUpload, className}: ComponentProps) {
     const [file, setFile] = useState<File | null>(null);
     const [progress, setProgress] = useState(0)
     const [uploaded, setUploaded] = useState(false);
+    const [isUploadSucces, setUploadSucces] = useState<boolean>(false);
     const { toast } = useToast()
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         // Do something with the files
@@ -58,11 +60,15 @@ export default function FileInput({onUpload}: ComponentProps) {
         setFile(acceptedFiles[0])
         try {
             await handleChange(acceptedFiles[0])
+            setUploadSucces(true);
         } catch {
             toast({
                 title: "File failed to upload",
                 description: "Something happened"
             })
+            setUploadSucces(false);
+        } finally {
+            setUploaded(true);
         }
       }, [])
     const {getRootProps, getInputProps, isDragActive, open} = useDropzone({onDrop})
@@ -107,8 +113,8 @@ export default function FileInput({onUpload}: ComponentProps) {
 
     if(file !== null) {
         return (
-            <div className="border border-neutral-450 w-full p-[1rem] rounded-[12px]">
-                <div className="flex items-center justify-between mb-2">
+            <div className={cn("border border-neutral-450 w-full p-[1rem] rounded-[12px]", className)}>
+                <div className={cn("flex items-center justify-between", uploaded? '' : 'mb-2')}>
                     <div className="flex items-center gap-3 mr-4">
                         <Image
                             src={`icons/fileinputassets/${fileExt(file.type)}.svg`}
@@ -120,7 +126,7 @@ export default function FileInput({onUpload}: ComponentProps) {
                             <h1 className="font-semibold">{file?.name || "placeholder-file.pdf"}</h1>
                             <div className="flex items-center gap-2">
                                 <h2 className="text-sm">{(file?.size || 0) * (progress / 100)} KB of {file?.size || 0} KB</h2>
-                                {uploaded && uploadedStatus(true)}
+                                {uploaded && uploadedStatus(isUploadSucces)}
                             </div>
                         </div>
                     </div>
@@ -132,10 +138,13 @@ export default function FileInput({onUpload}: ComponentProps) {
                             width={30}
                             height={30}
                             onClick={handleDelete}
+                            className="hover:cursor-pointer"
                         />
                     }
                 </div>
-                <ProgressBar progress={progress} isValueRightSided />
+                {!uploaded && 
+                    <ProgressBar progress={progress} isValueRightSided />
+                }
             </div>
         );
     }
@@ -144,7 +153,10 @@ export default function FileInput({onUpload}: ComponentProps) {
             <div 
                 {...getRootProps()} 
                 onClick={open} 
-                className="font-dmsans text-center w-fit bg-lilac-100 px-[4rem] py-[2rem] flex flex-col items-center border border-dashed border-purple-500 rounded-[8px] hover:cursor-pointer"
+                className={cn(
+                    "font-dmsans text-center w-fit bg-lilac-100 px-[4rem] py-[2rem] flex flex-col items-center border border-dashed border-purple-500 rounded-[8px] hover:cursor-pointer",
+                    className
+                )}
             >
                 <input {...getInputProps()} />
                 <Image
@@ -152,6 +164,7 @@ export default function FileInput({onUpload}: ComponentProps) {
                     alt="File icon"
                     width={30}
                     height={30}
+                    className="hover:cursor-pointer"
                 />
                 <div>
                     <h1 className="text-purple-500">
