@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { InputArea } from '../components/reset-password/input-area'
+import { ResetPasswordForm } from '../components/reset-password/input-area'
 import { Toaster } from '../components/ui/toaster'
 
 const ResetPasswordPage = () => {
@@ -14,7 +14,7 @@ const ResetPasswordPage = () => {
           className="absolute h-screen w-screen"></Image>
 
         {/* Main Page Parts */}
-        <div className="flex h-full w-full flex-row justify-center gap-[96px] max-md:my-10 max-md:flex-col max-md:items-center max-md:gap-[48px]">
+        <div className="flex h-full w-full flex-row items-center justify-center gap-[96px] max-md:my-10 max-md:flex-col max-md:items-center max-md:gap-[48px]">
           <Image
             src={'/images/reset-password/arkav-logo.png'}
             alt={'Arkav Logo'}
@@ -23,7 +23,7 @@ const ResetPasswordPage = () => {
             className="z-10 max-lg:w-80 max-md:h-72 max-md:w-64"
           />
           <div className="z-10">
-            <InputArea />
+            <ResetPasswordForm />
           </div>
           {/* Background Placeholder */}
         </div>
