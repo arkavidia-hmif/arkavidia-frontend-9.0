@@ -81,7 +81,6 @@ export default function FileInput({onUpload, className}: ComponentProps) {
     const {getRootProps, getInputProps, isDragActive, open} = useDropzone({onDrop})
 
     const fetchPresigned = async (filename:string) => {
-        // TODO
         const resp = await axios.get("https://api-staging.arkavidia.com/api/media/upload", {params: {
             filename,
             bucket: "competition-registration"
