@@ -16,7 +16,7 @@ import { useState } from 'react'
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md'
 import { useToast } from '~/hooks/use-toast'
 
-const resetPasswordSchema = z.object({
+const ResetPasswordSchema = z.object({
   newPassword: z.string().min(8, { message: 'Password harus minimal 8 karakter' }),
   confirmPassword: z.string().min(8, { message: 'Password harus minimal 8 karakter' })
 }).refine((data) => data.newPassword === data.confirmPassword, {
@@ -26,8 +26,8 @@ const resetPasswordSchema = z.object({
 
 export const ResetPasswordForm = () => {
   const { toast } = useToast()
-  const form = useForm<z.infer<typeof resetPasswordSchema>>({
-    resolver: zodResolver(resetPasswordSchema),
+  const form = useForm<z.infer<typeof ResetPasswordSchema>>({
+    resolver: zodResolver(ResetPasswordSchema),
     defaultValues: {
       newPassword: '',
       confirmPassword: ''
@@ -40,7 +40,7 @@ export const ResetPasswordForm = () => {
     setShowPassword(!showPassword)
   }
 
-  const onSubmit = (values: z.infer<typeof resetPasswordSchema>) => {
+  const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
     console.log('Password reset data:', values)
     toast({
         title: "Password Changed",
