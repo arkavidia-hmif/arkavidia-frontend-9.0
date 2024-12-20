@@ -61,11 +61,18 @@ export default function FileInput({onUpload, className}: ComponentProps) {
         try {
             await handleChange(acceptedFiles[0])
             setUploadSucces(true);
-        } catch {
-            toast({
-                title: "File failed to upload",
-                description: "Something happened"
-            })
+        } catch (err) {
+            if (err instanceof Error) {
+                toast({
+                    title: "File failed to upload",
+                    description: err.message
+                })
+            } else {
+                toast({
+                    title: "File failed to upload",
+                    description: "Something happened"
+                })
+            }
             setUploadSucces(false);
         } finally {
             setUploaded(true);
@@ -73,13 +80,14 @@ export default function FileInput({onUpload, className}: ComponentProps) {
       }, [])
     const {getRootProps, getInputProps, isDragActive, open} = useDropzone({onDrop})
 
-    const fetchPresigned = async () => {
+    const fetchPresigned = async (filename:string) => {
         // TODO
-        const data: MediaResponse = {
-            presignedUrl: '...',
-            mediaUrl: '...',
-            expiresIn: 60
-        }
+        const resp = await axios.get("https://api-staging.arkavidia.com/api/media/upload", {params: {
+            filename,
+            bucket: "competition-registration"
+        }})
+
+        const data: MediaResponse = resp.data;
 
         return data;
     }
@@ -101,7 +109,7 @@ export default function FileInput({onUpload, className}: ComponentProps) {
 
     const handleChange = async (selectedFile:File) => {
         setFile(selectedFile);
-        const mediaPresigned = await fetchPresigned();
+        const mediaPresigned = await fetchPresigned(selectedFile.name);
         await handleUpload(mediaPresigned.presignedUrl);
         onUpload && onUpload(mediaPresigned.mediaUrl);
     }
