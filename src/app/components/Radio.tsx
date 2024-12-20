@@ -47,7 +47,7 @@ export const RadioGroupItem = React.forwardRef<
            labelPosition = 'right', labelClassName, ...props },
             ref) => {
   return (
-    <div className="flex flex-row gap-2">
+    <div className="flex flex-row gap-4 items-center">
       {labelPosition === 'left' && <Label htmlFor={id} className={cn(labelClassName, props.disabled && 'opacity-50')}>{props.children}</Label>}
       <RadixRadioGroupItem
         ref={ref}
