@@ -9,7 +9,7 @@ interface ToggleProps {
   labelPosition?: 'left' | 'right'
 }
 
-function Toggle({ label, checked, onChange, disabled, labelPosition = 'right' }: ToggleProps) {
+function Toggle({ label, checked, onChange, disabled, labelPosition }: ToggleProps) {
   const handleCheckedChange = (checked: boolean) => {
     if (onChange) {
       onChange(checked);
