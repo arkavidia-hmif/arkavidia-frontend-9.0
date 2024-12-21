@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Belanosima, Teachers, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './providers/ThemeProvider'
+import { Toaster } from './components/ui/toaster'
 
 const BelanosimaFont = Belanosima({
   weight: '400',
@@ -46,6 +47,7 @@ export default function RootLayout({
           disableTransitionOnChange>
           <div className="h-full w-full dark:bg-black">{children}</div>
         </ThemeProvider>
+        <Toaster/>
       </body>
     </html>
   )
