@@ -17,14 +17,14 @@ function Toggle({ label, checked, onChange, disabled, labelPosition }: TogglePro
   };
   return (
     <div className="flex items-center gap-2">
-      {labelPosition === 'left' && <span className="text-white peer-disabled:opacity-50">{label}</span>}
+      {labelPosition === 'left' && <span className="text-white peer-disabled:opacity-50 font-dmsans">{label}</span>}
       
       <Switch 
         checked={checked} 
         onCheckedChange={handleCheckedChange}
         disabled={disabled} />
       
-      {labelPosition === 'right' && <span className="text-white peer-disabled:opacity-50">{label}</span>}
+      {labelPosition === 'right' && <span className="text-white peer-disabled:opacity-50 font-dmsans">{label}</span>}
     </div>
   )
 }
