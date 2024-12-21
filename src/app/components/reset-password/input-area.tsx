@@ -68,7 +68,7 @@ export const ResetPasswordForm = () => {
                   <FormControl>
                     <Input
                       type={showPassword ? 'text' : 'password'}
-                      className="bg-lilac-100 pr-10 placeholder:text-purple-500 max-md:text-xs"
+                      className="bg-lilac-100 pr-10 placeholder:text-purple-500 max-md:text-xs text-black"
                       placeholder="Masukkan password baru Anda"
                       {...field}
                     />
@@ -95,7 +95,7 @@ export const ResetPasswordForm = () => {
                   <FormControl>
                     <Input
                       type={showPassword ? 'text' : 'password'}
-                      className="bg-lilac-100 pr-10 placeholder:text-purple-500 max-md:text-xs"
+                      className="bg-lilac-100 pr-10 placeholder:text-purple-500 max-md:text-xs text-black"
                       placeholder="Masukkan kembali password Anda"
                       {...field}
                     />
