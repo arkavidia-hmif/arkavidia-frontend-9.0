@@ -19,7 +19,7 @@ interface ExpandedMenuItemProps {
   onClick?: () => void
 }
 
-function ExpandedMenuItem({
+function  ExpandedMenuItem({
   iconLeft,
   iconRight,
   option,
