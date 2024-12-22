@@ -28,5 +28,4 @@ function Toggle({ label, checked, onChange, disabled, labelPosition }: TogglePro
     </div>
   )
 }
-
-export { Toggle }
+export default Toggle
