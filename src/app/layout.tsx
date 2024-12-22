@@ -41,10 +41,10 @@ export default function RootLayout({
         className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} antialiased w-screen min-h-screen`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange>
-          {children}
+          <div className="h-full w-full dark:bg-black">{children}</div>
         </ThemeProvider>
       </body>
     </html>
