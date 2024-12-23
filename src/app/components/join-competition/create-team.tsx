@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react'
 import { ArrowLeft, Copy, Check } from 'lucide-react'
-import { 
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -10,17 +10,17 @@ import {
   DialogDescription,
   DialogClose,
   DialogTrigger
-} from "./../ui/dialog"
-import { Button } from "./../Button"
-import { Input } from "./../ui/input"
-import { Label } from "./../ui/label"
-import { cn } from "~/lib/utils"
+} from './../ui/dialog'
+import { Button } from './../Button'
+import { Input } from './../ui/input'
+import { Label } from './../ui/label'
+import { cn } from '~/lib/utils'
 
-type CompetitionType = 'cp' | 'ctf';
+type CompetitionType = 'cp' | 'ctf'
 
 const competitionAbbr: Record<CompetitionType, string> = {
-  'cp': "Competitive Programming",
-  'ctf': "Capture The Flag",
+  cp: 'Competitive Programming',
+  ctf: 'Capture The Flag'
 }
 
 interface SuccessDialogProps {
@@ -42,31 +42,36 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCo
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className='flex flex-col font-teachers justify-center items-center bg-purple-700 gap-8 p-12 max-w-4xl'>
-        <DialogHeader className='flex flex-col justify-center items-center gap-4 py-12'>
-          <DialogTitle className="text-5xl font-bold">
+      <DialogContent className="flex max-w-4xl flex-col items-center justify-center gap-2 sm:gap-8 bg-purple-700 sm:p-12 font-teachers">
+        <DialogHeader className="flex flex-col items-center justify-center gap-4 py-2 sm:py-4 md:py-12">
+          <DialogTitle className="text-3xl md:text-5xl font-bold">
             Successfully Created Team
           </DialogTitle>
-          <DialogDescription className='text-lg text-white text-center'>
+          <DialogDescription className="text-center text-base md:text-lg text-white">
             Share this code with your team members:
           </DialogDescription>
         </DialogHeader>
-        <div className="mt-12 flex w-full max-w-sm items-center justify-center border border-[#F5E1FF] text-[#F5E1FF] rounded-xl text-lg">
-          <div className='text-purple-800 bg-[#F5E1FF] flex items-center py-2.5 rounded-xl px-4 text-center'>Code</div>
+        <div className="mt-4 md:mt-12 flex w-full max-w-sm items-center justify-center rounded-xl border border-[#F5E1FF] text-base md:text-lg text-[#F5E1FF]">
+          <div className="flex items-center rounded-xl bg-[#F5E1FF] px-4 py-3 text-center text-purple-800">
+            Code
+          </div>
           <Input
             type="text"
             value={teamCode}
             readOnly
-            className="bg-transparent !text-xl active:border-none focus:border-none"
+            className="bg-transparent text-base md:text-xl focus:border-none active:border-none"
           />
-          <Button type="button" onClick={copyToClipboard} size="icon" className="h-12 w-12 bg-none bg-transparent border-[3F5E1FF] active:shadow-none focus:shadow-none active:border-none active:bg-none 
-          hover:bg-none hover:bg-transparent hover:shadow-none hover:text-opacity-80 focus:border-none focus:bg-none focus:bg-transparent active:bg-transparent">
+          <Button
+            type="button"
+            onClick={copyToClipboard}
+            size="icon"
+            className="h-12 w-12 border-[3F5E1FF] bg-transparent bg-none hover:bg-transparent hover:bg-none hover:text-opacity-80 hover:shadow-none focus:border-none focus:bg-transparent focus:bg-none focus:shadow-none active:border-none active:bg-transparent active:bg-none active:shadow-none">
             {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </Button>
         </div>
         <div className="mt-4 flex justify-end">
           <DialogClose asChild>
-            <Button size="xl" className='w-full' onClick={() => setIsOpen(false)}>
+            <Button size="xl" className="w-full" onClick={() => setIsOpen(false)}>
               Go to Dashboard
             </Button>
           </DialogClose>
@@ -76,7 +81,9 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCo
   )
 }
 
-export const CreateTeamPopup: React.FC<{ competitionType: CompetitionType }> = ({ competitionType }) => {
+export const CreateTeamPopup: React.FC<{ competitionType: CompetitionType }> = ({
+  competitionType
+}) => {
   const [teamName, setTeamName] = useState('')
   const [error, setError] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
@@ -106,24 +113,26 @@ export const CreateTeamPopup: React.FC<{ competitionType: CompetitionType }> = (
             Create Team
           </Button>
         </DialogTrigger>
-        <DialogContent className="bg-purple-700 max-w-5xl h-[60vh] flex gap-4 justify-center items-center font-teachers py-16">
-          <div className="flex flex-row gap-4 w-full justify-center">
-            <div className='grow-0'>
-              <DialogClose className="rounded-sm opacity-70 ring-offset-background p-2 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                <ArrowLeft className="w-8 h-auto" />
+        <DialogContent className="flex max-w-5xl items-center md:justify-center gap-4 bg-purple-700 py-16 font-teachers">
+          <div className="flex w-full flex-row justify-center md:gap-4">
+            <div className="grow-0">
+              <DialogClose className="rounded-sm p-2 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <ArrowLeft className="h-auto w-5 md:w-8" />
                 <span className="sr-only">Go back</span>
               </DialogClose>
             </div>
-            <div className='flex flex-col gap-8 grow-1'>
-              <DialogHeader className='flex flex-col gap-4'>
-                <DialogTitle className="text-5xl font-bold">
+            <div className="grow-1 flex flex-col md:gap-12">
+              <DialogHeader className="flex flex-col gap-4">
+                <DialogTitle className="text-2xl md:text-5xl font-bold">
                   Create Team for {competitionAbbr[competitionType]}
                 </DialogTitle>
-                <DialogDescription className='text-xl'>Once you create a team name you can invite others</DialogDescription>
+                <DialogDescription className="text-base md:text-xl">
+                  Once you create a team name you can invite others
+                </DialogDescription>
               </DialogHeader>
-              <form className="mt-4 flex flex-col gap-8" onSubmit={handleSubmit}>
+              <form className="mt-4 flex flex-col gap-2 md:gap-8" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-4">
-                  <Label htmlFor="teamName" className='text-xl'>
+                  <Label htmlFor="teamName" className="text-lg md:text-xl">
                     Team Name <span className="text-red-400">*</span>
                   </Label>
                   <Input
@@ -134,7 +143,10 @@ export const CreateTeamPopup: React.FC<{ competitionType: CompetitionType }> = (
                     value={teamName}
                     onChange={e => setTeamName(e.target.value)}
                     required
-                    className={cn((error ? 'border-red-400' : ''), ' bg-[#F5E1FF] text-black py-8 !text-xl')}
+                    className={cn(
+                      error ? 'border-red-400' : '',
+                      'bg-[#F5E1FF] py-6 md:py-8 md:text-xl text-black'
+                    )}
                   />
                   {error && <p className="text-lg text-red-400">{error}</p>}
                 </div>
@@ -146,13 +158,12 @@ export const CreateTeamPopup: React.FC<{ competitionType: CompetitionType }> = (
           </div>
         </DialogContent>
       </Dialog>
-      <SuccessDialog 
-        isOpen={isSuccess} 
-        setIsOpen={setIsSuccess} 
-        competitionType={competitionType} 
+      <SuccessDialog
+        isOpen={isSuccess}
+        setIsOpen={setIsSuccess}
+        competitionType={competitionType}
         teamCode={generatedTeamCode}
       />
     </>
   )
 }
-
