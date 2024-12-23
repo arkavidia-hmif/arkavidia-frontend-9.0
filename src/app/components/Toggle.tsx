@@ -29,3 +29,19 @@ function Toggle({ label, checked, onChange, disabled, labelPosition }: TogglePro
   )
 }
 export default Toggle
+
+// how to use
+// const [isToggled, setIsToggled] = useState(false);
+
+//   const handleToggleChange = (checked: boolean) => {
+//     console.log('Toggle state:', checked);
+//     setIsToggled(checked);
+//   };
+
+// <Toggle 
+//   checked = {isToggled}
+//   label = "placeholder"
+//   onChange = {handleToggleChange}
+//   labelPosition = "right"
+//   disabled = {false}
+// />
