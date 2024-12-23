@@ -62,25 +62,26 @@ function FrameAccordion({
 export default FrameAccordion;
 
 // how to use
+// const accordionData = [
+//   { id: 1, title: 'Frame 1', content: 'Content 1', color: '#4D06B0CC', radius: '8px' },
+//   { id: 2, title: 'Frame 2', content: 'Content 2', color: '#E50000CC', radius: '8px' },
+//   { id: 3, title: 'Frame 3', content: 'Content 3', color: '#FFD700CC', radius: '8px' },
+// ];
+
+// dlm function...
 // const [expandedId, setExpandedId] = useState<number | null>(null);
 
 // const toggleExpandedId = (id: number) => {
 //     setExpandedId(expandedId === id ? null : id);
 // };
 
-// <FrameAccordion
-//     color="#4D06B0CC"
-//     radius="8px"
-//     title="Frame 1"
-//     content="Content for Frame 1"
-//     isExpanded={expandedId === 1}
-//     onToggle={() => toggleExpandedId(1)}
-// />
-// <FrameAccordion
-//     color="#E50000CC"
-//     radius="8px"
-//     title="Frame 2"
-//     content="Content for Frame 2"
-//     isExpanded={expandedId === 2}
-//     onToggle={() => toggleExpandedId(2)}
-// />
+{/* <div className="flex flex-col max-w-2xl mx-auto">
+  {accordionData.map((item) => (
+    <FrameAccordion
+      key={item.id}
+      {...item}
+      isExpanded={expandedId === item.id}
+      onToggle={() => toggleExpandedId(item.id)}
+    />
+  ))}
+</div> */}

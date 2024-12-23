@@ -8,78 +8,48 @@ import {
 } from "./ui/accordion";
 
 interface FAQAccordionProps {
-  q1: string;
-  a1: string;
-  q2?: string;
-  a2?: string;
-  q3?: string;
-  a3?: string;
-  q4?: string;
-  a4?: string;
-  q5?: string;
-  a5?: string;
-  q6?: string;
-  a6?: string;
-  q7?: string;
-  a7?: string;
+  items: { question: string; answer: string }[];
 }
 
-function FAQAccordion({
-  q1,
-  a1,
-  q2,
-  a2,
-  q3,
-  a3,
-  q4,
-  a4,
-  q5,
-  a5,
-  q6,
-  a6,
-  q7,
-  a7,
-}: FAQAccordionProps) {
+function FAQAccordion({ items }: FAQAccordionProps) {
   const [openItem, setOpenItem] = useState<string | null>(null);
 
   const handleToggle = (item: string) => {
     setOpenItem((prev) => (prev === item ? null : item));
   };
 
-  const renderAccordionItem = (
-    value: string,
-    question?: string,
-    answer?: string
-  ) => {
-    if (!question || !answer) return null;
-    const isOpen = openItem === value;
-
-    return (
-      <AccordionItem value={value}>
-        <AccordionTrigger
-          isOpen={isOpen}
-          onClick={() => handleToggle(value)} 
-        >
-          {question}
-        </AccordionTrigger>
-        <AccordionContent>{answer}</AccordionContent>
-      </AccordionItem>
-    );
-  };
-
   return (
     <div className="flex items-center justify-center">
       <Accordion type="single" collapsible className="w-[50%]">
-        {renderAccordionItem("item-1", q1, a1)}
-        {renderAccordionItem("item-2", q2, a2)}
-        {renderAccordionItem("item-3", q3, a3)}
-        {renderAccordionItem("item-4", q4, a4)}
-        {renderAccordionItem("item-5", q5, a5)}
-        {renderAccordionItem("item-6", q6, a6)}
-        {renderAccordionItem("item-7", q7, a7)}
+        {items.map((item, index) => {
+          const value = `item-${index + 1}`;
+          const isOpen = openItem === value;
+
+          return (
+            <AccordionItem key={value} value={value}>
+              <AccordionTrigger
+                isOpen={isOpen}
+                onClick={() => handleToggle(value)}
+              >
+                {item.question}
+              </AccordionTrigger>
+              <AccordionContent>{item.answer}</AccordionContent>
+            </AccordionItem>
+          );
+        })}
       </Accordion>
     </div>
   );
 }
 
 export default FAQAccordion;
+
+// how to use
+// const faqItems = [
+//   { question: "What is React?", answer: "React is a JavaScript library for building user interfaces." },
+//   { question: "What is JSX?", answer: "JSX is a syntax extension for JavaScript, used with React to describe what the UI should look like." },
+//   { question: "What is a component?", answer: "A component is a reusable piece of UI in React." },
+//   { question: "What is state?", answer: "State is a way to manage changing data in a component." },
+// ];
+
+// <FAQAccordion items={faqItems} />
