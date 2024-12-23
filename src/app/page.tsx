@@ -2,9 +2,12 @@ import React from 'react'
 
 function Home() {
   return (
-    <div className="pt-4 text-center">
-      <h1 className="text-4xl font-bold dark:text-white">Coming Soon!</h1>
-      <div className="text-md dark:text-white">In development</div>
+    <div className="flex h-full w-full items-center justify-center dark:bg-black">
+      <div className="pt-4 text-center dark:bg-black">
+        <h1 className="text-4xl font-bold dark:text-white">Coming Soon!</h1>
+        <div className="text-md mb-1 dark:text-white">In development</div>
+        <p className="mt-2 text-sm dark:text-white">- by Arkavidia 9.0 IT Team</p>
+      </div>
     </div>
   )
 }
