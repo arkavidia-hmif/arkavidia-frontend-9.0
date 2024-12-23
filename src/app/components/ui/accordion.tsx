@@ -22,31 +22,28 @@ AccordionItem.displayName = "AccordionItem"
 
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  return (
-    <AccordionPrimitive.Header className="flex">
-      <AccordionPrimitive.Trigger
-        ref={ref}
-        className={cn(
-          "flex flex-1 items-center justify-between py-4 text-sm font-medium font-dmsans transition-all hover:underline text-left",
-          className
-        )}
-        {...props}
-        onClick={() => setIsOpen((prev) => !prev)}
-      >
-        {children}
-        {isOpen ? (
-          <Minus className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-        ) : (
-          <Plus className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-        )}
-      </AccordionPrimitive.Trigger>
-    </AccordionPrimitive.Header>
-  );
-});
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & {
+    isOpen: boolean;
+  }
+>(({ className, children, isOpen, ...props }, ref) => (
+  <AccordionPrimitive.Header className="flex">
+    <AccordionPrimitive.Trigger
+      ref={ref}
+      className={cn(
+        "flex flex-1 items-center justify-between py-4 text-sm font-medium font-dmsans transition-all hover:underline text-left text-white",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      {isOpen ? (
+        <Minus className="h-4 w-4 shrink-0 transition-transform duration-200 text-white" />
+      ) : (
+        <Plus className="h-4 w-4 shrink-0 transition-transform duration-200 text-white" />
+      )}
+    </AccordionPrimitive.Trigger>
+  </AccordionPrimitive.Header>
+));
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
 
@@ -56,7 +53,7 @@ const AccordionContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <AccordionPrimitive.Content
     ref={ref}
-    className="overflow-hidden text-sm text-left font-dmsans data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+    className="overflow-hidden text-sm text-left text-white font-dmsans data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
     {...props}
   >
     <div className={cn("pb-4 pt-0", className)}>{children}</div>
