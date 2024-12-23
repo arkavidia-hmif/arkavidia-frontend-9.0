@@ -50,7 +50,7 @@ function ProfileCompetition({
 
           {/* Join Code */}
           <div className="flex flex-col justify-center">
-            <div className="flex flex-row items-center justify-between gap-4 self-start rounded-lg border-[1px] border-white border-opacity-50 bg-gradient-to-r from-[rgba(255,255,255,0.24)] to-[rgba(255,255,255,0.08)] p-3 shadow-[0px_0px_10px_0px_rgba(255,255,255,0.2)] backdrop-blur-[10px] md:gap-6 md:p-5">
+            <div className="flex flex-row items-center justify-between gap-4 self-start rounded-lg border-[1px] border-white border-opacity-50 bg-gradient-to-r from-[rgba(255,255,255,0.24)] to-[rgba(255,255,255,0.08)] py-3 px-4 shadow-[0px_0px_10px_0px_rgba(255,255,255,0.2)] backdrop-blur-[10px] md:gap-6 md:py-5 md:px-6">
               <div className="flex flex-col">
                 <h1 className="text-2xl font-bold text-white md:text-4xl">#{joinCode}</h1>
                 <h3 className="text-sm text-white opacity-80 md:text-xl">Join Code</h3>
