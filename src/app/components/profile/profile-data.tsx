@@ -44,11 +44,12 @@ const ProfileData = (props: ProfileDataLayoutProps) => {
                   ? 'flex translate-y-0 opacity-100'
                   : 'pointer-events-none -translate-y-2 opacity-0'
               } w-full transition-all duration-300 ease-in-out`}>
-              <div className="flex flex-col items-start justify-normal gap-3 md:flex-row">
+              <div className="flex flex-col md:items-center justify-normal gap-3 md:flex-row w-fit">
+                {/* Field input places */}
                 {isEdit && (
                   <>
                     {props.children}
-                    <div className="flex flex-row gap-3">
+                    <div className="flex  flex-row gap-3">
                       <Button
                         onClick={handleCancel}
                         variant={'ghost'}
@@ -137,7 +138,7 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       handleSave={onSaveInput}>
       <Input
         placeholder="Masukkan password Anda"
-        className="bg-lilac-100 text-purple-400 max-md:text-xs"
+        className="bg-lilac-100 text-purple-400  py-6 min-w-72 "
         value={tempValue}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setTempValue(e.target.value)
@@ -215,7 +216,7 @@ export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
         type="date"
         value={formatDate(tempDate)}
         onChange={e => setTempDate(new Date(e.target.value))}
-        className="w-full rounded-md border border-purple-400 bg-lilac-100 p-2 text-purple-400"
+        className="w-full pr-40 py-3  rounded-md border border-purple-400 bg-lilac-100 p-2 text-purple-400"
       />
     </ProfileData>
   )
