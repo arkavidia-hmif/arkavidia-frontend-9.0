@@ -13,17 +13,23 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      # 1. Checkout the code
       - name: Checkout the code
         uses: actions/checkout@v3
 
-      # 2. Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # 3. Cache pnpm store
+      - name: Install PNPM
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run ESLint
+        run: pnpm lint
+
       - name: Cache pnpm store
         uses: actions/cache@v3
         with:
@@ -31,15 +37,3 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
-
-      # 4. Install PNPM
-      - name: Install PNPM
-        run: npm install -g pnpm
-
-      # 5. Install dependencies
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      # 6. Run ESLint
-      - name: Run ESLint
-        run: pnpm lint
