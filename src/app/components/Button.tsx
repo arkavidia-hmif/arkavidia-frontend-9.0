@@ -48,7 +48,7 @@ const ButtonVariants = cva(
 
       },
       size: {
-        default: "min-h-[170px] !px-[18px] !py-[16px] text-lg whitespace-normal",
+        default: "min-h-[52px] !px-[20px] !py-[14px] text-lg",
         xl: "min-h-[56px] !px-[32px] !py-[16px] text-xl whitespace-normal",
         lg: "min-h-[52px] !px-[20px] !py-[14px] text-lg",
         md: "min-h-[48px] !px-[16px] !py-[12px] text-base whitespace-normal",
@@ -66,11 +66,11 @@ const ButtonVariants = cva(
 );
 
 const sizeVariants = cva(
-  "min-h-[170px] !px-[18px] !py-[16px] text-lg whitespace-normal",
+  "min-h-[52px] !px-[20px] !py-[14px] text-lg",
   {
     variants: {
       size: {
-        default: "min-h-[170px] !px-[18px] !py-[16px] text-lg whitespace-normal",
+        default: "min-h-[52px] !px-[20px] !py-[14px] text-lg",
         xl: "min-h-[56px] !px-[32px] !py-[16px] text-xl whitespace-normal",
         lg: "min-h-[52px] !px-[20px] !py-[14px] text-lg",
         md: "min-h-[48px] !px-[16px] !py-[12px] text-base whitespace-normal",
