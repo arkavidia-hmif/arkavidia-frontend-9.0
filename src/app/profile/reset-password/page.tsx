@@ -13,7 +13,7 @@ const SHADOW = '0 0 10px rgba(255, 255, 255, 0.5)'
 
 export default function ResetPasswordPage() {
   return (
-    <div className="relative h-[100vh] min-h-screen w-full bg-gradient-to-b from-[#1f0246] to-[#2e046a] overflow-auto">
+    <div className="relative h-[100vh] min-h-screen w-full overflow-auto bg-gradient-to-b from-[#1f0246] to-[#2e046a]">
       <Image
         src="/images/profile/reset-password/bg.png"
         alt="Background"
@@ -47,9 +47,21 @@ export default function ResetPasswordPage() {
             className="flex h-[100%] flex-col gap-4 rounded-lg border border-[rgba(255,255,255,0.48)] px-10 pt-[72px] shadow-[0_0_10px_rgba(255,255,255,0.5)] backdrop-blur-sm md:pl-6"
             style={{ background: GRADIENT_BG }}>
             <form className="flex max-w-[607px] flex-col gap-4">
-              <Input />
-              <Input />
-              <Input />
+              <label htmlFor="placeholder_input_1" className="text-lilac-200">
+                Old Password <span className="text-red-500">*</span>{' '}
+              </label>
+              <Input id="placeholder_input_1" />
+              <a href="#" className="font-dmsans text-[14px] text-lilac-200 underline">
+                Forget Password?
+              </a>
+              <label htmlFor="placeholder_input_2" className="text-lilac-200">
+                New Password
+              </label>
+              <Input id="placeholder_input_2" />
+              <label htmlFor="placeholder_input_3" className="text-lilac-200">
+                Confirm New Password
+              </label>
+              <Input id="placeholder_input_3" />
               <div className="mt-4 flex gap-6">
                 <Button variant="outline" size="xl" className="w-full">
                   Cancel
