@@ -1,10 +1,10 @@
 import {
-  PersonalInformationContent,
-  ProfileInformationDefaultValue,
-} from '../components/profile/personal-information-content'
-import { ProfileLayout } from '../components/profile/profile-content-layout'
+  TeamInformationContent,
+  TeamInformationDefaultValue,
+} from '../components/competition/TeamInformationContent'
+import { Tab } from '../components/Tab'
 
-const DummyPersonalInfoData: ProfileInformationDefaultValue = {
+const DummyPersonalInfoData: TeamInformationDefaultValue = {
   name: 'Ahdmad Jone Done',
 }
 
@@ -19,13 +19,14 @@ const ProfilePage = () => {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <ProfileLayout
-        personalInformation={
-          <PersonalInformationContent
-            name={DummyPersonalInfoData.name}
-          />
-        }
-        socialMedia={<div></div>}
+      <Tab
+        contentType={["Team Information", "Announcement", "Task List", "Verification"]}
+        content={[
+          <TeamInformationContent name={DummyPersonalInfoData.name}/>,
+          <div />,
+          <div />,
+          <div />
+        ]}
       />
     </div>
   )
