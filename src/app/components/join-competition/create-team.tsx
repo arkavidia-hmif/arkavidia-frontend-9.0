@@ -51,23 +51,28 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCo
             Share this code with your team members:
           </DialogDescription>
         </DialogHeader>
-        <div className="mt-4 md:mt-12 flex w-full max-w-sm items-center justify-center rounded-xl border border-[#F5E1FF] text-base md:text-lg text-[#F5E1FF]">
-          <div className="flex items-center rounded-xl bg-[#F5E1FF] px-4 py-2 md:py-3 text-center text-purple-800">
+        <div className="mt-4 md:mt-12 flex w-full max-w-sm items-stretch justify-center rounded-xl border border-[#F5E1FF] text-base md:text-lg text-[#F5E1FF]">
+          <div className="flex items-center justify-center rounded-xl bg-[#F5E1FF] px-4 py-2 md:py-3 text-center text-purple-800">
             Code
           </div>
-          <Input
-            type="text"
-            value={teamCode}
-            readOnly
-            className="bg-transparent text-base md:text-xl focus:border-none active:border-none"
-          />
-          <Button
-            type="button"
-            onClick={copyToClipboard}
-            size="icon"
-            className="h-12 w-12 border-[3F5E1FF] bg-transparent bg-none hover:bg-transparent hover:bg-none hover:text-opacity-80 hover:shadow-none focus:border-none focus:bg-transparent focus:bg-none focus:shadow-none active:border-none active:bg-transparent active:bg-none active:shadow-none">
-            {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-          </Button>
+          <div className="flex flex-grow items-center">
+            <Input
+              type="text"
+              value={teamCode}
+              readOnly
+              className="bg-transparent text-base md:text-xl focus:border-none active:border-none flex-grow"
+            />
+          </div>
+          <div className='flex items-center justify-center'>
+            <Button
+              type="button"
+              onClick={copyToClipboard}
+              size="icon"
+              className="h-auto aspect-square border-[#F5E1FF] bg-transparent bg-none hover:bg-transparent hover:bg-none hover:text-opacity-80 hover:shadow-none focus:border-none focus:bg-transparent focus:bg-none focus:shadow-none active:border-none active:bg-transparent active:bg-none active:shadow-none"
+            >
+              {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            </Button>
+          </div>
         </div>
         <div className="mt-4 flex justify-end">
           <DialogClose asChild>
