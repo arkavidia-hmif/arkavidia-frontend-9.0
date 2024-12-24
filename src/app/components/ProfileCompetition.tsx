@@ -68,9 +68,9 @@ function ProfileCompetition({
 
         {/* Leave Team */}
         <div className="flex flex-col justify-start md:justify-center">
-          <button onClick={leaveTeam} className="mt-3 md:mt-0" type="button">
+          <div onClick={leaveTeam} className="mt-3 md:mt-0 hover:cursor-pointer">
             <MdExitToApp className="text-3xl text-red-200 md:text-4xl" />
-          </button>
+          </div>
         </div>
       </div>
     </div>
