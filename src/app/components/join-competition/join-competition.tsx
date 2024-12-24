@@ -33,7 +33,7 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, compet
   const teamName = 'Tim Sukses'; // Dummy
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className='flex flex-col justify-center items-center bg-purple-700 gap-4 md:gap-16 p-12 max-w-4xl'>
+      <DialogContent className="flex flex-col justify-center items-center gap-4 md:gap-16 p-12 max-w-4xl bg-[url('/images/join-competition/bg.png')] bg-cover bg-center bg-no-repeat">
         <DialogHeader className='flex flex-col justify-center items-center gap-2'>
           <CircleCheck className='w-32 h-auto fill-[#F5E1FF] text-purple-600' />
           <DialogTitle className="text-2xl md:text-3xl font-bold">
@@ -80,7 +80,11 @@ export const JoinCompetitionPopup: React.FC<{ competitionType: CompetitionType }
             Join Competition
           </Button>
         </DialogTrigger>
-        <DialogContent className="bg-purple-700 max-w-5xl flex gap-4 justify-center items-center font-teachers py-16">
+        <DialogContent 
+        className={cn(
+          "max-w-5xl flex gap-4 justify-center items-center font-teachers py-16",
+          "bg-[url('/images/join-competition/bg.png')] bg-cover bg-center bg-no-repeat",
+        )}>
           <div className="flex flex-row gap-2 md:gap-4 w-full justify-center">
             <div className='grow-0'>
               <DialogClose className="rounded-sm opacity-70 ring-offset-background p-2 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">

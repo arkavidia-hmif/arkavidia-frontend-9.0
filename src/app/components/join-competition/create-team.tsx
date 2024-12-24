@@ -42,7 +42,7 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCo
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="flex max-w-4xl flex-col items-center justify-center gap-2 sm:gap-8 bg-purple-700 sm:p-12 font-teachers">
+      <DialogContent className="flex max-w-4xl flex-col items-center justify-center gap-2 sm:gap-8 bg-[url('/images/join-competition/bg.png')] bg-cover bg-center bg-no-repeat sm:p-12 font-teachers">
         <DialogHeader className="flex flex-col items-center justify-center gap-4 py-2 sm:py-4 md:py-12">
           <DialogTitle className="text-3xl md:text-5xl font-bold">
             Successfully Created Team
@@ -113,7 +113,7 @@ export const CreateTeamPopup: React.FC<{ competitionType: CompetitionType }> = (
             Create Team
           </Button>
         </DialogTrigger>
-        <DialogContent className="flex max-w-5xl items-center md:justify-center gap-4 bg-purple-700 py-16 font-teachers">
+        <DialogContent className="flex max-w-5xl items-center md:justify-center gap-4 bg-[url('/images/join-competition/bg.png')] bg-cover bg-center bg-no-repeat py-16 font-teachers">
           <div className="flex w-full flex-row justify-center md:gap-4">
             <div className="grow-0">
               <DialogClose className="rounded-sm p-2 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
