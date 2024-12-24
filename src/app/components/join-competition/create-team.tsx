@@ -52,7 +52,7 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCo
           </DialogDescription>
         </DialogHeader>
         <div className="mt-4 md:mt-12 flex w-full max-w-sm items-center justify-center rounded-xl border border-[#F5E1FF] text-base md:text-lg text-[#F5E1FF]">
-          <div className="flex items-center rounded-xl bg-[#F5E1FF] px-4 py-3 text-center text-purple-800">
+          <div className="flex items-center rounded-xl bg-[#F5E1FF] px-4 py-2 md:py-3 text-center text-purple-800">
             Code
           </div>
           <Input
