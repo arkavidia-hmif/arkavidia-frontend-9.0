@@ -6,8 +6,8 @@ import { Button } from './ui/button'
 export type contentType = string 
 
 interface TabProps {
-  contentType: contentType[] // Array of tab titles
-  content: React.ReactNode[] // Corresponding content for each tab
+  contentType: contentType[] 
+  content: React.ReactNode[] 
 }
 
 // Tab Component
@@ -32,6 +32,7 @@ export const Tab = ({ contentType, content }: TabProps) => {
         </div>
         <span className="absolute bottom-0 h-1 w-full rounded-full bg-white"></span>
       </div>
+      
       {/* Render Selected Content */}
       <div className="mt-2">{selectedContent}</div>
     </>
