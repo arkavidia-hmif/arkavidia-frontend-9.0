@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} min-h-screen w-screen antialiased`}>
+        className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} antialiased w-screen min-h-screen`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
