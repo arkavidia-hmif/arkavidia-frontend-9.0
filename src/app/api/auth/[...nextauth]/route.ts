@@ -17,17 +17,14 @@ export const authOptions = {
         email: { label: 'Email', type: 'text', placeholder: 'mail@example.com' },
         password: { label: 'Password', type: 'password' }
       },
-      async authorize(
-        credentials: Record<'email' | 'password', string> | undefined,
-        req
-      ) {
+      async authorize(credentials: Record<'email' | 'password', string> | undefined) {
         if (!credentials) {
           return null
         }
 
         const res = await basicLogin({
           client: apiAxiosClient,
-          body: { email: credentials?.email, password: credentials?.password }
+          body: { email: credentials.email, password: credentials.password }
         })
 
         if (res.data) {
@@ -49,13 +46,30 @@ export const authOptions = {
     })
   ],
   callbacks: {
-    async jwt({ token, user }: { token: any; user: any }) {
+    async jwt({
+      token,
+      user,
+      trigger,
+      session
+    }: {
+      token: any
+      user: any
+      trigger?: any
+      session?: any
+    }) {
+      if (trigger === 'update' && session) {
+        return { ...token, ...session?.user }
+      }
+
       return { ...token, ...user }
     },
     async session({ session, token }: { session: Session; token: any }) {
       session.user = token
       return session
     }
+  },
+  pages: {
+    signIn: '/api-test/'
   }
 }
 

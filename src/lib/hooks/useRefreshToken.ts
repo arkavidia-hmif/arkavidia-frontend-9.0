@@ -5,7 +5,7 @@ import { axiosInstance } from '../axios'
 import { refresh, self } from '~/api/generated'
 
 export const useRefreshToken = () => {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
 
   const refreshToken = async () => {
     const res = await refresh({
@@ -14,8 +14,15 @@ export const useRefreshToken = () => {
     })
 
     if (session && res.data) {
-      session.user.accessToken = res.data.accessToken
-      session.user.refreshToken = res.data.refreshToken
+      await update({
+        user: {
+          ...session.user,
+          accessToken: res.data.accessToken,
+          refreshToken: res.data.refreshToken
+        }
+      })
+
+      return res.data.accessToken
     }
   }
 

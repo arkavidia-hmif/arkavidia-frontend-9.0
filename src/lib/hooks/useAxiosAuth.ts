@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { authAxiosInstance } from '../axios'
 import { useEffect } from 'react'
 import { useRefreshToken } from './useRefreshToken'
@@ -31,13 +31,14 @@ const useAxiosAuth = () => {
         // If the request was made and the server responded with a 401
         if (err.response.status === 401 && prevReq && !prevReq._sent) {
           prevReq._sent = true
-          await refreshToken()
-          prevReq.headers['Authorization'] = `Bearer ${session?.user.accessToken}`
+          const newAcc = await refreshToken()
+          prevReq.headers['Authorization'] = `Bearer ${newAcc}`
           return authAxiosInstance.instance(prevReq)
         }
 
         // Failed to refresh token
         console.log('Failed to refresh token')
+        await signOut()
         return Promise.reject(err)
       }
     )
