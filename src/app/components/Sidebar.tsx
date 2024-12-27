@@ -29,14 +29,9 @@ function Sidebar() {
   }
 
   return (
-    <div className="fixed left-0 top-0 m-2 h-[calc(100vh-1rem)] overflow-hidden rounded-xl lg:w-[156px]">
-      <Image
-        src="/images/sidebar/bg.svg"
-        alt="Sidebar background"
-        fill
-        className="object-cover"
-        sizes="(max-width: 768px) 200px, 250px"
-      />
+    <div
+      className="fixed left-0 top-0 m-2 h-[calc(100vh-1rem)] w-full overflow-hidden rounded-xl bg-cover bg-center bg-no-repeat lg:w-[156px]"
+      style={{ backgroundImage: "url('/images/sidebar/bg.svg')" }}>
       <div className="absolute inset-0 flex flex-col justify-between overflow-hidden">
         <div className="relative my-4 flex h-full w-full flex-col items-center justify-start lg:my-6">
           <Image
@@ -128,7 +123,10 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ name, link, image }) => {
           className="lg:h-3 lg:w-3"
         />
       </div>
-      <span className="flex-grow font-teachers text-xs font-bold text-white lg:text-base">
+      <span
+        className={`flex-grow font-teachers text-xs font-bold text-white lg:text-base ${
+          isActive ? 'drop-shadow-[0_0_4px_rgba(255,255,255,0.8)]' : ''
+        }`}>
         {name}
       </span>
     </Link>
