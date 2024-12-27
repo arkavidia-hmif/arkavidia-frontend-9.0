@@ -2,6 +2,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { ChevronUp, LogOut } from 'lucide-react'
 import {
   DropdownMenu,
@@ -107,11 +108,18 @@ interface SidebarItemProps {
 }
 
 const SidebarItem: React.FC<SidebarItemProps> = ({ name, link, image }) => {
+  const pathname = usePathname()
+  const isActive = pathname === link
+
   return (
     <Link
       href={link}
-      className="flex w-full flex-row items-center justify-start gap-1 rounded-lg p-1 text-left transition-colors hover:bg-white/10">
-      <div className="size-3 flex-shrink-0 items-center justify-center lg:size-4">
+      className={`flex w-full flex-row items-center justify-start gap-2.5 rounded-md p-1 text-left transition-all ${
+        isActive
+          ? 'bg-gradient-to-r from-white/15 to-white/10 shadow-[0_0_8px] shadow-white/75 backdrop-blur-[10px]'
+          : 'hover:bg-white/10'
+      }`}>
+      <div className="flex size-3 flex-shrink-0 items-center justify-center lg:size-4">
         <Image
           src={image ?? '/images/sidebar/item.svg'}
           alt="Arrow Right"
