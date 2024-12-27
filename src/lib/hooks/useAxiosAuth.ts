@@ -4,17 +4,21 @@ import { signOut, useSession } from 'next-auth/react'
 import { authAxiosInstance } from '../axios'
 import { useEffect } from 'react'
 import { useRefreshToken } from './useRefreshToken'
+import { useRouter } from 'next/navigation'
 
 const useAxiosAuth = () => {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const refreshToken = useRefreshToken()
+  const router = useRouter()
 
   useEffect(() => {
     const requestInterceptor = authAxiosInstance.instance.interceptors.request.use(
-      c => {
+      async c => {
         // Success
         if (!c.headers.Authorization) {
-          c.headers.Authorization = `Bearer ${session?.user.accessToken}`
+          c.headers.Authorization = session?.user.accessToken
+            ? `Bearer ${session.user.accessToken}`
+            : undefined
         }
 
         return c
@@ -36,9 +40,8 @@ const useAxiosAuth = () => {
           return authAxiosInstance.instance(prevReq)
         }
 
-        // Failed to refresh token
         console.log('Failed to refresh token')
-        await signOut()
+        await signOut({ redirect: false })
         return Promise.reject(err)
       }
     )
@@ -47,7 +50,7 @@ const useAxiosAuth = () => {
       authAxiosInstance.instance.interceptors.request.eject(requestInterceptor)
       authAxiosInstance.instance.interceptors.response.eject(responseInterceptor)
     }
-  }, [session])
+  }, [session, status, refreshToken])
 
   return authAxiosInstance
 }

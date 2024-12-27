@@ -2,18 +2,25 @@
 
 import { useSession } from 'next-auth/react'
 import { axiosInstance } from '../axios'
-import { refresh, self } from '~/api/generated'
+import { refresh } from '~/api/generated'
+import { useRouter } from 'next/navigation'
 
 export const useRefreshToken = () => {
-  const { data: session, update } = useSession()
+  const { data: session, update, status } = useSession()
+  const router = useRouter()
 
   const refreshToken = async () => {
+    if (!session?.user?.refreshToken) {
+      router.push('/api-test') // Redirect to login page if no refresh token
+      return
+    }
+
     const res = await refresh({
       client: axiosInstance,
       query: { token: session?.user.refreshToken ?? '' }
     })
 
-    if (session && res.data) {
+    if (res.data) {
       await update({
         user: {
           ...session.user,
