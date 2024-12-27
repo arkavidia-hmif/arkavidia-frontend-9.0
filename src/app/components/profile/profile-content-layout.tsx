@@ -19,10 +19,7 @@ export const ProfileLayout = ({
   return (
     <>
       <ContentTabBar selected={selected} setSelected={setSelected} />
-      <div className='mt-2'>
-
-      {renderProfileInfo ? personalInformation : socialMedia}
-      </div>
+      <div className="mt-2">{renderProfileInfo ? personalInformation : socialMedia}</div>
     </>
   )
 }
