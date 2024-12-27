@@ -70,7 +70,7 @@ function Sidebar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="start"
-            className="m-auto rounded-xl border border-lilac-200 bg-gradient-to-r from-purple-500 to-blue-600 p-2 backdrop-blur-sm">
+            className="m-auto ml-2 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-[0_0_10px] shadow-lilac-200">
             <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
               <svg
                 width="18"
