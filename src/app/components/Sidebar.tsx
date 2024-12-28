@@ -16,6 +16,7 @@ export interface SidebarProps {
 }
 
 function Sidebar({ announcement = true }: SidebarProps) {
+  const [isOpen, setIsOpen] = React.useState(false)
   const SIDEBAR_ITEMS = [
     { name: 'Dashboard', link: '/dashboard' },
     { name: 'Competitive Programming', link: '/dashboard/cp' },
@@ -25,7 +26,14 @@ function Sidebar({ announcement = true }: SidebarProps) {
     { name: 'Datavidia', link: '/dashboard/datavidia' },
     { name: 'Hackvidia', link: '/dashboard/hackvidia' },
     { name: 'ArkavX', link: '/dashboard/arkavx' },
-    { name: 'Academya', link: '/dashboard/academya' }
+    { name: 'Academya', link: '/dashboard/academya' },
+    announcement
+      ? {
+          name: 'Announcement',
+          link: '/dashboard/announcement',
+          image: '/images/sidebar/notification-important.svg'
+        }
+      : { name: 'Profile', link: '/profile', image: '/images/sidebar/face.svg' }
   ]
 
   const USERNAME = 'Ahmad John' // TODO: Get user name from auth context
@@ -49,26 +57,23 @@ function Sidebar({ announcement = true }: SidebarProps) {
           />
           <div className="mt-4 flex w-full flex-col gap-3 px-2 lg:mt-7 lg:gap-3 lg:px-[10px]">
             {SIDEBAR_ITEMS.map((item, index) => (
-              <SidebarItem key={index} name={item.name} link={item.link} />
+              <SidebarItem
+                key={index}
+                name={item.name}
+                link={item.link}
+                image={item.image}
+              />
             ))}
-            {announcement ? (
-              <SidebarItem
-                name="Announcement"
-                link="/dashboard/announcement"
-                image="/images/sidebar/notification-important.svg"
-              />
-            ) : (
-              <SidebarItem
-                name="Profile"
-                link="/profile"
-                image="/images/sidebar/face.svg"
-              />
-            )}
           </div>
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
+        <DropdownMenu
+          onOpenChange={open => {
+            setIsOpen(open)
+          }}>
+          <DropdownMenuTrigger
+            asChild
+            className="flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
             <div className="flex flex-1 items-center gap-2 text-left">
               <Image
                 src="/profileLogo.svg"
@@ -80,7 +85,11 @@ function Sidebar({ announcement = true }: SidebarProps) {
               <span className="truncate text-sm font-medium text-white lg:text-base">
                 {USERNAME}
               </span>
-              <ChevronUp className="m-1 ml-auto h-4 w-4 text-white lg:h-5 lg:w-5" />
+              <ChevronUp
+                className={`m-1 ml-auto h-4 w-4 text-white transition-transform duration-300 ease-in-out lg:h-5 lg:w-5 ${
+                  isOpen ? 'rotate-0' : 'rotate-180'
+                }`}
+              />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
