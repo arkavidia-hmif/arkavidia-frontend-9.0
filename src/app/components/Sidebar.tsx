@@ -12,7 +12,7 @@ import {
 } from './ui/dropdown-menu'
 
 export interface SidebarProps {
-  announcement: boolean
+  announcement?: boolean
 }
 
 function Sidebar({ announcement = true }: SidebarProps) {
@@ -44,7 +44,7 @@ function Sidebar({ announcement = true }: SidebarProps) {
 
   return (
     <div
-      className="fixed left-0 top-0 m-2 h-[calc(100vh-1rem)] w-full overflow-visible rounded-xl bg-cover bg-center bg-no-repeat lg:w-[156px]"
+      className="fixed left-0 top-0 m-2 h-[calc(100vh-1rem)] w-full overflow-visible rounded-xl bg-cover bg-center bg-no-repeat shadow-[0px_0px_10px_0px_#1B3E88] lg:w-[156px]"
       style={{ backgroundImage: "url('/images/sidebar/bg.svg')" }}>
       <div className="absolute inset-0 flex flex-col justify-between overflow-hidden">
         <div className="relative my-4 flex h-full w-full flex-col items-center justify-start lg:my-6">
@@ -73,7 +73,7 @@ function Sidebar({ announcement = true }: SidebarProps) {
           }}>
           <DropdownMenuTrigger
             asChild
-            className="flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
+            className="my-6 flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
             <div className="flex flex-1 items-center gap-2 text-left">
               <Image
                 src="/profileLogo.svg"
