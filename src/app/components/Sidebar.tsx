@@ -28,6 +28,8 @@ function Sidebar({ announcement = true }: SidebarProps) {
     { name: 'Academya', link: '/dashboard/academya' }
   ]
 
+  const USERNAME = 'Ahmad John' // TODO: Get user name from auth context
+
   function handleLogout() {
     // TODO: Implement logout functionality
   }
@@ -76,14 +78,14 @@ function Sidebar({ announcement = true }: SidebarProps) {
                 className="lg:h-6 lg:w-6"
               />
               <span className="truncate text-sm font-medium text-white lg:text-base">
-                Profile
+                {USERNAME}
               </span>
               <ChevronUp className="m-1 ml-auto h-4 w-4 text-white lg:h-5 lg:w-5" />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="start"
-            className="m-auto ml-1 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-[0_0_10px] shadow-lilac-200">
+            className="m-auto ml-1 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-[0_0_12px] shadow-lilac-200">
             <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
               <Image
                 src="/images/sidebar/landing-page.svg"
