@@ -112,7 +112,7 @@ export default Sidebar
 interface SidebarItemProps {
   name: string
   link: string
-  image?: string // * Kalo ada image, bisa langsung masukin aja di SIDEBAR_ITEMS
+  image?: string // Kalo ada image, bisa langsung masukin aja di SIDEBAR_ITEMS
 }
 
 const SidebarItem: React.FC<SidebarItemProps> = ({
@@ -131,14 +131,31 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
           ? 'bg-gradient-to-r from-white/15 to-white/10 shadow-[0_0_8px] shadow-white/75 backdrop-blur-[10px]'
           : 'hover:bg-white/10'
       }`}>
-      <div className="flex size-3 flex-shrink-0 items-center justify-center lg:size-4">
+      <div className="relative flex size-3 flex-shrink-0 items-center justify-center rounded-sm lg:size-4">
         <Image
           src={image}
-          alt="Arrow Right"
-          width={10}
-          height={10}
-          className="lg:h-4 lg:w-4"
+          alt={`${name} icon`}
+          width={16}
+          height={16}
+          className={`lg:h-4 lg:w-4 ${isActive ? 'invisible' : ''}`}
         />
+        {isActive && (
+          <div
+            className="absolute inset-0 drop-shadow-[0_0_8px_rgba(139,92,246,0.7)]"
+            style={{
+              background:
+                'linear-gradient(138.01deg, #FFB8CF 20.61%, #AC7CD0 62%, #91F0FF 100%)',
+              WebkitMaskImage: `url(${image})`,
+              maskImage: `url(${image})`,
+              WebkitMaskSize: 'contain',
+              maskSize: 'contain',
+              WebkitMaskRepeat: 'no-repeat',
+              maskRepeat: 'no-repeat',
+              WebkitMaskPosition: 'center',
+              maskPosition: 'center'
+            }}
+          />
+        )}
       </div>
       <span
         className={`min-w-0 whitespace-normal break-words font-teachers text-xs font-bold text-white lg:text-base ${
