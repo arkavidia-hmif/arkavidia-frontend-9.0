@@ -45,9 +45,23 @@ function Sidebar({ announcement = true }: SidebarProps) {
   return (
     <>
       <input type="checkbox" id="sidebarToggle" className="peer hidden" />
-      <label htmlFor="sidebarToggle" className="absolute right-4 top-4 z-50 lg:hidden">
-        <Menu className="h-6 w-6 text-white" />
-      </label>
+
+      <div className="fixed z-50 flex w-full items-center justify-between bg-transparent p-4 lg:hidden">
+        <Link href="/">
+          <Image
+            src="/arkavidiaLogo.svg"
+            alt="Logo Arkavidia 9.0"
+            width={38}
+            height={56}
+            className="ml-4"
+          />
+        </Link>
+        <label
+          htmlFor="sidebarToggle"
+          className="mr-2 size-fit cursor-pointer rounded-lg bg-gradient-to-b from-[#2E046A] to-[#0B1936] p-2">
+          <Menu className="h-6 w-6 text-white" />
+        </label>
+      </div>
 
       <div
         className={`fixed -left-2 top-2 z-50 h-[calc(100vh-1rem)] w-[162px] -translate-x-full transform overflow-visible rounded-xl bg-cover bg-center bg-no-repeat shadow-[0px_0px_10px_0px_#1B3E88] transition-transform duration-300 ease-in-out peer-checked:translate-x-3 lg:left-0 lg:top-0 lg:m-2 lg:block lg:translate-x-0`}
