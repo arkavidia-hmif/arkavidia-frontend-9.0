@@ -39,13 +39,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} antialiased w-screen min-h-screen`}>
+        className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} min-h-screen w-screen antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange>
-          <div className="h-full w-full dark:bg-black">{children}</div>
+          {children}
         </ThemeProvider>
         <Toaster/>
       </body>
