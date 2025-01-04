@@ -87,52 +87,54 @@ function Sidebar({ announcement = true }: SidebarProps) {
             </div>
           </div>
 
-          <DropdownMenu
-            onOpenChange={open => {
-              setDropdownOpen(open)
-            }}>
-            <DropdownMenuTrigger
-              asChild
-              className="my-6 flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
-              <div className="flex flex-1 items-center gap-2 text-left">
-                <Image
-                  src="/profileLogo.svg" // bisa diganti dengan foto profile user
-                  alt="Profile Logo"
-                  width={20}
-                  height={20}
-                  className="lg:h-6 lg:w-6"
-                />
-                <span className="truncate text-sm font-medium text-white lg:text-base">
-                  {USERNAME}
-                </span>
-                <ChevronUp
-                  className={`m-1 ml-auto h-4 w-4 text-white transition-transform duration-300 ease-in-out lg:h-5 lg:w-5 ${
-                    dropdownOpen ? 'rotate-0' : 'rotate-180'
-                  }`}
-                />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="m-auto ml-1 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-[0_0_12px] shadow-lilac-200">
-              <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
-                <Image
-                  src="/images/sidebar/landing-page.svg"
-                  alt={'Landing Pace Icon'}
-                  width={16}
-                  height={18}
-                  className="mr-2 h-4 w-4"
-                />
-                <Link href="/">Landing Page</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer rounded-lg text-red-500 focus:text-red-400"
-                onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="cursor-pointer">
+            <DropdownMenu
+              onOpenChange={open => {
+                setDropdownOpen(open)
+              }}>
+              <DropdownMenuTrigger
+                asChild
+                className="my-6 flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
+                <div className="flex flex-1 items-center gap-2 text-left">
+                  <Image
+                    src="/profileLogo.svg" // bisa diganti dengan foto profile user
+                    alt="Profile Logo"
+                    width={20}
+                    height={20}
+                    className="lg:h-6 lg:w-6"
+                  />
+                  <span className="truncate text-sm font-medium text-white lg:text-base">
+                    {USERNAME}
+                  </span>
+                  <ChevronUp
+                    className={`m-1 ml-auto h-4 w-4 text-white transition-transform duration-300 ease-in-out lg:h-5 lg:w-5 ${
+                      dropdownOpen ? 'rotate-0' : 'rotate-180'
+                    }`}
+                  />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="m-auto ml-1 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-[0_0_12px] shadow-lilac-200">
+                <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
+                  <Image
+                    src="/images/sidebar/landing-page.svg"
+                    alt={'Landing Pace Icon'}
+                    width={16}
+                    height={18}
+                    className="mr-2 h-4 w-4"
+                  />
+                  <Link href="/">Landing Page</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-lg text-red-500 focus:text-red-400"
+                  onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
