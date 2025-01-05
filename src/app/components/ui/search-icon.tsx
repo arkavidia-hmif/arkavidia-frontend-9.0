@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface SearchIconProps {
-  className?: string // Kelas tambahan untuk mengatur styling
+  className?: string
 }
 
 const SearchIcon: React.FC<SearchIconProps> = ({ className = '' }) => (
