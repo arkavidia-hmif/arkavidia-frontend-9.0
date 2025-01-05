@@ -16,11 +16,11 @@ const InputVariants = cva(
           'border-purple-400 bg-lilac-100 placeholder:font-dmsans font-dmsans placeholder:text-purple-400 placeholder:leading-[24px] placeholder:font-normal leading-[24px] font-normal  text-purple-700  ' +
           'hover:bg-lilac-200 ' +
           'focus-visible:ring-[3px] focus-visible:ring-lilac-200 focus-visible:border-purple-400 ' +
-          'disabled:bg-neutral-150 disabled:border-neutral-600 disabled:placeholder:text-neutral-600',
+          'disabled:bg-neutral-150 disabled:border-neutral-600 disabled:opacity-100 disabled:placeholder:text-neutral-600',
         unfilled:
           'border-lilac-100 bg-transparent placeholder:font-dmsans font-dmsans placeholder:text-lilac-100 placeholder:leading-[24px] placeholder:font-normal leading-[24px] font-normal text-lilac-100  ' +
           'hover:shadow-[0_0_4px_0_rgba(255,255,255,1)] ' +
-          'disabled:border-neutral-600 disabled:placeholder:text-neutral-600 disabled:hover:shadow-none'
+          'disabled:border-neutral-600 disabled:placeholder:text-neutral-600 disabled:hover:shadow-none disabled:opacity-100'
       },
       state: {
         default: '',
@@ -41,7 +41,7 @@ const InputVariants = cva(
   }
 )
 
-const IconVariants = cva('absolute top-1/2 -translate-y-1/2 disabled:text-neutral-600 ', {
+const IconVariants = cva('absolute top-1/2 -translate-y-1/2 ', {
   variants: {
     state: {
       default: '',
@@ -63,6 +63,8 @@ const IconVariants = cva('absolute top-1/2 -translate-y-1/2 disabled:text-neutra
     }
   },
   defaultVariants: {
+    variant: 'default',
+    state: 'default',
     size: 'lg',
     position: 'left'
   },
@@ -95,7 +97,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
       className,
-      variant,
+      variant = 'default',
       size = 'lg',
       state = 'default',
       leftIcon,
@@ -112,9 +114,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={props.id}
-            className={cn('font-dmsans text-base font-normal leading-[24px]')}>
+            className={cn(
+              'font-dmsans text-base font-normal leading-[24px]',
+              props.disabled && 'text-neutral-600',
+              !props.disabled && 'text-white'
+            )}>
             {label}
-            <span className="text-red-500"> *</span>
+            <span className={cn(props.disabled ? 'text-neutral-600' : 'text-red-500')}>
+              {' '}
+              *
+            </span>
           </label>
         )}
         <div className="relative">
@@ -123,7 +132,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           {leftIcon && typeof leftIcon === 'boolean' && (
             <SearchIcon
-              className={cn(IconVariants({ size, position: 'left', state, variant }))}
+              className={cn(
+                IconVariants({ size, position: 'left', state, variant }),
+                props.disabled && 'text-neutral-600'
+              )}
             />
           )}
           <ShadcnInput
@@ -144,17 +156,20 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
           {rightIcon && typeof rightIcon === 'boolean' && (
             <SearchIcon
-              className={cn(IconVariants({ size, position: 'right', state, variant }))}
+              className={cn(
+                IconVariants({ size, position: 'right', state, variant }),
+                props.disabled && 'text-neutral-600'
+              )}
             />
           )}
         </div>
         {(helperText || error) && (
           <p
-            className={cn('text-sm', {
+            className={cn('text-sm text-lilac-100', {
               'text-red-500': state === 'error',
               'text-green-400': state === 'success',
               'text-yellow-500': state === 'warning',
-              'text-muted-foreground': state === 'default'
+              'text-neutral-600': props.disabled,
             })}>
             {error || helperText}
           </p>
