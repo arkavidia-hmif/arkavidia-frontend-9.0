@@ -16,7 +16,8 @@ export interface SidebarProps {
 }
 
 function Sidebar({ announcement = true }: SidebarProps) {
-  const [dropdownOpen, setDropdownOpen] = React.useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
+
   const SIDEBAR_ITEMS = [
     { name: 'Dashboard', link: '/dashboard' },
     { name: 'Competitive Programming', link: '/dashboard/cp' },
@@ -88,10 +89,7 @@ function Sidebar({ announcement = true }: SidebarProps) {
           </div>
 
           <div className="cursor-pointer">
-            <DropdownMenu
-              onOpenChange={open => {
-                setDropdownOpen(open)
-              }}>
+            <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
               <DropdownMenuTrigger
                 asChild
                 className="my-6 flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
@@ -108,7 +106,7 @@ function Sidebar({ announcement = true }: SidebarProps) {
                   </span>
                   <ChevronUp
                     className={`m-1 ml-auto h-4 w-4 text-white transition-transform duration-300 ease-in-out lg:h-5 lg:w-5 ${
-                      dropdownOpen ? 'rotate-0' : 'rotate-180'
+                      isDropdownOpen ? 'rotate-0' : 'rotate-180'
                     }`}
                   />
                 </div>
@@ -141,6 +139,11 @@ function Sidebar({ announcement = true }: SidebarProps) {
       <label
         htmlFor="sidebarToggle"
         className="pointer-events-none fixed inset-0 z-40 bg-black opacity-0 transition-opacity duration-300 peer-checked:pointer-events-auto peer-checked:opacity-50 lg:hidden"
+        onClick={e => {
+          if (isDropdownOpen) {
+            e.preventDefault()
+          }
+        }}
       />
     </>
   )
