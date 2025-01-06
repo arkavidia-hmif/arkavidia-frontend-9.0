@@ -15,7 +15,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 const gradientClasses = cn('[background:linear-gradient(113.98deg,_#48E6FF_-34.84%,_#9274FF_45.46%,_#C159D8_125.76%)] text-white', 
     'hover:shadow hover:shadow-[#946AD0] focus:border-2 focus:border-[#EBC3FF] disabled:[background:_#595959] ',
     '[&[aria-disabled=true]]:[background:#595959] [&[aria-disabled=true]]:cursor-not-allowed',
-    'transition-all duration-200 ease-out')
+    'transition-all duration-200 ease-out cursor-pointer')
   
 const activeGradientClasses = 
   '[background:linear-gradient(113.98deg,_#3BB8CC_-34.84%,_#745CC8_45.46%,_#9A47AD_125.76%)]'
