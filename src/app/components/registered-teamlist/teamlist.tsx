@@ -35,12 +35,13 @@ type TeamDataItem = {
 }
 
 type RegisteredTeamListProps = {
-  teamData: TeamDataItem[]
+  "team-data": TeamDataItem[]
 }
 
 const maximumItemPage = 10
 
-export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({ teamData }) => {
+export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = (props) => {
+  const teamData = props["team-data"]
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(maximumItemPage)
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
