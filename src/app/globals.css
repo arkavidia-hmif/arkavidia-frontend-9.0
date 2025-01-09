@@ -109,3 +109,18 @@ body {
     rgb(255 113 160 / 60%) 99%
   );
 }
+
+.gradient-coming-soon {
+  background-image: linear-gradient(
+    90deg,
+    #ff71a0 0%,
+    #48e6ff 32.65%,
+    #d888ff 59.85%,
+    #946ad0 91.5%
+  );
+  background-size: 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
