@@ -1,5 +1,6 @@
 import { Tab } from "~/app/components/Tab";
 import TeamInfo from "~/app/components/team-lists/detail/TeamInfo";
+import Submission from "~/app/components/team-lists/detail/Submission";
 
 function TeamDetails() {
     return (
@@ -12,7 +13,7 @@ function TeamDetails() {
                 backgroundSize: 'cover',
               }}
         >
-            <Tab contentType={['Team Information']} content={[<TeamInfo/>]} />
+            <Tab contentType={['Team Information', 'Submission']} content={[<TeamInfo/>,<Submission />]} />
         </div>  
     )
 }
