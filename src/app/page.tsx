@@ -1,15 +1,65 @@
-import React from 'react'
+import { Input } from './components/Input'
+import { Search, AlertCircle, CheckCircle2 } from 'lucide-react'
+import Image from 'next/image'
 
-function Home() {
+
+export default function Home() {
   return (
-    <div className="flex h-full w-full items-center justify-center dark:bg-black">
-      <div className="pt-4 text-center dark:bg-black">
-        <h1 className="text-4xl font-bold dark:text-white">Coming Soon!</h1>
-        <div className="text-md mb-1 dark:text-white">In development</div>
-        <p className="mt-2 text-sm dark:text-white">- by Arkavidia 9.0 IT Team</p>
-      </div>
+    <div className="p-4 grid gap-4 max-w-md mx-auto bg-gray-400">
+      <Input
+        label="Large Input (Default)"
+        placeholder="Enter text..."
+        helperText="This is a helper text"
+        leftIcon={true}
+      />
+
+      <Input
+        size="md"
+        variant="unfilled"
+        label="Medium Unfilled Input"
+        placeholder="Search..."
+        helperText="This is an unfilled input"
+        leftIcon={true}
+        rightIcon={true}
+      />
+
+      <Input
+        variant='unfilled'
+        state="success"
+        label="Success Input"
+        placeholder="Verified input"
+        helperText="This input has been verified"
+        leftIcon={true}
+        rightIcon={true}
+        disabled = {true}
+      />
+
+      <Input
+        size="md"
+        state="warning"
+        label="Warning Input"
+        placeholder="Warning input"
+        helperText="This is a warning message"
+        rightIcon={<AlertCircle />}
+      />
+
+      <Input
+        state="error"
+        label="Error Input"
+        placeholder="Error input"
+        error="This field is required"
+        rightIcon={<AlertCircle />}
+      />
+
+      <Input
+        disabled
+        label="Disabled Input"
+        placeholder="Disabled input"
+        helperText="This input is disabled"
+        leftIcon={<Search />}
+      />
     </div>
   )
 }
 
-export default Home
+
