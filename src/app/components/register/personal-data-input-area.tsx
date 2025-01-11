@@ -23,19 +23,19 @@ interface PersonalDataProps {
 
 // Form Schema
 const registerPersonalDataSchema = z.object({
-  fullname: z.string().email({
-    message: 'Invalid email'
+  fullname: z.string().min(1),
+  birthdate: z.date({
+    invalid_type_error: 'Birthdate must be a valid date'
   }),
-  birthdate: z.date().nullable().optional(),
-  education: z.string().nullable().optional(),
+  education: z.string().min(1),
   institution: z.string(),
   phonenumber: z
     .string()
     .refine(val => !isNaN(Number(val)), {
       message: 'Phone number must be a valid number'
     })
-    .refine(val => val.length === 8, {
-      message: 'Phone number must be exactly 8 digits'
+    .refine(val => val.length >= 8, {
+      message: 'Phone number must be more than 8 digits'
     }),
   lineid: z.string().optional(),
   instagram: z.string().optional(),
@@ -51,8 +51,8 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
     resolver: zodResolver(registerPersonalDataSchema),
     defaultValues: {
       fullname: '',
-      birthdate: null,
-      education: null,
+      birthdate: undefined,
+      education: '',
       institution: '',
       phonenumber: '',
       lineid: '',
@@ -72,6 +72,8 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
     // TODO: Replace with backend logic
     if (isFormAccepted) {
       console.log('Register Value: ' + values)
+    } else {
+      console.error('Error register value')
     }
   }
 
@@ -201,11 +203,10 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                 <FormControl>
                   <Input
                     type="number"
-                    className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
+                    className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 [appearance:textfield] placeholder:text-purple-500 max-md:text-xs [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     placeholder="Masukkan nomor Whatsapp aktif"
                     {...field}
                   />
-                
                 </FormControl>
               </FormItem>
             )}
@@ -273,7 +274,9 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                           yang diberikan bersifat benar
                         </span>
                       }
-                      textclassName="text-sm"></Checkbox>
+                      textclassName="text-sm"
+                      checked={field.value}
+                      onCheckedChange={checked => field.onChange(checked)}></Checkbox>
                   </div>
                 </FormControl>
               </FormItem>
