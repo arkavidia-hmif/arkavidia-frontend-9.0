@@ -1,6 +1,9 @@
+"use client";
+
 import { Button } from "~/app/components/Button";
-import { Check, X } from "lucide-react";
+import { Check, Pencil, X } from "lucide-react";
 import Dropdown, { MenuItem } from "~/app/components/Dropdown";
+import { useState } from "react";
 import { 
     Table,
     TableBody,
@@ -9,6 +12,7 @@ import {
     TableHeader,
     TableRow, 
 } from "~/app/components/Table";
+import Tag from "../../Tag";
 
 type ComponentProps = {
     submissionType: "Final" | "Pre-eliminary";
@@ -53,12 +57,33 @@ function SubmissionPart(
         submissionDocs
     }: ComponentProps
 ) {
+    const [qualification, setQualification] = useState<MenuItem | null>(null);
+    const [hidden, setHidden] = useState<boolean>(false);
     return (
         <div className="flex flex-col gap-6">
             <div className="flex justify-between items-center">
-                <h1 className="font-bold text-[32px]">{submissionType}</h1>
-                <div className="flex gap-5">
-                    <Dropdown data={participantQualification} />
+                <div className="flex flex-col flex-wrap justify-center">
+                    <h1 className="font-bold text-[32px]">{submissionType}</h1>
+                    <div className="md:hidden">
+                        {
+                            hidden && (
+                                <div className="flex gap-2 items-center mt-3">
+                                    <Dropdown data={participantQualification} onChange={(e) => {setQualification(e)}} />
+                                    <div className="flex gap-2 flex-row pb-2">
+                                        <Button variant={'outline'} size={'sm'} onClick={() => {setHidden(false)}}>
+                                            <X size={10} className="text-white" strokeWidth={3} />
+                                        </Button>
+                                        <Button size={'sm'} onClick={() => {setHidden(false)}}>
+                                            <Check size={10}  strokeWidth={3} />
+                                        </Button>
+                                    </div>
+                                </div>
+                            )
+                        }
+                    </div>
+                </div>
+                <div className="hidden gap-5 md:flex">
+                    <Dropdown data={participantQualification} onChange={(e) => {setQualification(e)}} />
                     <div className="flex gap-2">
                         <Button variant={'outline'} size={'sm'}>
                             <X size={10} className="text-white" strokeWidth={3} />
@@ -67,6 +92,16 @@ function SubmissionPart(
                             <Check size={10}  strokeWidth={3}/>
                         </Button>
                     </div>
+                </div>
+                <div className="md:hidden">
+                    {
+                        !hidden && (
+                            <div className="flex gap-2 items-center">
+                                <Tag text={qualification ? qualification.option : '-'} variant="success" />
+                                <Pencil size={30} strokeWidth={2.5} className="hover:cursor-pointer" onClick={() => {setHidden(true)}}/>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
             <SubmissionTable submissionDocs={submissionDocs} />
