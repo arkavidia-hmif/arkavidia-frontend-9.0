@@ -17,8 +17,8 @@ jobs:
 
       - name: Ensure Docker Compose is installed
         run: |
-          echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S apt-get update
-          echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S apt-get install -y docker-compose
+          echo "${{ secrets.SUDO_PASS }}" | sudo -S apt-get update
+          echo "${{ secrets.SUDO_PASS }}" | sudo -S apt-get install -y docker-compose
 
       - name: Set environment variables
         run: |
