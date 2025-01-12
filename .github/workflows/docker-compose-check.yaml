@@ -15,11 +15,6 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
 
-      - name: Ensure Docker Compose is installed
-        run: |
-          echo "${{ secrets.SUDO_PASS }}" | sudo -S apt-get update
-          echo "${{ secrets.SUDO_PASS }}" | sudo -S apt-get install -y docker-compose
-
       - name: Set environment variables
         run: |
           echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> $GITHUB_ENV
@@ -27,11 +22,11 @@ jobs:
           echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> $GITHUB_ENV
 
       - name: Build Docker Compose
-        run: docker-compose build
+        run: docker compose build
 
       - name: Run Docker Compose
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Stop and Remove Containers
         if: always()
-        run: docker-compose down
+        run: docker compose down
