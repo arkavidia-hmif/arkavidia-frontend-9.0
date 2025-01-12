@@ -20,6 +20,7 @@ import { useToast } from '../../../hooks/use-toast'
 import { useState } from 'react'
 import Image from 'next/image'
 import { Eye, EyeOff } from 'lucide-react'
+import { useAuth } from '~/app/contexts/AuthContext'
 
 // Link Variable
 const FORGET_PASSWORD_LINK = 'forget-password'
@@ -37,6 +38,7 @@ const loginSchema = z.object({
 
 export const InputArea = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
+  const { basicLogin } = useAuth()
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(prev => !prev)
@@ -65,13 +67,7 @@ export const InputArea = () => {
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     // TODO: Replace with backend logic
     // console.log('TEST IS THIS CALLED')
-    const login = await basicLogin({
-      client: axiosInstance,
-      body: {
-        email: values.email,
-        password: values.password
-      }
-    })
+    const login = await basicLogin(values.email, values.password)
 
     if (login.error) {
       toast({
@@ -87,10 +83,6 @@ export const InputArea = () => {
       description: 'Successfully logged in',
       variant: 'default'
     })
-
-    setTimeout(() => {
-      window.location.href = '/'
-    }, 1000)
   }
 
   /**
