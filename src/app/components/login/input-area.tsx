@@ -9,6 +9,8 @@ import {
   FormItem,
   FormLabel
 } from '../ui/form'
+import { basicLogin } from '~/api/generated'
+import { axiosInstance } from '~/lib/axios'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '../ui/input'
@@ -18,6 +20,7 @@ import { useToast } from '../../../hooks/use-toast'
 import { useState } from 'react'
 import Image from 'next/image'
 import { Eye, EyeOff } from 'lucide-react'
+import { useAuth } from '~/app/contexts/AuthContext'
 
 // Link Variable
 const FORGET_PASSWORD_LINK = 'forget-password'
@@ -35,6 +38,7 @@ const loginSchema = z.object({
 
 export const InputArea = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
+  const { basicLogin } = useAuth()
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(prev => !prev)
@@ -60,9 +64,25 @@ export const InputArea = () => {
    * Used when form submitted
    * @param values The login schema data
    */
-  function onSubmit(values: z.infer<typeof loginSchema>) {
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
     // TODO: Replace with backend logic
-    console.log('TEST IS THIS CALLED')
+    // console.log('TEST IS THIS CALLED')
+    const login = await basicLogin(values.email, values.password)
+
+    if (login.error) {
+      toast({
+        title: 'Login Error',
+        description: 'Failed to login',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    toast({
+      title: 'Login Success',
+      description: 'Successfully logged in',
+      variant: 'default'
+    })
   }
 
   /**
@@ -156,7 +176,7 @@ export const InputArea = () => {
             style={{
               borderImage: 'url(/images/login/gradient-border.svg) 16 / 12px stretch'
             }}
-            type='button'
+            type="button"
             onClick={onGoogleClick}>
             <Image
               src={'/images/login/google-icon.png'}

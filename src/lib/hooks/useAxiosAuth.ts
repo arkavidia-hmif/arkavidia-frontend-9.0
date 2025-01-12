@@ -5,22 +5,16 @@ import { authAxiosInstance } from '../axios'
 import { useEffect } from 'react'
 import { useRefreshToken } from './useRefreshToken'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '~/app/contexts/AuthContext'
 
 const useAxiosAuth = () => {
-  const { data: session, status } = useSession()
+  const { logout } = useAuth()
   const refreshToken = useRefreshToken()
-  const router = useRouter()
 
   useEffect(() => {
     const requestInterceptor = authAxiosInstance.instance.interceptors.request.use(
       async c => {
         // Success
-        if (!c.headers.Authorization) {
-          c.headers.Authorization = session?.user.accessToken
-            ? `Bearer ${session.user.accessToken}`
-            : undefined
-        }
-
         return c
       },
       err => Promise.reject(err) // Error
@@ -31,17 +25,14 @@ const useAxiosAuth = () => {
       async err => {
         // Error
         const prevReq = err.config
-
         // If the request was made and the server responded with a 401
         if (err.response.status === 401 && prevReq && !prevReq._sent) {
           prevReq._sent = true
-          const newAcc = await refreshToken()
-          prevReq.headers['Authorization'] = `Bearer ${newAcc}`
+          await refreshToken()
           return authAxiosInstance.instance(prevReq)
         }
 
-        console.log('Failed to refresh token')
-        await signOut({ redirect: false })
+        logout()
         return Promise.reject(err)
       }
     )
@@ -50,7 +41,7 @@ const useAxiosAuth = () => {
       authAxiosInstance.instance.interceptors.request.eject(requestInterceptor)
       authAxiosInstance.instance.interceptors.response.eject(responseInterceptor)
     }
-  }, [session, status, refreshToken])
+  }, [refreshToken])
 
   return authAxiosInstance
 }
