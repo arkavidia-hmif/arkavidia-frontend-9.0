@@ -1,10 +1,8 @@
 'use client'
 
-import { signOut, useSession } from 'next-auth/react'
 import { authAxiosInstance } from '../axios'
 import { useEffect } from 'react'
 import { useRefreshToken } from './useRefreshToken'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '~/app/contexts/AuthContext'
 
 const useAxiosAuth = () => {
