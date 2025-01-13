@@ -7,6 +7,18 @@ import { Minus, Plus } from 'lucide-react'
 
 import { cn } from '~/lib/utils'
 
+const FAQPlusMinus = ({ isOpen = false }: { isOpen?: boolean }) => {
+  if (isOpen) {
+    return (
+      <Minus className="h-4 w-4 shrink-0 text-white transition-transform duration-200" />
+    )
+  } else {
+    return (
+      <Plus className="h-4 w-4 shrink-0 text-white transition-transform duration-200" />
+    )
+  }
+}
+
 const Accordion = AccordionPrimitive.Root
 
 const AccordionItem = React.forwardRef<
@@ -20,9 +32,10 @@ AccordionItem.displayName = 'AccordionItem'
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & {
-    isOpen: boolean
+    isOpen?: boolean
+    accType: 'framed' | 'faq'
   }
->(({ className, children, isOpen, ...props }, ref) => (
+>(({ className, children, isOpen, accType = 'framed', ...props }, ref) => (
   <AccordionPrimitive.Header className="flex">
     <AccordionPrimitive.Trigger
       ref={ref}
@@ -32,12 +45,11 @@ const AccordionTrigger = React.forwardRef<
       )}
       {...props}>
       {children}
-      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-      {isOpen ? (
-        <Minus className="h-4 w-4 shrink-0 text-white transition-transform duration-200" />
-      ) : (
-        <Plus className="h-4 w-4 shrink-0 text-white transition-transform duration-200" />
+      {accType === 'framed' && (
+        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
       )}
+
+      {accType === 'faq' && <FAQPlusMinus isOpen={isOpen} />}
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ))

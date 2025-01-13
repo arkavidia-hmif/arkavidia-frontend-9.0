@@ -227,6 +227,7 @@ const CompetitionPage = () => {
           {tasks.map(task => (
             <AccordionItem key={task.id} value={`task-${task.id}`}>
               <AccordionTrigger
+                accType="framed"
                 className={`&[data-state=open]>svg]:rotate-180 mt-2 rounded-xl border border-white px-5 py-5 outline-border hover:no-underline hover:decoration-0 md:py-7 [&>svg]:size-5 [&>svg]:-rotate-90 [&>svg]:text-white md:[&>svg]:size-7 [&[data-state=open]>svg]:rotate-0 ${getTriggerColor(
                   task
                 )}`}>
@@ -332,6 +333,7 @@ const CompetitionPage = () => {
           {verifs.map(verif => (
             <AccordionItem key={verif.id} value={`task-${verif.id}`}>
               <AccordionTrigger
+                accType="framed"
                 className={`&[data-state=open]>svg]:rotate-180 mt-2 rounded-xl border border-white px-5 py-5 outline-border hover:no-underline hover:decoration-0 md:py-7 [&>svg]:size-5 [&>svg]:-rotate-90 [&>svg]:text-white md:[&>svg]:size-7 [&[data-state=open]>svg]:rotate-0 ${getTriggerColor(
                   verif
                 )}`}>
