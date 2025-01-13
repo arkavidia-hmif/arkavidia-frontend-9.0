@@ -9,46 +9,69 @@ import {
   FormItem,
   FormLabel
 } from '../ui/form'
-import { basicLogin } from '~/api/generated'
-import { axiosInstance } from '~/lib/axios'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '../ui/input'
 import Link from 'next/link'
 import { Button } from '../ui/button'
 import { useToast } from '../../../hooks/use-toast'
-import { useState } from 'react'
 import Image from 'next/image'
-import { Eye, EyeOff } from 'lucide-react'
-import { useAuth } from '~/app/contexts/AuthContext'
+import { useState } from 'react'
+import { EyeOff, Eye } from 'lucide-react'
 
 // Link Variable
 const FORGET_PASSWORD_LINK = 'forget-password'
 const REGISTER_LINK = 'register'
 
 //TODO: Change the rules for each variable defined in schema here
-const loginSchema = z.object({
-  email: z.string().email({
-    message: 'Invalid email'
-  }),
-  password: z.string().nonempty({
-    message: 'Invalid password'
+const registerSchema = z
+  .object({
+    email: z.string().email({
+      message: 'Invalid email'
+    }),
+    password: z
+      .string()
+      .min(6, {
+        message: 'Password must be at least 6 characters long'
+      })
+      .nonempty({
+        message: "Password shouldn't be empty"
+      }),
+    confirmpassword: z.string().nonempty({
+      message: "Confirm Password shouldn't be empty"
+    })
   })
-})
+  .superRefine(({ confirmpassword, password }, ctx) => {
+    if (confirmpassword !== password) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'The passwords did not match',
+        path: ['confirmPassword']
+      })
+    }
+  })
+export const EmailRegisterForm = () => {
+  const { toast } = useToast()
 
-export const InputArea = () => {
+  // Input Visibility Handling
   const [passwordVisible, setPasswordVisible] = useState(false)
-  const { basicLogin } = useAuth()
-
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false)
+  
   const togglePasswordVisibility = () => {
     setPasswordVisible(prev => !prev)
   }
-  const { toast } = useToast()
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+
+  const toggleConfirmPasswordVisibility = () => {
+    setConfirmPasswordVisible(prev => !prev)
+  }
+
+  // Form
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       email: '',
-      password: ''
+      password: '',
+      confirmpassword: ''
     }
   })
 
@@ -64,25 +87,9 @@ export const InputArea = () => {
    * Used when form submitted
    * @param values The login schema data
    */
-  async function onSubmit(values: z.infer<typeof loginSchema>) {
+  function onSubmit(values: z.infer<typeof registerSchema>) {
     // TODO: Replace with backend logic
-    // console.log('TEST IS THIS CALLED')
-    const login = await basicLogin(values.email, values.password)
-
-    if (login.error) {
-      toast({
-        title: 'Login Error',
-        description: 'Failed to login',
-        variant: 'destructive'
-      })
-      return
-    }
-
-    toast({
-      title: 'Login Success',
-      description: 'Successfully logged in',
-      variant: 'default'
-    })
+    console.log('Email Register: ' + values)
   }
 
   /**
@@ -112,13 +119,13 @@ export const InputArea = () => {
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
+              <FormItem className={`flex flex-col gap-2`}>
                 <FormLabel className="text-lilac-200 max-md:text-xs">
                   Email <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
-                    className="bg-lilac-100 pr-10 max-md:text-xs"
+                    className="bg-lilac-100 pr-10 text-purple-500 max-md:text-xs"
                     placeholder="Masukkan e-mail Anda"
                     {...field}
                   />
@@ -130,7 +137,7 @@ export const InputArea = () => {
             control={form.control}
             name="password"
             render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
+              <FormItem className={`flex flex-col gap-2`}>
                 <FormLabel className="text-lilac-200 max-md:text-xs">
                   Password <span className="text-red-500">*</span>
                 </FormLabel>
@@ -150,33 +157,56 @@ export const InputArea = () => {
                     </button>
                   </div>
                 </FormControl>
-                <FormDescription>
-                  <Link className="text-lilac-200 underline" href={FORGET_PASSWORD_LINK}>
-                    Lupa password?
-                  </Link>
-                </FormDescription>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="confirmpassword"
+            render={({ field }) => (
+              <FormItem className={`flex flex-col gap-2`}>
+                <FormLabel className="text-lilac-200 max-md:text-xs">
+                  Confirm Password <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <div className="relative text-purple-500">
+                    <Input
+                      type={confirmPasswordVisible ? 'text' : 'password'}
+                      placeholder="Masukkan password Anda"
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 max-md:text-xs"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      onClick={toggleConfirmPasswordVisibility}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 transform text-purple-500">
+                      {confirmPasswordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </FormControl>
               </FormItem>
             )}
           />
         </div>
-        <div className="flex w-full flex-col text-center max-lg:gap-1.5 max-md:gap-1 max-md:text-xs lg:gap-2">
+        <div className="flex w-full flex-col text-center font-dmsans max-lg:gap-1.5 max-md:gap-1 max-md:text-xs lg:gap-2">
           {/* TODO: Replace with Login Button Component */}
           <Button
-            className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs'
+            className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] font-semibold text-white max-md:text-xs'
             type="submit"
             variant={'ghost'}>
-            Login
+            Register
           </Button>
           <span className="w-full font-semibold text-white max-md:text-xs lg:text-sm">
             or
           </span>
           {/* TODO: Replace with Google Variant Button Component */}
+
           <Button
             className="gradient-border relative flex rounded-lg bg-transparent py-5 text-white max-md:text-xs"
             style={{
               borderImage: 'url(/images/login/gradient-border.svg) 16 / 12px stretch'
             }}
-            type="button"
+            type='button'
             onClick={onGoogleClick}>
             <Image
               src={'/images/login/google-icon.png'}

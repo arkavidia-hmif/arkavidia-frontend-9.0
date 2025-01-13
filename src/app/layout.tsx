@@ -4,6 +4,7 @@ import './globals.css'
 import { ThemeProvider } from './providers/ThemeProvider'
 import NextAuthProvider from './components/NextAuthProvider'
 import { Toaster } from './components/ui/toaster'
+import { AuthProvider } from './contexts/AuthContext'
 
 const BelanosimaFont = Belanosima({
   weight: '400',
@@ -41,7 +42,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} min-h-screen w-screen antialiased`}>
-        <NextAuthProvider>
+        <AuthProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
@@ -49,7 +50,7 @@ export default function RootLayout({
             disableTransitionOnChange>
             {children}
           </ThemeProvider>
-        </NextAuthProvider>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>

@@ -11,8 +11,8 @@
     "openapi-ts": "openapi-ts"
   },
   "dependencies": {
-    "@hey-api/client-axios": "^0.2.11",
     "@heroicons/react": "^2.2.0",
+    "@hey-api/client-axios": "^0.2.11",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "1.1.4",
