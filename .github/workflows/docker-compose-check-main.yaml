@@ -1,0 +1,30 @@
+name: Docker Compose Build and Test Check
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  docker-compose:
+    runs-on: [self-hosted, power]
+    environment: production
+    env:
+      NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+      PORT: ${{ secrets.PORT }}
+      NODE_ENV: ${{ secrets.NODE_ENV }}
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Build Docker Compose
+        run: docker compose build
+
+      - name: Run Docker Compose
+        run: docker compose up -d
+
+      - name: Stop and Remove Containers
+        if: always()
+        run: docker compose down
