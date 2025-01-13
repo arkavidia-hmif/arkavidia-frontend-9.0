@@ -11,15 +11,14 @@ jobs:
   docker-compose:
     runs-on: [self-hosted, power]
     environment: ${{ github.ref_name == 'staging' && 'staging' || 'production' }}
+    env:
+      NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+      PORT: ${{ secrets.PORT }}
+      NODE_ENV: ${{ secrets.NODE_ENV }}
+
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
-
-      - name: Set environment variables
-        run: |
-          echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> $GITHUB_ENV
-          echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
-          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> $GITHUB_ENV
 
       - name: Build Docker Compose
         run: docker compose build
