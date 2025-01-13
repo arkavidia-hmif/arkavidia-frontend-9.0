@@ -52,8 +52,8 @@ function Sidebar({ announcement = true }: SidebarProps) {
           <Image
             src="/arkavidiaLogo.svg"
             alt="Logo Arkavidia 9.0"
-            width={38}
-            height={56}
+            width={24}
+            height={24}
             className="ml-4"
           />
         </Link>

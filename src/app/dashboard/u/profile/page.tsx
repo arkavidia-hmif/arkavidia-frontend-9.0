@@ -2,8 +2,9 @@ import {
   PersonalInformationContent,
   ProfileInformationDefaultValue,
   ProfileInformationDropdownOptions
-} from '../components/profile/personal-information-content'
-import { ProfileLayout } from '../components/profile/profile-content-layout'
+} from '../../../components/profile/personal-information-content'
+import { ProfileLayout } from '../../../components/profile/profile-content-layout'
+import ProfileHero from '../../../components/ProfileHero'
 
 const DummyPersonalInfoData: ProfileInformationDefaultValue = {
   name: 'Ahdmad Jone Done',
@@ -74,13 +75,15 @@ const DummyDropdownOptions: ProfileInformationDropdownOptions = {
 
 const ProfilePage = () => {
   return (
-    <div
-      className="relative max-h-fit bg-gradient-to-r from-[#1F0246] to-[#2E046A] px-6 md:min-h-screen"
-      style={{
-        backgroundImage: "url('/images/profile/bg.png')",
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}>
+    <div>
+      <div className="mb-8">
+        <ProfileHero
+          title="Profile"
+          name="Ahmad John Doe"
+          email="example@example.com"
+          isResetProfile={false}
+        />
+      </div>
       <ProfileLayout
         personalInformation={
           <PersonalInformationContent
