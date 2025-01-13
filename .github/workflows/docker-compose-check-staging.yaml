@@ -22,13 +22,16 @@ jobs:
       - name: Debug Environment
         run: printenv | grep -E 'NEXT_PUBLIC_API_URL|PORT|NODE_ENV'
 
-      - name: Build Docker Compose
-        run: |
-          docker compose build --build-arg API_URI=${{ secrets.NEXT_PUBLIC_API_URL }}
+      - name: CURL API
+        run: curl -v ${{ secrets.NEXT_PUBLIC_API_URL }}
 
-      - name: Run Docker Compose
-        run: docker compose up -d
+      # - name: Build Docker Compose
+      #   run: |
+      #     docker compose build --build-arg API_URI=${{ secrets.NEXT_PUBLIC_API_URL }}
 
-      - name: Stop and Remove Containers
-        if: always()
-        run: docker compose down
+      # - name: Run Docker Compose
+      #   run: docker compose up -d
+
+      # - name: Stop and Remove Containers
+      #   if: always()
+      #   run: docker compose down
