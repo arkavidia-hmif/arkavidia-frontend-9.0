@@ -12,14 +12,15 @@ import {
 import { HiChevronDoubleLeft, HiChevronDoubleRight } from 'react-icons/hi'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-const gradientClasses = cn('[background:linear-gradient(113.98deg,_#48E6FF_-34.84%,_#9274FF_45.46%,_#C159D8_125.76%)] text-white', 
-    'hover:shadow hover:shadow-[#946AD0] focus:border-2 focus:border-[#EBC3FF] disabled:[background:_#595959] ',
-    '[&[aria-disabled=true]]:[background:#595959] [&[aria-disabled=true]]:cursor-not-allowed',
-    'transition-all duration-200 ease-out')
-  
-const activeGradientClasses = 
-  '[background:linear-gradient(113.98deg,_#3BB8CC_-34.84%,_#745CC8_45.46%,_#9A47AD_125.76%)]'
+const gradientClasses = cn(
+  '[background:linear-gradient(113.98deg,_#48E6FF_-34.84%,_#9274FF_45.46%,_#C159D8_125.76%)] text-white',
+  'hover:shadow hover:shadow-[#946AD0] focus:border-2 focus:border-[#EBC3FF] disabled:[background:_#595959] ',
+  '[&[aria-disabled=true]]:[background:#595959] [&[aria-disabled=true]]:cursor-not-allowed',
+  'transition-all duration-200 ease-out cursor-pointer'
+)
 
+const activeGradientClasses =
+  '[background:linear-gradient(113.98deg,_#3BB8CC_-34.84%,_#745CC8_45.46%,_#9A47AD_125.76%)]'
 
 const PaginationLink = React.forwardRef<
   HTMLAnchorElement,
@@ -40,8 +41,7 @@ const PaginationPrevious = React.forwardRef<
   <RadixPaginationPrevious
     ref={ref}
     className={cn(gradientClasses, className)}
-    {...props}
-  >
+    {...props}>
     <ChevronLeft className="h-4 w-4" />
   </RadixPaginationPrevious>
 ))
@@ -51,7 +51,7 @@ const PaginationNext = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentProps<typeof RadixPaginationNext>
 >(({ className, ...props }, ref) => (
-  <RadixPaginationNext ref={ref} className={cn(gradientClasses, className)} {...props} >
+  <RadixPaginationNext ref={ref} className={cn(gradientClasses, className)} {...props}>
     <ChevronRight className="h-4 w-4" />
   </RadixPaginationNext>
 ))
