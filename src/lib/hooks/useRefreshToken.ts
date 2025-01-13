@@ -6,14 +6,13 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '~/app/contexts/AuthContext'
 
 export const useRefreshToken = () => {
-  const { getRefreshToken, setRefreshToken } = useAuth()
+  const { getRefreshToken, setRefreshToken, setIsAuth } = useAuth()
   const router = useRouter()
 
   const refreshToken = async () => {
     const refToken = getRefreshToken()
     if (!refToken) {
-      router.replace('/login') // Redirect to login page if no refresh token
-      return
+      return null
     }
 
     const tokens = await refresh({
@@ -23,6 +22,7 @@ export const useRefreshToken = () => {
 
     if (tokens.data?.refreshToken) {
       setRefreshToken(tokens.data.refreshToken)
+      setIsAuth(true)
     }
   }
 
