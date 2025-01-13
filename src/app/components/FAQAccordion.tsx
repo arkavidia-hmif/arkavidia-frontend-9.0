@@ -1,48 +1,48 @@
-'use client';
-import React, { useState } from "react";
+'use client'
+import React, { useState } from 'react'
 import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
-} from "./ui/accordion";
+  AccordionContent
+} from './ui/accordion'
 
 interface FAQAccordionProps {
-  items: { question: string; answer: string }[];
+  items: { question: string; answer: string }[]
 }
 
 function FAQAccordion({ items }: FAQAccordionProps) {
-  const [openItem, setOpenItem] = useState<string | null>(null);
+  const [openItem, setOpenItem] = useState<string | null>(null)
 
   const handleToggle = (item: string) => {
-    setOpenItem((prev) => (prev === item ? null : item));
-  };
+    setOpenItem(prev => (prev === item ? null : item))
+  }
 
   return (
     <div className="flex items-center justify-center">
       <Accordion type="single" collapsible className="w-[50%]">
         {items.map((item, index) => {
-          const value = `item-${index + 1}`;
-          const isOpen = openItem === value;
+          const value = `item-${index + 1}`
+          const isOpen = openItem === value
 
           return (
             <AccordionItem key={value} value={value}>
               <AccordionTrigger
                 isOpen={isOpen}
                 onClick={() => handleToggle(value)}
-              >
+                accType="faq">
                 {item.question}
               </AccordionTrigger>
               <AccordionContent>{item.answer}</AccordionContent>
             </AccordionItem>
-          );
+          )
         })}
       </Accordion>
     </div>
-  );
+  )
 }
 
-export default FAQAccordion;
+export default FAQAccordion
 
 // how to use
 // const faqItems = [
