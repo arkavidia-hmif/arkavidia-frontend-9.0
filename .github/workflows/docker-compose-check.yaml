@@ -9,27 +9,24 @@ on:
 
 jobs:
   docker-compose:
-    runs-on: self-hosted
+    runs-on: [self-hosted, power]
+    environment: ${{ github.ref_name == 'staging' && 'staging' || 'production' }}
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
 
-      - name: Make sure docker compose is installed
-        run: docker-compose --version || sudo apt-get install -y docker-compose
-
-      - name: Determine .env file to use
-        id: env-file
-        run: echo "ENV_FILE=fe-env" >> $GITHUB_ENV
-
-      - name: Validate env file
-        run: echo "Using env file:" && echo ${{ env.ENV_FILE }}
+      - name: Set environment variables
+        run: |
+          echo "NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}" >> $GITHUB_ENV
+          echo "PORT=${{ secrets.PORT }}" >> $GITHUB_ENV
+          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> $GITHUB_ENV
 
       - name: Build Docker Compose
-        run: docker-compose --env-file ${{ env.ENV_FILE }} build
+        run: docker compose build
 
       - name: Run Docker Compose
-        run: docker-compose --env-file ${{ env.ENV_FILE }} up -d
+        run: docker compose up -d
 
       - name: Stop and Remove Containers
         if: always()
-        run: docker-compose down
+        run: docker compose down
