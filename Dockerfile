@@ -5,6 +5,8 @@ RUN npm install -g pnpm
 ARG API_URI
 ENV NEXT_PUBLIC_API_URI=${API_URI}
 
+RUN echo "API_URI is $NEXT_PUBLIC_API_URI"
+
 WORKDIR /app
 
 # Copy package files
@@ -18,10 +20,10 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Get API Definition
-RUN pnpm dlx @hey-api/openapi-ts \
--c @hey-api/client-axios \
--i ${NEXT_PUBLIC_API_URI}/openapi.json \
--o src/api/generated
+# RUN pnpm dlx @hey-api/openapi-ts \
+# -c @hey-api/client-axios \
+# -i ${NEXT_PUBLIC_API_URI}/openapi.json \
+# -o src/api/generated
 
 
 # Build the Next.js app
