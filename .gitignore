@@ -43,3 +43,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated API
+/src/api/generated
+
+# generated API
+/src/api/generated
