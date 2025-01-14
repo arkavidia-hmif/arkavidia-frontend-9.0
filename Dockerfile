@@ -31,7 +31,7 @@ FROM node:18-alpine AS runner
 
 RUN npm install -g pnpm
 ARG API_URI
-ENV NEXT_PUBLIC_API_URI=${API_URI}
+ENV NEXT_PUBLIC_API_URL=${API_URI}
 
 WORKDIR /app
 
