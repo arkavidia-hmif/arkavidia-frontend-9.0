@@ -8,6 +8,7 @@ export interface basicLoginResponse {
 export interface AuthContextProps {
   isAuthenticated: boolean
   user: User | null
+  setIsAuth: (value: boolean) => void
   getRefreshToken: () => string | null
   setRefreshToken: (token: string) => void
   clearRefreshToken: () => void

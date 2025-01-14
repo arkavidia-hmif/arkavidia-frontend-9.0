@@ -14,6 +14,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null)
   const router = useRouter()
 
+  const setIsAuth = (value: boolean) => {
+    setIsAuthenticated(value)
+  }
+
   const basicLogin = async (email: string, password: string) => {
     const req = await login({
       client: axiosInstance,
@@ -47,7 +51,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     localStorage.removeItem('ref_tkn')
     setIsAuthenticated(false)
-    await reqLogout({ client: authAxiosInstance }) // Delete cookies
+    await reqLogout({
+      client: authAxiosInstance,
+      headers: {
+        'X-Logout-Request': 'true'
+      }
+    }) // Delete cookies
     router.replace('/login')
   }
 
@@ -68,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         isAuthenticated,
         user,
+        setIsAuth,
         basicLogin,
         logout,
         getRefreshToken,
