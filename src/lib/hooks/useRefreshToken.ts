@@ -24,6 +24,8 @@ export const useRefreshToken = () => {
       setRefreshToken(tokens.data.refreshToken)
       setIsAuth(true)
     }
+
+    return tokens.data?.refreshToken ?? null
   }
 
   return refreshToken

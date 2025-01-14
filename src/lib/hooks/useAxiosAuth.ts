@@ -27,13 +27,12 @@ const useAxiosAuth = () => {
       async err => {
         // Error
         const prevReq = err.config
+        // If the request is a logout request, don't try to refresh the token
+        if (prevReq && prevReq.headers['X-Logout-Request'] === 'true') {
+          return Promise.reject(err)
+        }
         // If the request was made and the server responded with a 401
-        if (
-          err.response.status === 401 &&
-          prevReq &&
-          !prevReq._sent &&
-          prevReq.headers['X-Logout-Request'] !== 'true'
-        ) {
+        else if (err.response.status === 401 && prevReq && !prevReq._sent) {
           prevReq._sent = true
           const refresh = await refreshToken()
           if (!refresh) {
