@@ -19,15 +19,9 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
 
-      - name: Debug Environment
-        run: printenv | grep -E 'NEXT_PUBLIC_API_URL|PORT|NODE_ENV'
-
-      - name: CURL API
-        run: curl -v ${{ secrets.NEXT_PUBLIC_API_URL }}
-
       - name: Build Docker Compose
         run: |
-          docker compose build --build-arg API_URI=${{ secrets.NEXT_PUBLIC_API_URL }}
+          docker compose build
 
       - name: Run Docker Compose
         run: docker compose up -d
