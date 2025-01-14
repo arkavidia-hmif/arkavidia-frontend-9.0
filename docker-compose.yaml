@@ -4,9 +4,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        API_URI: ${NEXT_PUBLIC_API_URL}
     ports:
       - '${PORT}:${PORT}'
     environment:
       NODE_ENV: ${NODE_ENV}
-      NEXT_PUBLIC_API_URL: ${API_URL}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       PORT: ${PORT}
