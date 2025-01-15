@@ -16,24 +16,62 @@ import Link from 'next/link'
 import { Button } from '../ui/button'
 import { useToast } from '../../../hooks/use-toast'
 import Image from 'next/image'
+import { useState } from 'react'
+import { EyeOff, Eye } from 'lucide-react'
 
 // Link Variable
 const FORGET_PASSWORD_LINK = 'forget-password'
 const REGISTER_LINK = 'register'
 
 //TODO: Change the rules for each variable defined in schema here
-const loginSchema = z.object({
-  email: z.string().email({
-    message: 'Invalid email'
+const registerSchema = z
+  .object({
+    email: z.string().email({
+      message: 'Invalid email'
+    }),
+    password: z
+      .string()
+      .min(6, {
+        message: 'Password must be at least 6 characters long'
+      })
+      .nonempty({
+        message: "Password shouldn't be empty"
+      }),
+    confirmpassword: z.string().nonempty({
+      message: "Confirm Password shouldn't be empty"
+    })
   })
-})
-
+  .superRefine(({ confirmpassword, password }, ctx) => {
+    if (confirmpassword !== password) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'The passwords did not match',
+        path: ['confirmPassword']
+      })
+    }
+  })
 export const EmailRegisterForm = () => {
   const { toast } = useToast()
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+
+  // Input Visibility Handling
+  const [passwordVisible, setPasswordVisible] = useState(false)
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false)
+  
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(prev => !prev)
+  }
+
+  const toggleConfirmPasswordVisibility = () => {
+    setConfirmPasswordVisible(prev => !prev)
+  }
+
+  // Form
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
-      email: ''
+      email: '',
+      password: '',
+      confirmpassword: ''
     }
   })
 
@@ -49,9 +87,9 @@ export const EmailRegisterForm = () => {
    * Used when form submitted
    * @param values The login schema data
    */
-  function onSubmit(values: z.infer<typeof loginSchema>) {
+  function onSubmit(values: z.infer<typeof registerSchema>) {
     // TODO: Replace with backend logic
-    console.log('TEST IS THIS CALLED')
+    console.log('Email Register: ' + values)
   }
 
   /**
@@ -82,15 +120,69 @@ export const EmailRegisterForm = () => {
             name="email"
             render={({ field }) => (
               <FormItem className={`flex flex-col gap-2`}>
-                <FormLabel className="text-lilac-200 max-md:text-xs ">
+                <FormLabel className="text-lilac-200 max-md:text-xs">
                   Email <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
-                    className="bg-lilac-100 text-purple-500 pr-10 max-md:text-xs"
+                    className="bg-lilac-100 pr-10 text-purple-500 max-md:text-xs"
                     placeholder="Masukkan e-mail Anda"
                     {...field}
                   />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className={`flex flex-col gap-2`}>
+                <FormLabel className="text-lilac-200 max-md:text-xs">
+                  Password <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <div className="relative text-purple-500">
+                    <Input
+                      type={passwordVisible ? 'text' : 'password'}
+                      placeholder="Masukkan password Anda"
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 max-md:text-xs"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 transform text-purple-500">
+                      {passwordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="confirmpassword"
+            render={({ field }) => (
+              <FormItem className={`flex flex-col gap-2`}>
+                <FormLabel className="text-lilac-200 max-md:text-xs">
+                  Confirm Password <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <div className="relative text-purple-500">
+                    <Input
+                      type={confirmPasswordVisible ? 'text' : 'password'}
+                      placeholder="Masukkan password Anda"
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 max-md:text-xs"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      onClick={toggleConfirmPasswordVisibility}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 transform text-purple-500">
+                      {confirmPasswordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
                 </FormControl>
               </FormItem>
             )}
@@ -114,6 +206,7 @@ export const EmailRegisterForm = () => {
             style={{
               borderImage: 'url(/images/login/gradient-border.svg) 16 / 12px stretch'
             }}
+            type='button'
             onClick={onGoogleClick}>
             <Image
               src={'/images/login/google-icon.png'}

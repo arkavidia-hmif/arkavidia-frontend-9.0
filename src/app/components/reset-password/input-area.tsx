@@ -1,13 +1,7 @@
 'use client'
 
 import { useForm } from 'react-hook-form'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel
-} from '../ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel } from '../ui/form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '../ui/input'
@@ -16,13 +10,15 @@ import { useState } from 'react'
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md'
 import { useToast } from '~/hooks/use-toast'
 
-const ResetPasswordSchema = z.object({
-  newPassword: z.string().min(8, { message: 'Password harus minimal 8 karakter' }),
-  confirmPassword: z.string().min(8, { message: 'Password harus minimal 8 karakter' })
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Password tidak cocok',
-  path: ['confirmPassword']
-})
+const ResetPasswordSchema = z
+  .object({
+    newPassword: z.string().min(8, { message: 'Password harus minimal 8 karakter' }),
+    confirmPassword: z.string().min(8, { message: 'Password harus minimal 8 karakter' })
+  })
+  .refine(data => data.newPassword === data.confirmPassword, {
+    message: 'Password tidak cocok',
+    path: ['confirmPassword']
+  })
 
 export const ResetPasswordForm = () => {
   const { toast } = useToast()
@@ -43,9 +39,9 @@ export const ResetPasswordForm = () => {
   const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
     console.log('Password reset data:', values)
     toast({
-        title: "Password Changed",
-        description: "Passwordmu sudah berhasil diganti",
-      })
+      title: 'Password Changed',
+      description: 'Passwordmu sudah berhasil diganti'
+    })
     // TODO: Add backend logic for password reset
   }
 
@@ -54,8 +50,10 @@ export const ResetPasswordForm = () => {
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col rounded-xl bg-purple-800 max-lg:gap-[48px] max-lg:px-[60px] max-lg:py-[60px] max-md:gap-[24px] max-md:px-[36px] max-md:py-[40px] lg:gap-[48px] lg:px-[72px] lg:py-[80px]">
-        <div className="flex flex-col max-lg:w-[275px] max-lg:gap-4 max-md:gap-2.5 max-md:text-[0.5rem] max-md:text-xs lg:w-[350px] lg:gap-5 font-dmsans">
-          <h1 className='text-center text-lilac-200 text font-bold text-3xl mb-12 font-teachers'>Reset Password</h1>
+        <div className="flex flex-col font-dmsans max-lg:w-[275px] max-lg:gap-4 max-md:gap-2.5 max-md:text-[0.5rem] max-md:text-xs lg:w-[350px] lg:gap-5">
+          <h1 className="text mb-12 text-center font-teachers text-3xl font-bold text-lilac-200">
+            Reset Password
+          </h1>
           <FormField
             control={form.control}
             name="newPassword"
@@ -68,7 +66,7 @@ export const ResetPasswordForm = () => {
                   <FormControl>
                     <Input
                       type={showPassword ? 'text' : 'password'}
-                      className="bg-lilac-100 pr-10 placeholder:text-purple-500 max-md:text-xs text-black"
+                      className="bg-lilac-100 pr-10 text-black placeholder:text-purple-500 max-md:text-xs"
                       placeholder="Masukkan password baru Anda"
                       {...field}
                     />
@@ -76,8 +74,12 @@ export const ResetPasswordForm = () => {
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    {showPassword ? <MdVisibilityOff className="h-5 w-5 text-purple-500" /> : <MdVisibility className="h-5 w-5 text-purple-500" />}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    {showPassword ? (
+                      <MdVisibilityOff className="h-5 w-5 text-purple-500" />
+                    ) : (
+                      <MdVisibility className="h-5 w-5 text-purple-500" />
+                    )}
                   </button>
                 </div>
               </FormItem>
@@ -95,7 +97,7 @@ export const ResetPasswordForm = () => {
                   <FormControl>
                     <Input
                       type={showPassword ? 'text' : 'password'}
-                      className="bg-lilac-100 pr-10 placeholder:text-purple-500 max-md:text-xs text-black"
+                      className="bg-lilac-100 pr-10 text-black placeholder:text-purple-500 max-md:text-xs"
                       placeholder="Masukkan kembali password Anda"
                       {...field}
                     />
@@ -103,8 +105,12 @@ export const ResetPasswordForm = () => {
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    {showPassword ? <MdVisibilityOff className="h-5 w-5 text-purple-500" /> : <MdVisibility className="h-5 w-5 text-purple-500" />}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    {showPassword ? (
+                      <MdVisibilityOff className="h-5 w-5 text-purple-500" />
+                    ) : (
+                      <MdVisibility className="h-5 w-5 text-purple-500" />
+                    )}
                   </button>
                 </div>
               </FormItem>
@@ -113,7 +119,7 @@ export const ResetPasswordForm = () => {
         </div>
         <div className="flex w-full flex-col text-center max-lg:gap-1.5 max-md:gap-1 max-md:text-xs lg:gap-2">
           <Button
-            className='p-10 py-6 bg-[linear-gradient(114deg,#48E6FF_-34.84%,#9274FF_45.46%,#C159D8_125.76%)] hover:text-purple-600 text-white max-md:text-xs font-semibold rounded-xl'
+            className="rounded-xl bg-[linear-gradient(114deg,#48E6FF_-34.84%,#9274FF_45.46%,#C159D8_125.76%)] p-10 py-6 font-semibold text-white hover:text-purple-600 max-md:text-xs"
             type="submit"
             variant="ghost">
             Reset Password
