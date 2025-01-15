@@ -1,13 +1,9 @@
 import { Check, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
+import { TeamMember } from "~/api/generated";
 import { Button } from "~/app/components/Button";
 import Tag from "~/app/components/Tag";
-
-const dummy = {
-    name: "Rafly Hanggaraksa",
-    email: "rafly@example.com",
-    phone: "081234567890"
-}
 
 function Field({title, value}: {title: string, value: string}) {
     return (
@@ -77,13 +73,13 @@ function FileRequirements({filetype, editable}: {filetype: string, editable?: bo
     )
 }
 
-function MemberCard({isTeamLeader}: {isTeamLeader?: boolean}) {
+function MemberCard({isTeamLeader, name, email, phone}: {isTeamLeader?: boolean, name: string, email: string, phone: string}) {
     return (
         <div className="relative px-5 py-4 border border-white flex flex-col gap-3 rounded-lg">
             {isTeamLeader && <Tag variant="lilac" text="Team Leader" className="absolute right-4 top-3 w-fit px-5 bg-white"/>}
-            <Field title="Name" value={dummy.name} />
-            <Field title="Email" value={dummy.email} />
-            <Field title="Phone" value={dummy.phone} />
+            <Field title="Name" value={name} />
+            <Field title="Email" value={email} />
+            <Field title="Phone" value={phone? phone : '-'} />
             {
                 isTeamLeader ?
                 <>
@@ -102,14 +98,63 @@ function MemberCard({isTeamLeader}: {isTeamLeader?: boolean}) {
     )
 }
 
-export default function TeamInfo() {
+const TeamDummy = {
+    data: [
+        {
+            name: 'John Doe 1',
+            email: 'john1@example.com',
+            phone: '08123456789'
+        },
+        {
+            name: 'John Doe 2',
+            email: 'john2@example.com',
+            phone: '08123456789'
+        },
+        {
+            name: 'John Doe 3',
+            email: 'john3@example.com',
+            phone: '08123456789'
+        },
+    ]
+}
+
+type GetTeamDetailResponse = {
+    members?: Array<TeamMember>; // Make members optional
+  };
+
+// const membersData = {
+//     data: [
+//         {
+//             name: 'John Doe 1',
+//             email: 'johndoe@example.com',
+//             phone: '08123456789'
+//         },
+//         {
+//             name: 'John Doe 1',
+//             email: 'johndoe@example.com',
+//             phone: '08123456789'
+//         },
+//         {
+//             name: 'John Doe 1',
+//             email: 'johndoe@example.com',
+//             phone: '08123456789'
+//         }
+//     ]
+// };
+
+export default function TeamInfo({members} : GetTeamDetailResponse) {
+
     return (
         <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 shadow-lg px-[2rem] py-[1rem] font-dmsans">
             <PaymentProof />
             <div className="grid xl:grid-cols-3 grid-cols-1 gap-7">
-                <MemberCard isTeamLeader/>
-                <MemberCard />
-                <MemberCard />
+                {
+                    members && 
+                    members.map((member, index) => (
+                        <MemberCard key={index} name={member.user.fullName ? member.user.fullName : '-' } email={member.user.email} phone={member.user.phoneNumber ? member.user.phoneNumber.toString() : '-'} isTeamLeader={member.role === 'leader'}/>
+                        // <MemberCard key={index} name={member.name} email={member.email} phone={member.phone} isTeamLeader={index === 0}/>
+                    ))
+                }
             </div>
         </div>
     )
