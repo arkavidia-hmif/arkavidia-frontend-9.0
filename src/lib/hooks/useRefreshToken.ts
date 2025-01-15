@@ -1,36 +1,31 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
 import { axiosInstance } from '../axios'
 import { refresh } from '~/api/generated'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '~/app/contexts/AuthContext'
 
 export const useRefreshToken = () => {
-  const { data: session, update, status } = useSession()
+  const { getRefreshToken, setRefreshToken, setIsAuth } = useAuth()
   const router = useRouter()
 
   const refreshToken = async () => {
-    if (!session?.user?.refreshToken) {
-      router.push('/api-test') // Redirect to login page if no refresh token
-      return
+    const refToken = getRefreshToken()
+    if (!refToken) {
+      return null
     }
 
-    const res = await refresh({
+    const tokens = await refresh({
       client: axiosInstance,
-      query: { token: session?.user.refreshToken ?? '' }
+      query: { token: refToken ?? '' }
     })
 
-    if (res.data) {
-      await update({
-        user: {
-          ...session.user,
-          accessToken: res.data.accessToken,
-          refreshToken: res.data.refreshToken
-        }
-      })
-
-      return res.data.accessToken
+    if (tokens.data?.refreshToken) {
+      setRefreshToken(tokens.data.refreshToken)
+      setIsAuth(true)
     }
+
+    return tokens.data?.refreshToken ?? null
   }
 
   return refreshToken

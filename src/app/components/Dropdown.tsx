@@ -6,6 +6,7 @@ import { LoaderCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import ExpandedMenu from './ui/expanded-menu'
+import clsx from 'clsx'
 
 export interface MenuItem {
   id: number
@@ -23,14 +24,17 @@ export default function Dropdown({
   placeholder,
   onChange,
   value,
+  className,
 }: {
   data: MenuItem[]
   label?: string
   isRequired?: boolean
   helper_text?: string
   placeholder?: string
-  onChange?: (selectedItem: MenuItem | null) => void 
-  value?: MenuItem | null 
+  onChange?: (selectedItem: MenuItem | null) => void
+  value?: MenuItem | null
+  className?: string
+  
 }) {
   const [inputValue, setInputValue] = useState('') // For filtering only
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -69,7 +73,7 @@ export default function Dropdown({
   }
 
   return (
-    <div className="mx-auto w-full max-w-[350px] space-y-2">
+    <div className={`mx-auto w-full max-w-[350px] space-y-2 text-base ${className}`}>
       {label && (
         <Label
           htmlFor="input-27"
@@ -79,11 +83,13 @@ export default function Dropdown({
       )}
 
       {/* Input and Expanded Menu */}
-      <div className="relative w-full">
+      <div className="relative w-full text-inherit">
         {/* Search Input */}
         <input
           id="input-27"
-          className="peer h-fit w-full appearance-none rounded-xl border-[1.5px] border-purple-400 bg-lilac-200 p-3 pe-12 ps-12 font-dmsans text-base font-normal leading-6 text-purple-500 shadow-[0_0_0_3px_rgba(113,56,192,1)] placeholder:font-dmsans placeholder:text-base placeholder:font-normal placeholder:leading-6 placeholder:text-purple-500 placeholder:opacity-100 focus:outline-none"
+          className={clsx(
+            'h-fit w-full appearance-none rounded-xl border-[1.5px] border-purple-400 bg-lilac-200 p-3 pe-12 ps-12 font-dmsans font-normal leading-6 text-inherit text-purple-500 shadow-[0_0_0_3px_rgba(113,56,192,1)] placeholder:font-dmsans placeholder:font-normal placeholder:leading-6 placeholder:text-inherit placeholder:text-purple-500 placeholder:opacity-100 focus:outline-none'
+          )}
           placeholder={selectedItem ? selectedItem.option : (placeholder ?? 'Search...')} // Show selected option in placeholder
           type="search"
           value={inputValue} // Controlled value for filtering

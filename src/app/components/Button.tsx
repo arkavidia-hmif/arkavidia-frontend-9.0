@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Button as RadixButton, ButtonProps as RadixButtonProps } from "./ui/button";
+import { Button as RadixButton } from "./ui/button";
 import { cn } from "~/lib/utils";
 import { cva } from "class-variance-authority";
 

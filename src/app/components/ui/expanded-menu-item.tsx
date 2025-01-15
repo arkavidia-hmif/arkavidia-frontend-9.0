@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import Checkbox from '../Checkbox'
+import { Checkbox } from '../Checkbox'
 
 interface ExpandedMenuItemProps {
   /** Whether to display the left icon */
