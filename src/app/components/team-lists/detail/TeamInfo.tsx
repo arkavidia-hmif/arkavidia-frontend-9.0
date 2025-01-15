@@ -1,9 +1,11 @@
-import { Check, ExternalLink, X } from "lucide-react";
+import { Check, ExternalLink, SendHorizonal, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { TeamMember } from "~/api/generated";
 import { Button } from "~/app/components/Button";
 import Tag from "~/app/components/Tag";
+import { cn } from "~/lib/utils";
+import { Input } from "../../Input";
 
 function Field({title, value}: {title: string, value: string}) {
     return (
@@ -43,8 +45,10 @@ function PaymentProof() {
 }
 
 function FileRequirements({filetype, editable}: {filetype: string, editable?: boolean}) {
+    const [isFeedback, setIsFeedback] = useState(false);
+
     return (
-        <div className="flex justify-between">
+        <div className={cn("flex justify-between", isFeedback ? 'md:flex-row gap-2 flex-col' : '')}>
             <div className="flex gap-1 items-center">
                 <ExternalLink size={24} />
                 <div className="mt-1">
@@ -55,14 +59,22 @@ function FileRequirements({filetype, editable}: {filetype: string, editable?: bo
             </div>
             {
                 editable ? 
-                    <div className="flex gap-5">
-                        <Button variant={'outline'} size={'sm'}>
-                            <X size={10} className="text-white" strokeWidth={3} />
-                        </Button>
-                        <Button size={'sm'}>
-                            <Check size={10}  strokeWidth={3}/>
-                        </Button>
-                    </div> 
+                    <>
+                        <div className={cn("gap-5", isFeedback ? 'hidden' : 'flex')}>
+                            <Button variant={'outline'} size={'sm'} onClick={() => setIsFeedback(true)}>
+                                <X size={10} className="text-white" strokeWidth={3} />
+                            </Button>
+                            <Button size={'sm'}>
+                                <Check size={10}  strokeWidth={3}/>
+                            </Button>
+                        </div>
+                        <div className={cn("gap-5 items-center justify-start", isFeedback ? 'flex' : 'hidden')}>
+                                <Input placeholder="Send what's wrong" className="max-w-[250px]" />
+                                <Button size={'sm'} onClick={() => setIsFeedback(false)}>
+                                    <SendHorizonal size={15}  strokeWidth={3}/>
+                                </Button>
+                        </div> 
+                    </>
                     : 
                     <div>
                         <Check size={30}  strokeWidth={2}/>
@@ -119,40 +131,53 @@ const TeamDummy = {
 }
 
 type GetTeamDetailResponse = {
-    members?: Array<TeamMember>; // Make members optional
+    members?: Array<TeamMember> | undefined; // Make members optional
   };
 
-// const membersData = {
-//     data: [
-//         {
-//             name: 'John Doe 1',
-//             email: 'johndoe@example.com',
-//             phone: '08123456789'
-//         },
-//         {
-//             name: 'John Doe 1',
-//             email: 'johndoe@example.com',
-//             phone: '08123456789'
-//         },
-//         {
-//             name: 'John Doe 1',
-//             email: 'johndoe@example.com',
-//             phone: '08123456789'
-//         }
-//     ]
-// };
+const membersData = {
+    data: [
+        {
+            name: 'John Doe 1',
+            email: 'johndoe@example.com',
+            phone: '08123456789'
+        },
+        {
+            name: 'John Doe 1',
+            email: 'johndoe@example.com',
+            phone: '08123456789'
+        },
+        {
+            name: 'John Doe 1',
+            email: 'johndoe@example.com',
+            phone: '08123456789'
+        }
+    ]
+};
 
 export default function TeamInfo({members} : GetTeamDetailResponse) {
 
     return (
         <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 shadow-lg px-[2rem] py-[1rem] font-dmsans">
             <PaymentProof />
-            <div className="grid xl:grid-cols-3 grid-cols-1 gap-7">
+            {/* <div className={cn("xl:grid-cols-3 grid-cols-1 gap-7", members ? 'grid' : 'hidden')}>
                 {
                     members && 
                     members.map((member, index) => (
                         <MemberCard key={index} name={member.user.fullName ? member.user.fullName : '-' } email={member.user.email} phone={member.user.phoneNumber ? member.user.phoneNumber.toString() : '-'} isTeamLeader={member.role === 'leader'}/>
                         // <MemberCard key={index} name={member.name} email={member.email} phone={member.phone} isTeamLeader={index === 0}/>
+                    ))
+                }
+            </div> */}
+            <div className={cn("grid xl:grid-cols-3 grid-cols-1 gap-7")}>
+                {
+                    // members && 
+                    // members.map((member, index) => (
+                    //     <MemberCard key={index} name={member.user.fullName ? member.user.fullName : '-' } email={member.user.email} phone={member.user.phoneNumber ? member.user.phoneNumber.toString() : '-'} isTeamLeader={member.role === 'leader'}/>
+                    //     // <MemberCard key={index} name={member.name} email={member.email} phone={member.phone} isTeamLeader={index === 0}/>
+                    // ))
+                    membersData && 
+                    membersData.data.map((member, index) => (
+                        <MemberCard key={index} name={member.name} email={member.email} phone={member.phone} isTeamLeader={index === 0}/>
                     ))
                 }
             </div>

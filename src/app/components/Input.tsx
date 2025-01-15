@@ -110,7 +110,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ref
   ) => {
     return (
-      <div className="grid w-full gap-2">
+      <div className="grid gap-2">
         {label && (
           <label
             htmlFor={props.id}
@@ -126,7 +126,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             </span>
           </label>
         )}
-        <div className="relative">
+        <div className="relative w-fit">
           {leftIcon && typeof leftIcon === 'object' && (
             <div className={cn(IconVariants({ size, position: 'left' }))}>{leftIcon}</div>
           )}

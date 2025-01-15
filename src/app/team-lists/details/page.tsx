@@ -4,7 +4,7 @@ import { Tab } from "~/app/components/Tab";
 import TeamInfo from "~/app/components/team-lists/detail/TeamInfo";
 import Submission from "~/app/components/team-lists/detail/Submission";
 import { useEffect, useState } from "react";
-import { basicLogin, getTeamDetail, GetTeamDetailResponse, TeamMember } from "~/api/generated";
+import { basicLogin, getTeamDetail, GetTeamDetailResponse, TeamMember, logout, getCompetitionSubmission } from "~/api/generated";
 import useAxiosAuth from "~/lib/hooks/useAxiosAuth";
 import { axiosInstance } from "~/lib/axios";
 
@@ -13,55 +13,61 @@ function TeamDetails() {
     const axiosAuth = useAxiosAuth();
 
     useEffect(() => {
-        const login = async () => {
-            try {
-                const resp = await basicLogin(
-                    {
-                        client: axiosInstance,
-                        body: {
-                            email: 'admin@example.com',
-                            password: 'password'
-                        }
-                    }
-                );
-
-                console.log("Login")
-                console.log(resp.status)
-                console.log(resp.data)
-            } catch (err) {
-                console.log(err)
-            }
-        }
+        let isMounted = true;
 
         const fetchTeamData = async () => {
             try {
-                const resp = await getTeamDetail(
-                    {
-                        client: axiosAuth,
-                        path: {
-                            teamId: 'es3hvk58',
-                            competitionId: 'zrl4bjpi'
-                        }
+                const resp = await getTeamDetail({
+                    client: axiosAuth,
+                    path: {
+                        teamId: 'es3hvk58',
+                        competitionId: 'zrl4bjpi'
                     }
-                );
-    
-                setTeamData(resp.data);
-                console.log(resp.data)
+                });
+                
+                if (isMounted) {
+                    setTeamData(resp.data);
+                    console.log("Team data fetched:", resp.data);
+                }
             } catch (err) {
-                console.log(err);
+                console.error("Team data fetch error:", err);
+                throw err;
             }
+        };
 
+        const fetchTestData = async () => {
+            try {
+                const resp = await getCompetitionSubmission({
+                    client: axiosAuth,
+                    path: {
+                        competitionId: 'zrl4bjpi'
+                    }
+                })
+
+                console.log("Test data fetched:", resp.data);
+            } catch (err) {
+                console.error("Test data fetch error:", err);
+            }
         }
 
-        const fetchTest = async () => {
-            await login();
-            await fetchTeamData();
-        }
+        const initializeData = async () => {
+            try {
+                // await handleLogout();
+                // await handleLogin();
+                await fetchTestData();
+                await fetchTeamData();
+            } catch (err) {
+                console.error("Initialization sequence failed:", err);
+            }
+        };
 
-        fetchTest();
-        // login();
-        // fetchTeamData();
-    }, [])
+        initializeData();
+
+        // Cleanup function
+        return () => {
+            isMounted = false;
+        };
+    }, [axiosAuth]); // Add axiosAuth as dependency
 
     return (
         <div
@@ -71,11 +77,17 @@ function TeamDetails() {
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
                 backgroundSize: 'cover',
-              }}
+            }}
         >
-            <Tab contentType={['Team Information', 'Submission']} content={[<TeamInfo members={teamData?.members}/>,<Submission />]} />
-        </div>  
-    )
+            <Tab 
+                contentType={['Team Information', 'Submission']} 
+                content={[
+                    <TeamInfo key="team-info" members={teamData?.members}/>,
+                    <Submission key="submission" />
+                ]} 
+            />
+        </div>
+    );
 }
 
 export default TeamDetails;
