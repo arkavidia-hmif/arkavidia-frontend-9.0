@@ -4,11 +4,14 @@ import { Tab } from "~/app/components/Tab";
 import TeamInfo from "~/app/components/team-lists/detail/TeamInfo";
 import Submission from "~/app/components/team-lists/detail/Submission";
 import { useEffect, useState } from "react";
-import { basicLogin, getTeamDetail, GetTeamDetailResponse, TeamMember, logout, getCompetitionSubmission } from "~/api/generated";
+import { getTeamDetail, GetTeamDetailResponse } from "~/api/generated";
 import useAxiosAuth from "~/lib/hooks/useAxiosAuth";
 import { axiosInstance } from "~/lib/axios";
 
+type Competition = 'CP' | 'CTF' | 'HACKVIDIA' | 'UXVIDIA' | 'DATAVIDIA';
+
 function TeamDetails() {
+    const [competition, setCompetition] = useState<Competition>('CP');
     const [teamData, setTeamData] = useState<GetTeamDetailResponse>();
     const axiosAuth = useAxiosAuth();
 
@@ -35,26 +38,10 @@ function TeamDetails() {
             }
         };
 
-        const fetchTestData = async () => {
-            try {
-                const resp = await getCompetitionSubmission({
-                    client: axiosAuth,
-                    path: {
-                        competitionId: 'zrl4bjpi'
-                    }
-                })
-
-                console.log("Test data fetched:", resp.data);
-            } catch (err) {
-                console.error("Test data fetch error:", err);
-            }
-        }
-
         const initializeData = async () => {
             try {
                 // await handleLogout();
                 // await handleLogin();
-                await fetchTestData();
                 await fetchTeamData();
             } catch (err) {
                 console.error("Initialization sequence failed:", err);
@@ -79,13 +66,24 @@ function TeamDetails() {
                 backgroundSize: 'cover',
             }}
         >
-            <Tab 
-                contentType={['Team Information', 'Submission']} 
-                content={[
-                    <TeamInfo key="team-info" members={teamData?.members}/>,
-                    <Submission key="submission" />
-                ]} 
-            />
+            {
+                competition === 'UXVIDIA' || competition === 'DATAVIDIA' ? (
+                    <Tab 
+                        contentType={['Team Information', 'Submission']} 
+                        content={[
+                            <TeamInfo key="team-info" members={teamData?.teamMembers} existsSubmission/>,
+                            <Submission key="submission" />
+                        ]} 
+                    />
+                ) : (
+                    <Tab 
+                        contentType={['Team Information']} 
+                        content={[
+                            <TeamInfo key="team-info" members={teamData?.teamMembers}/>,
+                        ]} 
+                    />
+                )  
+            }
         </div>
     );
 }
