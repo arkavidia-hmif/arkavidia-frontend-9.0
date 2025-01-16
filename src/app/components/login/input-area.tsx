@@ -9,7 +9,7 @@ import {
   FormItem,
   FormLabel
 } from '../ui/form'
-import { basicLogin } from '~/api/generated'
+import { googleAuth } from '~/api/generated'
 import { axiosInstance } from '~/lib/axios'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -21,6 +21,9 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '~/app/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
+import useGAuth from '~/lib/hooks/useGAuth'
+import { useAppDispatch } from '~/redux/store'
 
 // Link Variable
 const FORGET_PASSWORD_LINK = 'forget-password'
@@ -39,6 +42,7 @@ const loginSchema = z.object({
 export const InputArea = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
   const { basicLogin } = useAuth()
+  const { login } = useGAuth()
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(prev => !prev)
@@ -55,9 +59,9 @@ export const InputArea = () => {
   /**
    * Used when Login with google Button is clicked
    */
-  function onGoogleClick() {
+  async function onGoogleClick() {
     //TODO: Replace with google auth function
-    console.log('Login From Google')
+    login()
   }
 
   /**
@@ -81,7 +85,7 @@ export const InputArea = () => {
     toast({
       title: 'Login Success',
       description: 'Successfully logged in',
-      variant: 'default'
+      variant: 'success'
     })
   }
 
@@ -185,7 +189,7 @@ export const InputArea = () => {
               height={24}
             />
             <span className="bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] bg-clip-text text-transparent">
-              Register dengan Google
+              Login dengan Google
             </span>
           </Button>
         </div>

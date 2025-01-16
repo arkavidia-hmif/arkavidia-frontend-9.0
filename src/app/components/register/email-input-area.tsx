@@ -18,6 +18,10 @@ import { useToast } from '../../../hooks/use-toast'
 import Image from 'next/image'
 import { useState } from 'react'
 import { EyeOff, Eye } from 'lucide-react'
+import { basicRegister, bypassRegister } from '~/api/generated'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { axiosInstance } from '~/lib/axios'
+import useGAuth from '~/lib/hooks/useGAuth'
 
 // Link Variable
 const FORGET_PASSWORD_LINK = 'forget-password'
@@ -52,11 +56,12 @@ const registerSchema = z
   })
 export const EmailRegisterForm = () => {
   const { toast } = useToast()
+  const { register } = useGAuth()
 
   // Input Visibility Handling
   const [passwordVisible, setPasswordVisible] = useState(false)
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false)
-  
+
   const togglePasswordVisibility = () => {
     setPasswordVisible(prev => !prev)
   }
@@ -80,16 +85,38 @@ export const EmailRegisterForm = () => {
    */
   function onGoogleClick() {
     //TODO: Replace with google auth function
-    console.log('Login From Google')
+    register()
   }
 
   /**
    * Used when form submitted
    * @param values The login schema data
    */
-  function onSubmit(values: z.infer<typeof registerSchema>) {
+  async function onSubmit(values: z.infer<typeof registerSchema>) {
     // TODO: Replace with backend logic
-    console.log('Email Register: ' + values)
+    const regRequest = await bypassRegister({
+      client: axiosInstance,
+      body: {
+        email: values.email,
+        password: values.password,
+        confirmPassword: values.confirmpassword
+      }
+    })
+
+    if (regRequest.error) {
+      toast({
+        title: 'Registration Error',
+        description: 'Failed to register',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    toast({
+      title: 'Registration Success',
+      description: 'Successfully registered',
+      variant: 'success'
+    })
   }
 
   /**
@@ -206,7 +233,7 @@ export const EmailRegisterForm = () => {
             style={{
               borderImage: 'url(/images/login/gradient-border.svg) 16 / 12px stretch'
             }}
-            type='button'
+            type="button"
             onClick={onGoogleClick}>
             <Image
               src={'/images/login/google-icon.png'}
@@ -221,9 +248,9 @@ export const EmailRegisterForm = () => {
         </div>
 
         <span className="text-center text-xs text-lilac-200 max-md:text-[10px]">
-          Belum punya akun?{' '}
-          <Link className="font-bold underline" href={REGISTER_LINK}>
-            Register
+          Sudah punya akun?{' '}
+          <Link className="font-bold underline" href="/login">
+            Login
           </Link>
         </span>
       </form>

@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 import { AuthContextProps, basicLoginResponse } from './AuthContextTypes'
 import { useAppDispatch, useAppSelector, StoreType } from '~/redux/store'
 import { useToast } from '~/hooks/use-toast'
-import { setNotAdmin, userLogin, userLogout } from '~/redux/slices/auth'
+import { setAdmin, setNotAdmin, userLogin, userLogout } from '~/redux/slices/auth'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useStore } from 'react-redux'
 
@@ -47,11 +47,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
       }
     }
+    setIsLoading(false)
   }
 
   useEffect(() => {
     sessionCheck()
-    setIsLoading(false)
   }, [])
 
   const basicLogin = async (email: string, password: string) => {
