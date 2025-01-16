@@ -2,9 +2,9 @@ import {
   PersonalInformationContent,
   ProfileInformationDefaultValue,
   ProfileInformationDropdownOptions
-} from '../../../components/profile/personal-information-content'
-import { ProfileLayout } from '../../../components/profile/profile-content-layout'
-import ProfileHero from '../../../components/ProfileHero'
+} from '../../components/profile/personal-information-content'
+import { ProfileLayout } from '../../components/profile/profile-content-layout'
+import ProfileHero from '~/app/components/ProfileHero'
 
 const DummyPersonalInfoData: ProfileInformationDefaultValue = {
   name: 'Ahdmad Jone Done',
