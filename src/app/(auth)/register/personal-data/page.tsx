@@ -23,11 +23,7 @@ const DummyPersonalEducation: MenuItem[] = [
 ]
 
 const PersonalDataRegisterPage = () => {
-  return (
-    
-      <PersonalDataForm educationOptions={DummyPersonalEducation} />
-    
-  )
+  return <PersonalDataForm educationOptions={DummyPersonalEducation} />
 }
 
 export default PersonalDataRegisterPage

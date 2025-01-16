@@ -34,13 +34,14 @@ const LoginPage = () => {
         className="absolute h-screen w-screen"></Image>
 
       {/* Main Page Parts */}
-      <div className="flex h-full w-full flex-row justify-center gap-[96px] max-md:my-10 max-md:flex-col max-md:items-center max-md:gap-[48px]">
+      <div className="flex h-full w-full flex-row items-center justify-center gap-[110px] max-md:my-10 max-md:flex-col max-md:items-center max-md:gap-[24px]">
         <Image
           src={'/images/login/arkav-logo.png'}
           alt={'Arkav Logo'}
           width={503}
           height={579}
-          className="z-10 max-lg:w-80 max-md:h-72 max-md:w-64"
+          quality={100}
+          className="z-10 w-[250px] md:w-[330px] lg:w-[400px]"
         />
         <div className="z-10">
           <InputArea />

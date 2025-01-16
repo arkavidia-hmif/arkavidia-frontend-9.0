@@ -13,7 +13,7 @@ import { googleAuth } from '~/api/generated'
 import { axiosInstance } from '~/lib/axios'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Input } from '../ui/input'
+import { Input } from '../Input'
 import Link from 'next/link'
 import { Button } from '../ui/button'
 import { useToast } from '../../../hooks/use-toast'
@@ -122,7 +122,7 @@ export const InputArea = () => {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    className="bg-lilac-100 pr-10 max-md:text-xs"
+                    className="w-full bg-lilac-100 pr-10 max-md:text-xs"
                     placeholder="Masukkan e-mail Anda"
                     {...field}
                   />
@@ -143,7 +143,7 @@ export const InputArea = () => {
                     <Input
                       type={passwordVisible ? 'text' : 'password'}
                       placeholder="Masukkan password Anda"
-                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 max-md:text-xs"
+                      className="w-full border-[1.5px] border-purple-300 bg-lilac-100 pr-10 max-md:text-xs"
                       {...field}
                     />
                     <button

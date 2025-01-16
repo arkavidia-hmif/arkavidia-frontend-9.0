@@ -8,7 +8,7 @@ import Image from 'next/image'
 import SearchIcon from './ui/search-icon'
 
 const InputVariants = cva(
-  'flex w-[350px] rounded-[12px] transition duration-200 ease-in-out border-[1.5px] text-base placeholder:text-base ',
+  'flex w-[350px] rounded-[12px] transition duration-200 ease-in-out border-[1.5px] text-base placeholder:text-md ',
   {
     variants: {
       variant: {
@@ -29,7 +29,7 @@ const InputVariants = cva(
         error: 'border-red-500 '
       },
       size: {
-        lg: 'h-[48px] max-w-[350px] p-[12px] ',
+        lg: 'h-[48px] max-w-[350px] p-[12px] py-2 ',
         md: 'h-[40px] max-w-[350px] px-[12px] py-[8px] '
       }
     },

@@ -97,7 +97,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}
-        className="flex flex-col gap-12 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[60px] max-md:px-[36px] max-md:py-[40px] lg:px-[72px] lg:py-[80px]">
+        className="my-6 mr-4 flex flex-col gap-12 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[60px] max-md:px-[36px] max-md:py-[40px] lg:px-[72px] lg:py-[80px]">
         <h1 className="w-full text-center font-teachers text-3xl font-bold text-lilac-200">
           Lengkapi Data Dirimu!
         </h1>
