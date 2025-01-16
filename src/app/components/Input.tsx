@@ -169,7 +169,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               'text-red-500': state === 'error',
               'text-green-400': state === 'success',
               'text-yellow-500': state === 'warning',
-              'text-neutral-600': props.disabled,
+              'text-neutral-600': props.disabled
             })}>
             {error || helperText}
           </p>

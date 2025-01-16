@@ -1,8 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { InputArea } from '../components/login/input-area'
-import { Toaster } from '../components/ui/toaster'
+import { InputArea } from '../../components/login/input-area'
 import { useRouter } from 'next/navigation'
 import { useAppSelector } from '~/redux/store'
 import { useEffect } from 'react'

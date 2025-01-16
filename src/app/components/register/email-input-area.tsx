@@ -22,6 +22,7 @@ import { basicRegister, bypassRegister } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { axiosInstance } from '~/lib/axios'
 import useGAuth from '~/lib/hooks/useGAuth'
+import { useRouter } from 'next/navigation'
 
 // Link Variable
 const FORGET_PASSWORD_LINK = 'forget-password'
@@ -57,6 +58,7 @@ const registerSchema = z
 export const EmailRegisterForm = () => {
   const { toast } = useToast()
   const { register } = useGAuth()
+  const router = useRouter()
 
   // Input Visibility Handling
   const [passwordVisible, setPasswordVisible] = useState(false)
@@ -94,29 +96,30 @@ export const EmailRegisterForm = () => {
    */
   async function onSubmit(values: z.infer<typeof registerSchema>) {
     // TODO: Replace with backend logic
-    const regRequest = await bypassRegister({
-      client: axiosInstance,
-      body: {
-        email: values.email,
-        password: values.password,
-        confirmPassword: values.confirmpassword
-      }
-    })
+    router.push('/')
+    // const regRequest = await bypassRegister({
+    //   client: axiosInstance,
+    //   body: {
+    //     email: values.email,
+    //     password: values.password,
+    //     confirmPassword: values.confirmpassword
+    //   }
+    // })
 
-    if (regRequest.error) {
-      toast({
-        title: 'Registration Error',
-        description: 'Failed to register',
-        variant: 'destructive'
-      })
-      return
-    }
+    // if (regRequest.error) {
+    //   toast({
+    //     title: 'Registration Error',
+    //     description: 'Failed to register',
+    //     variant: 'destructive'
+    //   })
+    //   return
+    // }
 
-    toast({
-      title: 'Registration Success',
-      description: 'Successfully registered',
-      variant: 'success'
-    })
+    // toast({
+    //   title: 'Registration Success',
+    //   description: 'Successfully registered',
+    //   variant: 'success'
+    // })
   }
 
   /**

@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Toaster } from '../components/ui/toaster'
+import { Toaster } from '../../components/ui/toaster'
 import { FormForgetPassword } from './components/FormForgetPassword'
 
 function ForgetPassword() {
