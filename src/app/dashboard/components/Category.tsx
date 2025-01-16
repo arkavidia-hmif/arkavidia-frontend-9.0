@@ -2,7 +2,12 @@ import React from 'react'
 
 function Category({ categoryName }: { categoryName: string }) {
   return (
-    <div className="rounded-[100px] bg-gradient-to-r from-[#25DE82] via-[#24A5B6] to-[#1E23C3] px-4 py-1.5 font-teachers text-[16px] font-bold">
+    <div
+      className="relative rounded-full px-[26px] py-1 font-teachers text-[14px] font-bold text-white"
+      style={{
+        background:
+          'linear-gradient(to right, rgba(73, 152, 127, 1), rgba(64, 131, 144, 1), rgba(43, 83, 146, 1))'
+      }}>
       {categoryName ?? 'Category'}
     </div>
   )
