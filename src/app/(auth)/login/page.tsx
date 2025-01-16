@@ -5,13 +5,20 @@ import { InputArea } from '../../components/login/input-area'
 import { useRouter } from 'next/navigation'
 import { useAppSelector } from '~/redux/store'
 import { useEffect } from 'react'
+import { useToast } from '~/hooks/use-toast'
 
 const LoginPage = () => {
   const router = useRouter()
+  const { toast } = useToast()
   const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
 
   useEffect(() => {
     if (isLoggedIn) {
+      toast({
+        title: 'You are already logged in',
+        variant: 'info',
+        duration: 3000
+      })
       router.push('/')
     }
   }, [])
