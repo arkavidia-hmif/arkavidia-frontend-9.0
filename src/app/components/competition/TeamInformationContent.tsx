@@ -274,6 +274,10 @@ const TeamInformationContent = () => {
     return <div>Loading Team Information...</div>;
   }
 
+  if (!teamName) {
+    return <div>No Team Information Found</div>;
+  }
+
   return (
     <div className="flex justify-between md:gap-36 rounded-lg border border-[rgba(255,255,255,0.80)] bg-[linear-gradient(93deg,rgba(2,2,2,0.30)_7.52%,rgba(113,56,192,0.60)_104.77%)] backdrop-blur-[5px] px-10 pb-72 pt-20 shadow-lg md:flex-row flex-col gap-8">
       <div className="flex w-1/2 flex-col gap-8">
