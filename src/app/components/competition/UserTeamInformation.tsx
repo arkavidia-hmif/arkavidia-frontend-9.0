@@ -68,7 +68,7 @@ export const UserTeamInformation = () => {
   }
 
   if (!team) {
-    return <div>No teams found for the user.</div>; 
+    return <div>No Teams Found.</div>; 
   }
 
   return (
