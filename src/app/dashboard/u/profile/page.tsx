@@ -1,3 +1,4 @@
+import { SocialMediaContent } from '~/app/components/profile/social-media-content'
 import {
   PersonalInformationContent,
   ProfileInformationDefaultValue,
@@ -98,7 +99,7 @@ const ProfilePage = () => {
             howDoYouKnowArkavOptions={DummyDropdownOptions.howDoYouKnowArkavOptions}
           />
         }
-        socialMedia={<div></div>}
+        socialMedia={<SocialMediaContent />}
       />
     </div>
   )
