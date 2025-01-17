@@ -15,10 +15,6 @@ const DummyPersonalEducation: MenuItem[] = [
   {
     id: 3,
     option: 'S2'
-  },
-  {
-    id: 4,
-    option: 'S3'
   }
 ]
 

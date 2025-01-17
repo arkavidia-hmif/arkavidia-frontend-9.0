@@ -17,9 +17,14 @@ import { useToast } from '../../../hooks/use-toast'
 import Dropdown, { MenuItem } from '../Dropdown'
 import { Checkbox } from '../Checkbox'
 import CustomDatePicker from '../date-picker/CustomDatePicker'
-import { getPresignedLink, self } from '~/api/generated'
+import { getPresignedLink, self, updateUser } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { axiosInstance } from '~/lib/axios'
+import { useRouter } from 'next/navigation'
+import { getEducation, getFormattedBirthDate } from '~/lib/utils'
+import { setFilledInfo } from '~/redux/slices/auth'
+import { useAppDispatch } from '~/redux/store'
+import useCheckFillInfo from '~/lib/hooks/useCheckFillInfo'
 
 interface PersonalDataProps {
   educationOptions: MenuItem[]
@@ -53,8 +58,19 @@ const registerPersonalDataSchema = z.object({
 })
 
 export const PersonalDataForm = (props: PersonalDataProps) => {
+  const hasFinishedRegis = useCheckFillInfo()
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
+  const router = useRouter()
+  const appDispatch = useAppDispatch()
+
+  if (hasFinishedRegis) {
+    setTimeout(() => {
+      router.push('/')
+    }, 1000)
+    return null
+  }
+
   const form = useForm<z.infer<typeof registerPersonalDataSchema>>({
     resolver: zodResolver(registerPersonalDataSchema),
     defaultValues: {
@@ -87,16 +103,18 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
       })
 
       // Upload to S3
+      // Get User ID to be embedded into file name
       const getSelf = await self({ client: axiosAuth })
       if (getSelf.error) {
         toast({
           title: 'Error',
-          description: 'Something went wrong',
+          description: 'Gagal mengirimkan data',
           variant: 'destructive'
         })
       }
 
       if (getSelf.data) {
+        // Generate presigned link with userID-embedded file name
         const userId = getSelf.data.id
         const fileName = values.identityCard[0].name
         const fileExt = fileName.slice(((fileName.lastIndexOf('.') - 1) >>> 0) + 2)
@@ -107,25 +125,74 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
             filename: `${userId}-identity-card.${fileExt}`
           }
         })
-        console.log(getLink.data)
+        if (getLink.error) {
+          toast({
+            title: 'Error',
+            description: 'Gagal melakukan upload data',
+            variant: 'destructive'
+          })
+        }
+
         if (getLink.data) {
-          // PUT to S3
+          // If we get the link, do a PUT rqeuest to S3
           const upload = await axiosInstance.put({
             url: getLink.data.presignedUrl,
             body: values.identityCard[0]
           })
 
           if (upload.status === 200) {
+            // If the upload is successful, save the data to the backend
+            // Logic to save new user profile data
+            const updateProfile = await updateUser({
+              client: axiosAuth,
+              body: {
+                fullName: values.fullname,
+                birthDate: getFormattedBirthDate(values.birthdate),
+                education: getEducation(values.education),
+                instance: values.institution,
+                phoneNumber: values.phonenumber,
+                idLine: values.lineid,
+                idInstagram: values.instagram,
+                idDiscord: values.discord,
+                consent: values.formacceptance
+              }
+            })
+            if (updateProfile.error) {
+              toast({
+                title: 'Error',
+                description: 'Gagal melakukan pembaruan data',
+                variant: 'destructive'
+              })
+            }
+
+            if (updateProfile.data) {
+              appDispatch(setFilledInfo(true))
+            }
+            // TODO: Add logic to save S3 data to backend database here
             toast({
               title: 'Success',
               description: 'Data berhasil disimpan',
               variant: 'success'
             })
+
+            setTimeout(() => {
+              router.replace('/')
+            }, 1000)
+          } else {
+            toast({
+              title: 'Error',
+              description: 'Gagal melakukan upload data',
+              variant: 'destructive'
+            })
           }
         }
       }
     } else {
-      console.error('Error on submitting form')
+      toast({
+        title: 'Validasi Gagal',
+        description: 'Anda harus menyetujui pernyataan kebenaran data',
+        variant: 'destructive'
+      })
     }
   }
 
@@ -152,7 +219,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}
-        className="max-w-1/2 my-6 mr-4 flex flex-col gap-12 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[60px] max-md:px-[36px] max-md:py-[40px] lg:px-[72px] lg:py-[80px]">
+        className="my-6 mr-4 flex flex-col gap-12 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[60px] max-md:px-[36px] max-md:py-[40px] lg:px-[72px] lg:py-[80px]">
         <h1 className="w-full text-center font-teachers text-3xl font-bold text-lilac-200">
           Lengkapi Data Dirimu!
         </h1>

@@ -32,7 +32,17 @@ function VerifyEmailPage() {
       })
       if (res.error) {
         setStatus('error')
-        setMessage('Something went wrong. Please try again.')
+        // @ts-ignore
+        if (res.error.message === 'Token has expired') {
+          setMessage('Verification link has expired. Redirecting to register page...')
+        } else {
+          // @ts-ignore
+          setMessage(res.error.message + '. Redirecting to register page...')
+        }
+        setIsProcessing(false)
+        setTimeout(() => {
+          router.replace('/register')
+        }, 3000)
       }
       if (res.data) {
         const accessToken = res.data.accessToken
@@ -42,7 +52,7 @@ function VerifyEmailPage() {
         setMessage('Email verified successfully')
         setTimeout(() => {
           router.replace('/')
-        }, 1500)
+        }, 2000)
       }
     }
 

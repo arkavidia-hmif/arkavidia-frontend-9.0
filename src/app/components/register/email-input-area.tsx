@@ -25,11 +25,6 @@ import useGAuth from '~/lib/hooks/useGAuth'
 import { useRouter } from 'next/navigation'
 import { VerificationModal } from '~/app/(auth)/register/components/VerificationSendModal'
 import { useAppSelector } from '~/redux/store'
-import { error } from 'console'
-
-// Link Variable
-const FORGET_PASSWORD_LINK = 'forget-password'
-const REGISTER_LINK = 'register'
 
 //TODO: Change the rules for each variable defined in schema here
 const registerSchema = z
@@ -156,7 +151,6 @@ export const EmailRegisterForm = () => {
    * Handle form errors and show toast notifications
    */
   function handleFormErrors(errors: typeof form.formState.errors) {
-    console.log(errors)
     Object.values(errors).forEach(error => {
       if (error?.message) {
         toast({
