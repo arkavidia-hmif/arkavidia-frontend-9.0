@@ -15,3 +15,22 @@ export function expandCompetitionName(competitionName: string) {
       return competitionName
   }
 }
+
+export function getFormattedBirthDate(date: Date) {
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+
+  return `${year}-${month}-${day}`
+}
+
+export function getEducation(education: string) {
+  switch (education) {
+    case 'SMA/MA/SMK':
+      return 'sma'
+    case 'S1':
+      return 's1'
+    case 'S2':
+      return 's2'
+  }
+}
