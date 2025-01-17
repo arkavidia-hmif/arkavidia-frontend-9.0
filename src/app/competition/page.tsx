@@ -10,7 +10,7 @@ import {
 import { Button } from '../components/ui/button'
 import { Tab } from '../components/Tab'
 import { ChevronLeft, CloudUpload } from 'lucide-react'
-import UserTeamInformation from '../components/competition/UserTeamInformation'
+import TeamInformationContent from '../components/competition/TeamInformationContent'
 
 // Task interface
 interface Task {
@@ -153,7 +153,7 @@ const CompetitionPage = () => {
   const contentTypes = ['Team Information', 'Announcements', 'Task List', 'Verification']
   const contents = [
     // Team Information Content
-    <UserTeamInformation  />,
+    <TeamInformationContent  />,
 
     // Announcements Content
     <div>Announcements Content</div>,
