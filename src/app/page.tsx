@@ -1,12 +1,12 @@
-import React from 'react'
+import { Input } from './components/Input'
+import { Search, AlertCircle, CheckCircle2 } from 'lucide-react'
+import Image from 'next/image'
+import ComingSoon from './components/404-coming-soon/ComingSoon'
 
-function Home() {
+export default function Home() {
   return (
-    <div className="pt-4 text-center">
-      <h1 className="text-4xl font-bold dark:text-white">Coming Soon!</h1>
-      <div className="text-md dark:text-white">In development</div>
+    <div className="">
+      <ComingSoon />
     </div>
   )
 }
-
-export default Home

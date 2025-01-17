@@ -25,20 +25,23 @@ interface Props
     ProfileInformationDropdownOptions {}
 
 export const PersonalInformationContent = (Props: Props) => {
-  const ErrorMenuItem : MenuItem = {
+  const ErrorMenuItem: MenuItem = {
     id: -1,
-    option: "Error"
+    option: 'Error'
   }
   return (
-    <div className="flex justify-between md:gap-36 rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-10 pb-72 pt-20 shadow-lg md:flex-row flex-col gap-8">
+    <div className="flex flex-col justify-between gap-8 rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-10 pb-72 pt-20 shadow-lg md:flex-row md:gap-36">
       <div className="flex w-full flex-col gap-8">
         <InputProfileData
           title={'Name'}
           default_value={Props.name ?? ''}
           placehodler={'Placeholder'}
         />
-        
-        <DatePickerProfileData title={'Birthdate'} default_value={Props.birthdate ?? new Date()} />
+
+        <DatePickerProfileData
+          title={'Birthdate'}
+          default_value={Props.birthdate ?? new Date()}
+        />
         <DropdownProfileData
           title={'Education'}
           selectedOption={Props.education ?? ErrorMenuItem}

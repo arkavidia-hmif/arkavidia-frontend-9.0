@@ -2,16 +2,16 @@ import {
   PersonalInformationContent,
   ProfileInformationDefaultValue,
   ProfileInformationDropdownOptions
-} from '../components/profile/personal-information-content'
-import { ProfileLayout } from '../components/profile/profile-content-layout'
-import { SocialMediaContent } from '../components/profile/social-media-content';
+} from '../../../components/profile/personal-information-content'
+import { ProfileLayout } from '../../../components/profile/profile-content-layout'
+import ProfileHero from '../../../components/ProfileHero'
 
 const DummyPersonalInfoData: ProfileInformationDefaultValue = {
   name: 'Ahdmad Jone Done',
   birthdate: new Date('2004-09-09'),
   education: {
     id: 1,
-    option: 'Institute',
+    option: 'Institute'
   },
   instance: {
     id: 2,
@@ -21,7 +21,7 @@ const DummyPersonalInfoData: ProfileInformationDefaultValue = {
   howDoYouKnowArkavidia: {
     id: 3,
     option: 'example@gmail.com'
-  },
+  }
 }
 
 const DummyDropdownOptions: ProfileInformationDropdownOptions = {
@@ -73,22 +73,17 @@ const DummyDropdownOptions: ProfileInformationDropdownOptions = {
   ]
 }
 
-const DummySocialMediaData = {
-  line: { id: 1, value: "john_doe123" },
-  discord: { id: 2, value: "john_doe_gantengabis" },
-  instagram: { id: 3, value: "@johndoe123" }
-};
-
 const ProfilePage = () => {
   return (
-    <div
-      className="relative md:min-h-screen bg-gradient-to-r from-[#1F0246] to-[#2E046A] px-6 max-h-fit"
-      style={{
-        backgroundImage: "url('/images/profile/bg.png')",
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
+    <div>
+      <div className="mb-8">
+        <ProfileHero
+          title="Profile"
+          name="Ahmad John Doe"
+          email="example@example.com"
+          isResetProfile={false}
+        />
+      </div>
       <ProfileLayout
         personalInformation={
           <PersonalInformationContent
@@ -103,16 +98,10 @@ const ProfilePage = () => {
             howDoYouKnowArkavOptions={DummyDropdownOptions.howDoYouKnowArkavOptions}
           />
         }
-        socialMedia={
-          <SocialMediaContent
-            line={DummySocialMediaData.line}
-            discord={DummySocialMediaData.discord}
-            instagram={DummySocialMediaData.instagram}
-          />
-        }
+        socialMedia={<div></div>}
       />
     </div>
-  );
-};
+  )
+}
 
-export default ProfilePage;
+export default ProfilePage

@@ -1,34 +1,34 @@
-'use client';
+'use client'
 
-import Image from 'next/image';
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import Dropdown, { MenuItem } from '../Dropdown';
+import Image from 'next/image'
+import { useState } from 'react'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
+import Dropdown, { MenuItem } from '../Dropdown'
 
 interface ProfileDataProps {
-  title: string;
-  value: string;
-  handleSave: () => void;
-  handleCancel: () => void;
+  title: string
+  value: string
+  handleSave: () => void
+  handleCancel: () => void
 }
 
 interface ProfileDataLayoutProps extends ProfileDataProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 // Base profileData components layout
 const ProfileData = (props: ProfileDataLayoutProps) => {
-  const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState<boolean>(false)
 
   function handleCancel() {
-    props.handleCancel();
-    setIsEdit(false);
+    props.handleCancel()
+    setIsEdit(false)
   }
 
   function handleSave() {
-    props.handleSave();
-    setIsEdit(false);
+    props.handleSave()
+    setIsEdit(false)
   }
 
   return (
@@ -43,9 +43,8 @@ const ProfileData = (props: ProfileDataLayoutProps) => {
                 isEdit
                   ? 'flex translate-y-0 opacity-100'
                   : 'pointer-events-none -translate-y-2 opacity-0'
-              } w-full transition-all duration-300 ease-in-out`}
-            >
-              <div className="flex flex-col md:items-center justify-normal gap-3 md:flex-row w-fit">
+              } w-full transition-all duration-300 ease-in-out`}>
+              <div className="flex w-fit flex-col justify-normal gap-3 md:flex-row md:items-center">
                 {/* Field input places */}
                 {isEdit && (
                   <>
@@ -55,8 +54,7 @@ const ProfileData = (props: ProfileDataLayoutProps) => {
                         onClick={handleCancel}
                         variant={'ghost'}
                         size={'icon'}
-                        className="border-2 border-[#9274FF]"
-                      >
+                        className="border-2 border-[#9274FF]">
                         <Image
                           src={'/images/profile/close.svg'}
                           alt={'Close Button'}
@@ -69,8 +67,7 @@ const ProfileData = (props: ProfileDataLayoutProps) => {
                         onClick={handleSave}
                         variant={'ghost'}
                         className="bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs"
-                        size={'icon'}
-                      >
+                        size={'icon'}>
                         <Image
                           src={'/images/profile/check.svg'}
                           alt={'Save Button'}
@@ -91,8 +88,7 @@ const ProfileData = (props: ProfileDataLayoutProps) => {
                 isEdit
                   ? 'pointer-events-none translate-y-2 opacity-0'
                   : 'translate-y-0 opacity-100'
-              } transition-all duration-300 ease-in-out`}
-            >
+              } transition-all duration-300 ease-in-out`}>
               <h2 className="font-dmsans text-[1rem] text-lg font-normal">
                 {props.value}
               </h2>
@@ -111,26 +107,26 @@ const ProfileData = (props: ProfileDataLayoutProps) => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
 interface InputProfileDataProps {
-  title: string;
-  default_value: string;
-  placehodler: string;
-  logoSrc?: React.ReactNode;
+  title: string
+  default_value: string
+  placehodler: string
+  logoSrc?: React.ReactNode
 }
 
 export const InputProfileData = (props: InputProfileDataProps) => {
-  const [value, setValue] = useState<string>(props.default_value);
-  const [tempValue, setTempValue] = useState<string>(props.default_value);
+  const [value, setValue] = useState<string>(props.default_value)
+  const [tempValue, setTempValue] = useState<string>(props.default_value)
 
   function onSaveInput() {
-    setValue(tempValue);
+    setValue(tempValue)
   }
 
   function onCancelInput() {
-    setTempValue(value);
+    setTempValue(value)
   }
 
   return (
@@ -138,13 +134,12 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       handleCancel={onCancelInput}
       title={props.title}
       value={value}
-      handleSave={onSaveInput}
-    >
+      handleSave={onSaveInput}>
       <div className="flex items-center">
         {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
         <Input
           placeholder={props.placehodler}
-          className="bg-lilac-100 text-purple-400 py-6 min-w-72"
+          className="min-w-72 bg-lilac-100 py-6 text-purple-400"
           value={tempValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTempValue(e.target.value)
@@ -152,26 +147,26 @@ export const InputProfileData = (props: InputProfileDataProps) => {
         />
       </div>
     </ProfileData>
-  );
-};
+  )
+}
 
 interface DropdownProfileDataProps {
-  title: string;
-  dropdownData: MenuItem[];
-  selectedOption: MenuItem;
-  logoSrc?: React.ReactNode; // Tambahkan prop untuk logo
+  title: string
+  dropdownData: MenuItem[]
+  selectedOption: MenuItem
+  logoSrc?: React.ReactNode // Tambahkan prop untuk logo
 }
 
 export const DropdownProfileData = (props: DropdownProfileDataProps) => {
-  const [value, setValue] = useState<MenuItem>(props.selectedOption);
-  const [tempValue, setTempValue] = useState<MenuItem>(props.selectedOption);
+  const [value, setValue] = useState<MenuItem>(props.selectedOption)
+  const [tempValue, setTempValue] = useState<MenuItem>(props.selectedOption)
 
   function onSaveInput() {
-    setValue(tempValue);
+    setValue(tempValue)
   }
 
   function onCancelInput() {
-    setTempValue(value);
+    setTempValue(value)
   }
 
   return (
@@ -179,8 +174,7 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
       handleCancel={onCancelInput}
       title={props.title}
       value={value.option}
-      handleSave={onSaveInput}
-    >
+      handleSave={onSaveInput}>
       <div className="flex items-center">
         {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
         <Dropdown
@@ -188,50 +182,49 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
           label={''}
           helper_text={''}
           value={tempValue}
-          onChange={(selectedItem) => setTempValue(selectedItem ?? value)}
+          onChange={selectedItem => setTempValue(selectedItem ?? value)}
         />
       </div>
     </ProfileData>
-  );
-};
+  )
+}
 
 interface DatePickerProfileDataProps {
-  title: string;
-  default_value: Date;
-  logoSrc?: React.ReactNode;
+  title: string
+  default_value: Date
+  logoSrc?: React.ReactNode
 }
 
 export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(props.default_value);
-  const [tempDate, setTempDate] = useState<Date>(props.default_value);
+  const [selectedDate, setSelectedDate] = useState<Date>(props.default_value)
+  const [tempDate, setTempDate] = useState<Date>(props.default_value)
 
   function onSaveDate() {
-    setSelectedDate(tempDate);
+    setSelectedDate(tempDate)
   }
 
   function onCancelDate() {
-    setTempDate(selectedDate);
+    setTempDate(selectedDate)
   }
 
-  const formatDate = (date: Date) => date.toISOString().split('T')[0];
+  const formatDate = (date: Date) => date.toISOString().split('T')[0]
 
   return (
     <ProfileData
       handleCancel={onCancelDate}
       title={props.title}
       value={selectedDate.toDateString()}
-      handleSave={onSaveDate}
-    >
+      handleSave={onSaveDate}>
       <div className="flex items-center">
         {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
         <input
           aria-label="Date"
           type="date"
           value={formatDate(tempDate)}
-          onChange={(e) => setTempDate(new Date(e.target.value))}
-          className="w-full pr-40 py-3 rounded-md border border-purple-400 bg-lilac-100 p-2 text-purple-400"
+          onChange={e => setTempDate(new Date(e.target.value))}
+          className="w-full rounded-md border border-purple-400 bg-lilac-100 p-2 py-3 pr-40 text-purple-400"
         />
       </div>
     </ProfileData>
-  );
-};
+  )
+}

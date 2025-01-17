@@ -2,7 +2,7 @@
 import { SetStateAction, useState } from 'react'
 import { ContentTabBar } from './content-tab-bar'
 import { PersonalInformationContent } from './personal-information-content'
-import { SocialMediaContent } from './social-media-content' 
+import { SocialMediaContent } from './social-media-content'
 import { contentType } from './menu'
 
 interface ProfileLayoutProps {
@@ -20,9 +20,7 @@ export const ProfileLayout = ({
   return (
     <>
       <ContentTabBar selected={selected} setSelected={setSelected} />
-      <div className='mt-2'>
-      {renderProfileInfo ? personalInformation : socialMedia}
-      </div>
+      <div className="mt-2">{renderProfileInfo ? personalInformation : socialMedia}</div>
     </>
   )
 }

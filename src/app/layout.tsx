@@ -2,6 +2,13 @@ import type { Metadata } from 'next'
 import { Belanosima, Teachers, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './providers/ThemeProvider'
+import { Provider } from 'react-redux'
+import { Toaster } from './components/ui/toaster'
+import { AuthProvider } from './contexts/AuthContext'
+import { store, persistor } from '~/redux/store'
+import Loading from './components/Loading'
+import { PersistGate } from 'redux-persist/integration/react'
+import ReduxProvider from './providers/ReduxProvider'
 
 const BelanosimaFont = Belanosima({
   weight: '400',
@@ -38,14 +45,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} antialiased w-screen min-h-screen`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange>
-          <div className="h-full w-full dark:bg-black">{children}</div>
-        </ThemeProvider>
+        className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} min-h-screen w-full antialiased`}>
+        <ReduxProvider>
+          <AuthProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange>
+              {children}
+            </ThemeProvider>
+          </AuthProvider>
+          <Toaster />
+        </ReduxProvider>
       </body>
     </html>
   )

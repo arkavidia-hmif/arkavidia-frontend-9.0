@@ -9,18 +9,22 @@ import {
   FormItem,
   FormLabel
 } from '../ui/form'
+import { basicLogin } from '~/api/generated'
+import { axiosInstance } from '~/lib/axios'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '../ui/input'
 import Link from 'next/link'
 import { Button } from '../ui/button'
-import { useToast } from "../../../hooks/use-toast"
-
+import { useToast } from '../../../hooks/use-toast'
+import { useState } from 'react'
+import Image from 'next/image'
+import { Eye, EyeOff } from 'lucide-react'
+import { useAuth } from '~/app/contexts/AuthContext'
 
 // Link Variable
 const FORGET_PASSWORD_LINK = 'forget-password'
 const REGISTER_LINK = 'register'
-
 
 //TODO: Change the rules for each variable defined in schema here
 const loginSchema = z.object({
@@ -33,6 +37,12 @@ const loginSchema = z.object({
 })
 
 export const InputArea = () => {
+  const [passwordVisible, setPasswordVisible] = useState(false)
+  const { basicLogin } = useAuth()
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(prev => !prev)
+  }
   const { toast } = useToast()
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -50,14 +60,29 @@ export const InputArea = () => {
     console.log('Login From Google')
   }
 
-
   /**
    * Used when form submitted
    * @param values The login schema data
    */
-  function onSubmit(values: z.infer<typeof loginSchema>) {
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
     // TODO: Replace with backend logic
-    console.log('TEST IS THIS CALLED')
+    // console.log('TEST IS THIS CALLED')
+    const login = await basicLogin(values.email, values.password)
+
+    if (login.error) {
+      toast({
+        title: 'Login Error',
+        description: 'Failed to login',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    toast({
+      title: 'Login Success',
+      description: 'Successfully logged in',
+      variant: 'default'
+    })
   }
 
   /**
@@ -110,11 +135,20 @@ export const InputArea = () => {
                   Password <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Masukkan password Anda"
-                    className="bg-lilac-100 max-md:text-xs"
-                    {...field}
-                  />
+                  <div className="relative text-purple-500">
+                    <Input
+                      type={passwordVisible ? 'text' : 'password'}
+                      placeholder="Masukkan password Anda"
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 max-md:text-xs"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 transform text-purple-500">
+                      {passwordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormDescription>
                   <Link className="text-lilac-200 underline" href={FORGET_PASSWORD_LINK}>
@@ -130,7 +164,7 @@ export const InputArea = () => {
           <Button
             className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs'
             type="submit"
-            variant={"ghost"}>
+            variant={'ghost'}>
             Login
           </Button>
           <span className="w-full font-semibold text-white max-md:text-xs lg:text-sm">
@@ -138,11 +172,21 @@ export const InputArea = () => {
           </span>
           {/* TODO: Replace with Google Variant Button Component */}
           <Button
+            className="gradient-border relative flex rounded-lg bg-transparent py-5 text-white max-md:text-xs"
+            style={{
+              borderImage: 'url(/images/login/gradient-border.svg) 16 / 12px stretch'
+            }}
             type="button"
-            onClick={onGoogleClick}
-            variant={'ghost'}
-            className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs'>
-            Login dengan Google
+            onClick={onGoogleClick}>
+            <Image
+              src={'/images/login/google-icon.png'}
+              alt="Google Icon"
+              width={24}
+              height={24}
+            />
+            <span className="bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] bg-clip-text text-transparent">
+              Register dengan Google
+            </span>
           </Button>
         </div>
 
