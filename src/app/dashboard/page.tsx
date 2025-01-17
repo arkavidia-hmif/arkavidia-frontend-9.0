@@ -38,7 +38,7 @@ function DashboardPage() {
       content: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.'
     }
   ]
-  const events = [
+  const events: { date: Date; information: string }[] = [
     { date: new Date('2025-01-10'), information: 'Hari Raya' },
     { date: new Date('2025-01-16'), information: 'Hari Besar' },
     { date: new Date('2025-01-25'), information: 'Hari Berbahagia' }
@@ -59,9 +59,9 @@ function DashboardPage() {
   ]
 
   return (
-    <div className="relative flex h-full w-full flex-col gap-6">
-      {/* Header */}
-      <div>
+    <div className="relative flex h-full w-full flex-col">
+      {/* Title */}
+      <div className="mb-4 xl:mb-5">
         <div className="flex items-center gap-x-2">
           <Image
             src="/icons/userDashboardLogo.png"
@@ -72,68 +72,115 @@ function DashboardPage() {
           <p className="dashboardTitle font-belanosima text-[32px]">Dashboard</p>
         </div>
         <div className="dashboardSeparator mt-4 h-1.5 rounded"></div>
-        <p className="my-4 font-belanosima text-[24px]">Hi, {username}!</p>
-
-        {/* Team Information */}
-        <div className="flex flex-col gap-y-4 text-white">
-          {/* Team Name */}
-          <div className="flex items-center">
-            <span className="w-[100px] font-dmsans text-xs">Team</span>
-            <span className="max-w-[200px] break-words font-teachers text-[14px] font-bold">
-              {team}
-            </span>
-          </div>
-
-          {/* Kategori */}
-          <div className="flex items-center">
-            <span className="w-[100px] font-dmsans text-xs">Kategori</span>
-            <Category categoryName="Arkavidia" />
-          </div>
-
-          {/* Team Status */}
-          <div className="flex items-center">
-            <span className="w-[100px] font-dmsans text-xs">Team Status</span>
-            <Tag variant="success" text="Verified" className="w-[120px]" />
-          </div>
-
-          {/* Team Stage */}
-          <div className="flex items-center">
-            <span className="w-[100px] font-dmsans text-xs">Team Stage</span>
-            <Tag variant="pink" text="Pre-eliminary" className="w-[120px]" />
-          </div>
-        </div>
       </div>
 
-      {/* Countdown */}
-      <Countdown eventName="Penyisihan" eventDate={new Date('2026-01-01T00:00:00')} />
+      <section className="flex w-full flex-col gap-6 xl:flex-row xl:flex-wrap xl:justify-between xl:gap-[45px]">
+        {/* left section */}
+        <section className="flex flex-col gap-6 xl:flex-grow xl:gap-8">
+          {/* Header */}
+          <div>
+            {/* Title */}
+            <p className="mb-4 font-belanosima text-[24px] xl:text-[48px]">Hi, {username}!</p>
 
-      {/* Pengunguman */}
-      <Information informations={informations} />
-
-      {/* Submisi */}
-      <Submisi submissions={submissions} />
-
-      {/* Calendar */}
-      <ComponentBox title="Calendar">
-        <div className='x flex flex-col '>
-          <Calendar events={events} />
-          {/* Informasi event */}
-          <div className="mt-[23px] flex flex-col self-start">
-            {events &&
-              events.map((event, index) => (
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-gradient-to-br from-[#FF71A0] to-[#CE6AFF]"></div>
-                  <h6 className="text-[14px] font-semibold">
-                    {String(event.date.getDate()).padStart(2, '0')}/
-                    {String(event.date.getMonth() + 1).padStart(2, '0')}/
-                    {String(event.date.getFullYear()).slice(-2)}
-                  </h6>
-                  <p className="text-[14px]">: {event.information}</p>
+            {/* Team Information */}
+            <div className="flex flex-col gap-[18px] text-white xl:flex-row xl:justify-between">
+              <div className="flex flex-col gap-[6px]">
+                {/* Team Name */}
+                <div className="flex items-center">
+                  <span className="w-[84px] font-dmsans text-xs xl:text-base">Team</span>
+                  <span className="w-4">:</span>
+                  <span className="max-w-[200px] break-words font-teachers text-[14px] xl:text-base font-bold">
+                    {team}
+                  </span>
                 </div>
-              ))}
+                {/* Kategori */}
+                <div className="flex items-center">
+                  <span className="w-[84px] font-dmsans text-xs xl:text-base">
+                    Kategori
+                  </span>
+                  <span className="w-4">:</span>
+                  <Category categoryName="Arkavidia" />
+                </div>
+              </div>
+              <div className="flex flex-col gap-[6px]">
+                {/* Team Status */}
+                <div className="flex items-center">
+                  <span className="w-[100px] font-dmsans text-xs xl:text-base">
+                    Team Status
+                  </span>
+                  <Tag variant="success" text="Verified" className="w-[116px] xl:w-40" />
+                </div>
+
+                {/* Team Stage */}
+                <div className="flex items-center">
+                  <span className="w-[100px] font-dmsans text-xs xl:text-base">
+                    Team Stage
+                  </span>
+                  <Tag
+                    variant="pink"
+                    text="Pre-eliminary"
+                    className="w-[116px] xl:w-40"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </ComponentBox>
+
+          {/* Countdown */}
+          <div className="xl:hidden">
+            <Countdown
+              eventName="Penyisihan"
+              eventDate={new Date('2026-01-01T00:00:00')}
+            />
+          </div>
+
+          {/* Pengunguman */}
+          <Information informations={informations} />
+
+          {/* Submisi */}
+          <div className="hidden xl:block">
+            <Submisi submissions={submissions}  />
+          </div>
+        </section>
+
+        {/* Right section */}
+        <section className="flex w-full flex-col gap-6 xl:w-auto xl:gap-8">
+          {/* Submisi */}
+          <div className="xl:hidden">
+            <Submisi submissions={submissions} />
+          </div>
+
+          {/* Countdown */}
+          <div className="hidden xl:block">
+            <Countdown
+              eventName="Penyisihan"
+              eventDate={new Date('2026-01-01T00:00:00')}
+            />
+          </div>
+
+          {/* Calendar */}
+          <ComponentBox title="Calendar" morespace={true}>
+            <div className="x flex flex-col">
+              <Calendar eventDate={events} />
+              {/* Informasi event */}
+              <div className="mt-[23px] flex flex-col self-start">
+                {events &&
+                  events.map((event, index) => (
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full bg-gradient-to-br from-[#FF71A0] to-[#CE6AFF]"></div>
+                      <h6 className="text-[14px] font-semibold">
+                        {String(event.date.getDate()).padStart(2, '0')}/
+                        {String(event.date.getMonth() + 1).padStart(2, '0')}/
+                        {String(event.date.getFullYear()).slice(-2)}
+                      </h6>
+                      <p className="text-[14px]">: {event.information}</p>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </ComponentBox>
+        </section>
+      </section>
     </div>
   )
 }

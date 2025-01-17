@@ -1,5 +1,6 @@
 'use client'
 
+import ComponentBox from '../ComponentBox'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './accordion'
 
 interface InformationItem {
@@ -14,8 +15,7 @@ export default function Information({
   informations?: InformationItem[]
 }) {
   return (
-    <div className="border-1 countdownBox flex flex-col items-center justify-center gap-3 rounded-lg border border-white border-opacity-60 bg-gradient-to-br from-white/[0.24] to-white/[0.08] p-3 shadow-[0_0_10px_rgba(255,255,255,0.2)] backdrop-blur-md">
-      <h1 className="font-teachers text-[20px] font-bold text-white">Pengumuman</h1>
+    <ComponentBox title="Pengumuman" center={false}>
       {!informations || informations.length === 0 ? (
         <div className="mb-2 mt-2 text-white/60">Belum ada informasi</div>
       ) : (
@@ -40,6 +40,6 @@ export default function Information({
           ))}
         </Accordion>
       )}
-    </div>
+    </ComponentBox>
   )
 }

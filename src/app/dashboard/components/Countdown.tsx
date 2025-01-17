@@ -46,10 +46,10 @@ function CountdownPart({ type, number }: { type: string; number: number }) {
 
   return (
     <div className="flex flex-col items-center justify-center gap-y-2">
-      <p className="bg-gradient-to-r from-[#CE6AFF] to-[#FF71A0] bg-clip-text font-belanosima text-[40px] text-transparent">
+      <p className="bg-gradient-to-r from-[#CE6AFF] to-[#FF71A0] bg-clip-text font-belanosima text-[56px] xl:text-[64px] text-transparent">
         {displayNumber}
       </p>
-      <p className="calendarDateTypes font-teachers text-[20px] font-bold">
+      <p className="calendarDateTypes font-teachers text-[20px] xl:text-[24px] font-bold">
         {type.toUpperCase()}
       </p>
     </div>
@@ -68,21 +68,21 @@ function Countdown({ eventName, eventDate }: CountdownProps) {
   }, [eventDate])
 
   return (
-    <ComponentBox title="Countdown">
+    <ComponentBox title="Countdown" morespace={true}>
       <div className="w-full px-2">
         <div className="flex w-full justify-between font-dmsans text-[20px]">
-          <p className="text-[14px] font-normal">{eventName ?? 'Event Name'}</p>
-          <p className="text-[14px] font-normal">{getDateText(eventDate)}</p>
+          <p className="text-[14px] font-normal xl:text-base">{eventName ?? 'Event Name'}</p>
+          <p className="text-[14px] font-normal xl:text-base">{getDateText(eventDate)}</p>
         </div>
         <div className="grid grid-cols-1 pb-4">
           <div className="grid grid-cols-3 gap-x-2 text-center">
             <CountdownPart type="days" number={timeLeft.days} />
-            <p className="font-belanosima text-[48px]">:</p>
+            <p className="font-belanosima text-[48px] xl:text-[64px]">:</p>
             <CountdownPart type="hours" number={timeLeft.hours} />
           </div>
           <div className="grid grid-cols-3 gap-x-2 text-center">
             <CountdownPart type="minutes" number={timeLeft.minutes} />
-            <p className="font-belanosima text-[48px]">:</p>
+            <p className="font-belanosima text-[48px] xl:text-[64px]">:</p>
             <CountdownPart type="seconds" number={timeLeft.seconds} />
           </div>
         </div>
