@@ -2,10 +2,11 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
+import { updateUser } from '~/api/generated/sdk.gen'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import Dropdown, { MenuItem } from '../Dropdown'
-
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 interface ProfileDataProps {
   title: string
   value: string
@@ -70,7 +71,7 @@ const ProfileData = (props: ProfileDataLayoutProps) => {
                         size={'icon'}>
                         <Image
                           src={'/images/profile/check.svg'}
-                          alt={'Close Button'}
+                          alt={'Save Button'}
                           width={24}
                           height={24}
                           className="mx-5 my-3 h-6 w-6"
@@ -113,20 +114,36 @@ const ProfileData = (props: ProfileDataLayoutProps) => {
 interface InputProfileDataProps {
   title: string
   default_value: string
-  placehodler: string
+  placeholder: string
 }
 
 export const InputProfileData = (props: InputProfileDataProps) => {
+  const axiosAuth = useAxiosAuth()
   const [value, setValue] = useState<string>(props.default_value)
-  //Save the
   const [tempValue, setTempValue] = useState<string>(props.default_value)
 
-  function onSaveInput() {
-    //TODO - Fetch a save api here
-    setValue(tempValue)
+  async function onSaveInput() {
+    try {
+      const noSpace = props.title.toLowerCase().replace(' ', '_')
+      const fieldMap: Record<string, string> = {
+        name: 'fullName',
+        phone_number: 'phoneNumber'
+      }
+
+      const fieldName = fieldMap[noSpace]
+
+      const response = await updateUser({
+        client: axiosAuth,
+        body: { [fieldName]: tempValue }
+      })
+      // console.log('API Response:', response)
+      setValue(tempValue)
+    } catch (error) {
+      console.error('Failed to update input:', error)
+    }
   }
+
   function onCancelInput() {
-    //Cancel the edit
     setTempValue(value)
   }
 
@@ -137,7 +154,7 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       value={value}
       handleSave={onSaveInput}>
       <Input
-        placeholder="Masukkan password Anda"
+        placeholder={props.placeholder}
         className="min-w-72 bg-lilac-100 py-6 text-purple-400"
         value={tempValue}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -155,18 +172,37 @@ interface DropdownProfileDataProps {
 }
 
 export const DropdownProfileData = (props: DropdownProfileDataProps) => {
+  const axiosAuth = useAxiosAuth()
   const [value, setValue] = useState<MenuItem>(props.selectedOption)
-  //Save the
   const [tempValue, setTempValue] = useState<MenuItem>(props.selectedOption)
 
-  function onSaveInput() {
-    //TODO - Fetch a save api here
-    setValue(tempValue)
+  async function onSaveInput() {
+    try {
+      console.log('title', props.title)
+      const noSpace = props.title.toLowerCase().replace(/ /g, '_')
+      console.log(noSpace)
+      const fieldMap: Record<string, string> = {
+        instance: 'instance',
+        education: 'education',
+        how_do_you_know_about_arkavidia: 'entrySource'
+      }
+      const fieldName = fieldMap[noSpace]
+      console.log(tempValue.option)
+      const response = await updateUser({
+        client: axiosAuth,
+        body: { [fieldName]: tempValue.option }
+      })
+      // console.log(response)
+      setValue(tempValue)
+    } catch (error) {
+      console.error('Failed to update dropdown:', error)
+    }
   }
+
   function onCancelInput() {
-    //Cancel the edit
     setTempValue(value)
   }
+
   return (
     <ProfileData
       handleCancel={onCancelInput}
@@ -175,8 +211,8 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
       handleSave={onSaveInput}>
       <Dropdown
         data={props.dropdownData}
-        label={''}
-        helper_text={''}
+        label=""
+        helper_text=""
         value={tempValue}
         onChange={selectedItem => setTempValue(selectedItem ?? value)}
       />
@@ -190,16 +226,23 @@ interface DatePickerProfileDataProps {
 }
 
 export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
+  const axiosAuth = useAxiosAuth()
   const [selectedDate, setSelectedDate] = useState<Date>(props.default_value)
   const [tempDate, setTempDate] = useState<Date>(props.default_value)
 
-  function onSaveDate() {
-    // TODO - Fetch a save API here
-    setSelectedDate(tempDate)
+  async function onSaveDate() {
+    try {
+      await updateUser({
+        client: axiosAuth,
+        body: { birthDate: tempDate.toISOString().split('T')[0] }
+      })
+      setSelectedDate(tempDate)
+    } catch (error) {
+      console.error('Failed to update date:', error)
+    }
   }
 
   function onCancelDate() {
-    // Cancel the edit
     setTempDate(selectedDate)
   }
 
@@ -209,7 +252,7 @@ export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
     <ProfileData
       handleCancel={onCancelDate}
       title={props.title}
-      value={selectedDate.toDateString()} // Format the date as a readable string
+      value={selectedDate.toDateString()}
       handleSave={onSaveDate}>
       <input
         aria-label="Date"
