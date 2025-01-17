@@ -6,19 +6,19 @@ import { Toaster } from '~/app/components/ui/toaster'
 const DummyPersonalEducation: MenuItem[] = [
   {
     id: 1,
-    option: 'Insitute'
+    option: 'SMA/MA/SMK'
   },
   {
     id: 2,
-    option: 'ITB'
+    option: 'S1'
   },
   {
     id: 3,
-    option: 'UI'
+    option: 'S2'
   },
   {
     id: 4,
-    option: 'UGM'
+    option: 'S3'
   }
 ]
 

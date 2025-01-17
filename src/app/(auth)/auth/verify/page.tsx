@@ -15,8 +15,8 @@ function VerifyEmailPage() {
   const [status, setStatus] = React.useState<'loading' | 'success' | 'error'>('loading')
 
   const searchParams = useSearchParams()
-  const userId = searchParams.get('userId')
-  const token = searchParams.get('verificationToken')
+  const userId = searchParams.get('user')
+  const token = searchParams.get('token')
 
   const appDispatch = useAppDispatch()
   const router = useRouter()
@@ -30,15 +30,14 @@ function VerifyEmailPage() {
           token: token
         }
       })
-
       if (res.error) {
         setStatus('error')
         setMessage('Something went wrong. Please try again.')
       }
-
       if (res.data) {
         const accessToken = res.data.accessToken
         appDispatch(userLogin(accessToken))
+        setIsProcessing(false)
         setStatus('success')
         setMessage('Email verified successfully')
         setTimeout(() => {
@@ -47,16 +46,19 @@ function VerifyEmailPage() {
       }
     }
 
-    // Dummy logic
-    setTimeout(() => {
+    if (!userId || !token) {
+      setStatus('error')
       setIsProcessing(false)
-      setStatus('success')
-      setMessage('Email verified successfully. Redirecting to homepage...')
-    }, 1000)
+      setMessage('Invalid verification link. Redirecting to login page...')
+      setTimeout(() => {
+        router.replace('/login')
+      }, 1500)
+      return
+    }
 
     setTimeout(() => {
-      router.replace('/')
-    }, 3000)
+      verifyEmail(userId, token)
+    }, 1000)
   }, [])
 
   return (

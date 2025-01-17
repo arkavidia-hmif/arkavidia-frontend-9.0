@@ -1,5 +1,5 @@
-import Image from 'next/image'
-import { Toaster } from '../../components/ui/toaster'
+'use client'
+
 import { EmailRegisterForm } from '../../components/register/email-input-area'
 
 const EmailRegisterPage = () => {

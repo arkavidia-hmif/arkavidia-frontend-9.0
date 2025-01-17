@@ -7,12 +7,14 @@ export interface AuthReducerState {
   accessToken: string | null
   isAdmin: boolean
   isLoggedIn: boolean
+  hasFilledInfo: boolean
 }
 
 const initialState = {
   accessToken: null,
   isAdmin: false,
-  isLoggedIn: false
+  isLoggedIn: false,
+  hasFilledInfo: false
 } as AuthReducerState
 
 const authSlice = createSlice({
@@ -34,9 +36,13 @@ const authSlice = createSlice({
     },
     setNotAdmin(state) {
       state.isAdmin = false
+    },
+    setFilledInfo(state, action: PayloadAction<boolean>) {
+      state.hasFilledInfo = action.payload
     }
   }
 })
 
-export const { userLogin, userLogout, setAdmin, setNotAdmin } = authSlice.actions
+export const { userLogin, userLogout, setAdmin, setNotAdmin, setFilledInfo } =
+  authSlice.actions
 export default authSlice.reducer

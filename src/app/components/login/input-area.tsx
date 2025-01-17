@@ -74,11 +74,29 @@ export const InputArea = () => {
     const login = await basicLogin(values.email, values.password)
 
     if (login.error) {
-      toast({
-        title: 'Login Error',
-        description: 'Failed to login',
-        variant: 'destructive'
-      })
+      if (login.message === "User isn't verified") {
+        toast({
+          title: 'Login Error',
+          description: 'Email belum terverifikasi',
+          variant: 'destructive'
+        })
+      } else if (
+        login.message === 'Email not found' ||
+        login.message === 'Wrong password'
+      ) {
+        toast({
+          title: 'Login Error',
+          description: 'Email atau password salah',
+          variant: 'destructive'
+        })
+      } else {
+        toast({
+          title: 'Login Error',
+          description: 'Terjadi kegagalan saat login',
+          variant: 'destructive'
+        })
+      }
+
       return
     }
 

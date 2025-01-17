@@ -3,6 +3,7 @@ import { User } from '~/api/generated'
 export interface basicLoginResponse {
   ok: boolean
   error: boolean
+  message?: string
 }
 
 export interface AuthContextProps {

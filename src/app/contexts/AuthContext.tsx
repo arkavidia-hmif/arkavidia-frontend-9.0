@@ -9,7 +9,13 @@ import { useRouter } from 'next/navigation'
 import { AuthContextProps, basicLoginResponse } from './AuthContextTypes'
 import { useAppDispatch, useAppSelector, StoreType } from '~/redux/store'
 import { useToast } from '~/hooks/use-toast'
-import { setAdmin, setNotAdmin, userLogin, userLogout } from '~/redux/slices/auth'
+import {
+  setAdmin,
+  setFilledInfo,
+  setNotAdmin,
+  userLogin,
+  userLogout
+} from '~/redux/slices/auth'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useStore } from 'react-redux'
 
@@ -46,6 +52,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           variant: 'info'
         })
       }
+
+      if (selfReq.data) {
+        // // Logic to get user personal info status
+        // const hasFilledInfo = selfReq.data.hasFilledInfo
+        // if (!hasFilledInfo) {
+        //   router.replace('/register/personal-data')
+        // } else {
+        //   appDispatch(setFilledInfo(true))
+        // }
+      }
     }
     setIsLoading(false)
   }
@@ -62,11 +78,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const res: basicLoginResponse = {
       ok: false,
-      error: false
+      error: false,
+      message: ''
     }
 
     if (!req.data) {
       res.error = true
+      // @ts-expect-error
+      res.message = req.error?.message
       return res
     }
 
