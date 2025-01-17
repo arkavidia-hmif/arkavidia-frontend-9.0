@@ -11,6 +11,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from './ui/dropdown-menu'
+import { useAuth } from '../contexts/AuthContext'
+import { useAppSelector } from '~/redux/store'
+import { toast } from '~/hooks/use-toast'
 
 type NavItem = {
   name: string
@@ -18,7 +21,9 @@ type NavItem = {
 }
 
 function Navbar() {
-  const LOGGED_IN = true // ! hardcode untuk testing
+  const isAuthenticated = useAppSelector(state => state.auth.accessToken !== null)
+  const { logout } = useAuth()
+  const LOGGED_IN = isAuthenticated // ! hardcode untuk testing
   const pathname = usePathname()
   const NAV_ITEMS: NavItem[] = [
     { name: 'About Us', link: '/aboutus' },
@@ -26,12 +31,17 @@ function Navbar() {
     { name: 'Competition', link: '/competition' }
   ]
 
-  function handleLogout() {
-    // TODO: Implement logout functionality
+  async function handleLogout() {
+    await logout()
+    toast({
+      title: 'Logged out',
+      description: 'You have been logged out',
+      variant: 'info'
+    })
   }
 
   return (
-    <nav className="bg-black px-4 py-3 lg:px-12">
+    <nav className="bg-transparent px-4 py-3 lg:px-12">
       <div className="flex flex-row items-center justify-between">
         <Link href="/" className="flex flex-row items-center justify-center gap-2">
           <Image
@@ -74,7 +84,7 @@ function Navbar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="cursor-pointer text-red-500 focus:text-red-400">
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="mr-2 h-4 w-4" onClick={handleLogout} />
                   Log out
                 </DropdownMenuItem>
               </>

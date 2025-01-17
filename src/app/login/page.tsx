@@ -1,9 +1,22 @@
+'use client'
+
 import Image from 'next/image'
 import { InputArea } from '../components/login/input-area'
-import { ToastProvider } from '../components/ui/toast'
 import { Toaster } from '../components/ui/toaster'
+import { useRouter } from 'next/navigation'
+import { useAppSelector } from '~/redux/store'
+import { useEffect } from 'react'
 
 const LoginPage = () => {
+  const router = useRouter()
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push('/')
+    }
+  }, [])
+
   return (
     <div className="relative flex min-h-screen items-center bg-purple-900">
       {/* Background Placeholder */}
@@ -28,8 +41,6 @@ const LoginPage = () => {
         </div>
         {/* Background Placeholder */}
       </div>
-      {/* NOTE: Might consider put this on main pages */}
-      <Toaster />
     </div>
   )
 }
