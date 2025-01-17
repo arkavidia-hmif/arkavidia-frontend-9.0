@@ -4,6 +4,7 @@ import {
   ProfileInformationDropdownOptions
 } from '../components/profile/personal-information-content'
 import { ProfileLayout } from '../components/profile/profile-content-layout'
+import { SocialMediaContent } from '../components/profile/social-media-content';
 
 const DummyPersonalInfoData: ProfileInformationDefaultValue = {
   name: 'Ahdmad Jone Done',
@@ -72,6 +73,12 @@ const DummyDropdownOptions: ProfileInformationDropdownOptions = {
   ]
 }
 
+const DummySocialMediaData = {
+  line: { id: 1, value: "john_doe123" },
+  discord: { id: 2, value: "john_doe_gantengabis" },
+  instagram: { id: 3, value: "@johndoe123" }
+};
+
 const ProfilePage = () => {
   return (
     <div
@@ -96,10 +103,16 @@ const ProfilePage = () => {
             howDoYouKnowArkavOptions={DummyDropdownOptions.howDoYouKnowArkavOptions}
           />
         }
-        socialMedia={<div></div>}
+        socialMedia={
+          <SocialMediaContent
+            line={DummySocialMediaData.line}
+            discord={DummySocialMediaData.discord}
+            instagram={DummySocialMediaData.instagram}
+          />
+        }
       />
     </div>
-  )
-}
+  );
+};
 
-export default ProfilePage
+export default ProfilePage;
