@@ -11,6 +11,7 @@ import ComponentBox from './components/ComponentBox'
 import Information from './components/Information/Information'
 import Submisi from './components/Submisi'
 import { link } from 'fs'
+import { map } from 'zod'
 
 function DashboardPage() {
   const currDate = new Date()
@@ -37,10 +38,10 @@ function DashboardPage() {
       content: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.'
     }
   ]
-  const dummyEventDate: Date[] = [
-    new Date('2025-01-10'),
-    new Date('2025-01-16'),
-    new Date('2025-01-25')
+  const events = [
+    { date: new Date('2025-01-10'), information: 'Hari Raya' },
+    { date: new Date('2025-01-16'), information: 'Hari Besar' },
+    { date: new Date('2025-01-25'), information: 'Hari Berbahagia' }
   ]
   const submissions = [
     {
@@ -114,7 +115,24 @@ function DashboardPage() {
 
       {/* Calendar */}
       <ComponentBox title="Calendar">
-        <Calendar events={dummyEventDate} />
+        <div className='x flex flex-col '>
+          <Calendar events={events} />
+          {/* Informasi event */}
+          <div className="mt-[23px] flex flex-col self-start">
+            {events &&
+              events.map((event, index) => (
+                <div className="flex items-center gap-2">
+                  <div className="h-3 w-3 rounded-full bg-gradient-to-br from-[#FF71A0] to-[#CE6AFF]"></div>
+                  <h6 className="text-[14px] font-semibold">
+                    {String(event.date.getDate()).padStart(2, '0')}/
+                    {String(event.date.getMonth() + 1).padStart(2, '0')}/
+                    {String(event.date.getFullYear()).slice(-2)}
+                  </h6>
+                  <p className="text-[14px]">: {event.information}</p>
+                </div>
+              ))}
+          </div>
+        </div>
       </ComponentBox>
     </div>
   )

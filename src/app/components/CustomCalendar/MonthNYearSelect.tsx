@@ -18,16 +18,16 @@ function MonthNYearSelect({ ...props }: MonthNYearSelectProps) {
   return (
     <div className="flex gap-x-2">
       <Select>
-        <SelectTrigger className="gap-x-2 rounded-lg border-white">
+        <SelectTrigger className="gap-x-2 h-6 rounded-lg border-white text-[13px]">
           <SelectValue
-            className=""
+            className="text-[10px]"
             placeholder={
               props.type === 'month'
                 ? initialDate.toLocaleString('id-ID', { month: 'long' })
                 : initialDate.getFullYear()
             }></SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="text-[10px]">
           {props.type === 'month' && (
             <>
               <SelectItem value="1">Januari</SelectItem>

@@ -25,7 +25,12 @@ const dayList = ['Se', 'Sel', 'Ra', 'Ka', 'Ju', 'Sa', 'Mi']
 //   new Date('2025-01-25')
 // ]
 
-const Calendar: React.FC = ({ events }: { events?: Date[] }) => {
+interface EventDate {
+  date: Date
+  information: string
+}
+
+const Calendar: React.FC = ({ events }: { events?: EventDate[] }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [currentDate, setCurrentDate] = useState(new Date())
   const [days, setDays] = useState<Date[]>()
@@ -89,7 +94,8 @@ const Calendar: React.FC = ({ events }: { events?: Date[] }) => {
             day={day}
             currentDate={currentDate}
             isEventDate={
-              events && events.some(event => event.toDateString() === day.toDateString())
+              events ?
+              events.some(event => event.date.toDateString() === day.toDateString()) : false
             }
           />
         ))}
