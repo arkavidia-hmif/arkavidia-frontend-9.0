@@ -6,9 +6,9 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import {
   PersonalInformationContent,
   ProfileInformationDropdownOptions
-} from '../../../components/profile/personal-information-content'
-import { ProfileLayout } from '../../../components/profile/profile-content-layout'
-import ProfileHero from '../../../components/ProfileHero'
+} from '../../components/profile/personal-information-content'
+import { ProfileLayout } from '../../components/profile/profile-content-layout'
+import ProfileHero from '~/app/components/ProfileHero'
 
 const DropdownOptions: ProfileInformationDropdownOptions = {
   educationOptions: [

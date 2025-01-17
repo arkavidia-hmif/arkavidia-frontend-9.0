@@ -9,6 +9,7 @@ import { store, persistor } from '~/redux/store'
 import Loading from './components/Loading'
 import { PersistGate } from 'redux-persist/integration/react'
 import ReduxProvider from './providers/ReduxProvider'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 const BelanosimaFont = Belanosima({
   weight: '400',
@@ -46,18 +47,20 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} min-h-screen w-full antialiased`}>
-        <ReduxProvider>
-          <AuthProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="dark"
-              enableSystem
-              disableTransitionOnChange>
-              {children}
-            </ThemeProvider>
-          </AuthProvider>
-          <Toaster />
-        </ReduxProvider>
+        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ''}>
+          <ReduxProvider>
+            <AuthProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+                enableSystem
+                disableTransitionOnChange>
+                {children}
+              </ThemeProvider>
+            </AuthProvider>
+            <Toaster />
+          </ReduxProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   )

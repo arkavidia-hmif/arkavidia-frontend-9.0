@@ -1,16 +1,16 @@
-import Sidebar from '../components/Sidebar'
+import Sidebar from '../components/Sidebar/Sidebar'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <section
-      className="py-6 md:min-h-screen"
+      className="pb-6"
       style={{
         backgroundImage: "url('/images/profile/bg.png')",
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}>
       <Sidebar />
-      <div className="px-8 lg:pl-[220px]">{children}</div>
+      <div className="px-8 py-20 lg:py-6 lg:pl-[230px]">{children}</div>
     </section>
   )
 }

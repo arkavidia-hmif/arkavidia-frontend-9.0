@@ -14,7 +14,7 @@ function Loading({
     size = size + 1
   }
 
-  const defaultSize = 400
+  const defaultSize = 360
   const maxSmallSize = 32
   const usedSize = size
     ? isSmallVariant
@@ -55,6 +55,7 @@ function Loading({
             alt="Loading icon"
             width={imageSize}
             height={imageSize}
+            quality={30}
           />
           <p className="mt-2 font-teachers text-2xl font-bold text-white">Loading....</p>
         </div>
