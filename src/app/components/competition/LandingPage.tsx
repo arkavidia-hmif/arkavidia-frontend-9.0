@@ -1,13 +1,10 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Image from 'next/image'
 import Navbar from '../Navbar'
+import Timeline, {TimelineEventProps} from '../Timeline'
 
-type RegistrationDeadlineProps = {
-  title: string
-  time: Date
-}
 
 type WinnerPrizeProps = {
   position: string
@@ -26,11 +23,12 @@ type ContactPersonProps = {
 }
 
 type CompetitionLandingPageProps = {
+  competitionCode: string,
   competitionName: string
   competitionDescription: string
   competitionLogoPath: string
-  registrationTimeline: RegistrationDeadlineProps[]
-  handbook: string
+  registrationDeadline: TimelineEventProps[]
+  handbookLink: string
   registerLink: string
   faq?: FAQProps[]
   contactPerson?: ContactPersonProps[]
@@ -41,12 +39,12 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   return (
     <div className="min-h-[100vh] min-w-[100vw] bg-[url('/images/competition/landing-page.jpg')] bg-cover bg-no-repeat">
       <Navbar />
-      <div className="mx-24 my-8 flex flex-col items-center">
+      <div className="mx-24 py-36 flex flex-col items-center gap-16">
         <section
           className="flex flex-col items-center justify-around gap-12"
           id="competition-information">
-          <div className="flex flex-row justify-center gap-28">
-            <div className="grow-[4]">
+          <div className="flex flex-row gap-8">
+            <div className="w-1/3 flex items-center justify-center">
               <Image
                 width={200}
                 height={200}
@@ -58,9 +56,9 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
                 alt={props.competitionName}
               />
             </div>
-            <div className="grow-0">
-              <h1>{props.competitionName}</h1>
-              <div>{props.competitionDescription}</div>
+            <div className="w-1/2 flex flex-col justify-between text-wrap">
+              <h1 className='text-6xl text-bold font-belanosima'>{props.competitionName}</h1>
+              <p className='text-lg text-justify font-dmsans'>{props.competitionDescription}</p>
             </div>
           </div>
         </section>
@@ -68,12 +66,10 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
         {/* Countdown Section */}
         <section id="registration-time"></section>
 
-        <section className="flex flex-col items-center" id="competition-timeline">
-          <h1 className="text-2xl font-extrabold">Competition Timeline</h1>
+        <section className="flex flex-col items-center gap-16" id="competition-timeline">
+          <h1 className="text-5xl font-extrabold font-belanosima">Competition Timeline</h1>
           <div className="flex flex-col items-center justify-center">
-            <div>
-              <h3></h3>
-            </div>
+            <Timeline events={props.registrationDeadline} variant='horizontal' />
           </div>
         </section>
 
