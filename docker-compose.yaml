@@ -6,9 +6,8 @@ services:
       dockerfile: Dockerfile
       args:
         API_URI: ${API_URI}
+        NEXT_PUBLIC_API_URI: ${NEXT_PUBLIC_API_URL}
+        NODE_ENV: ${NODE_ENV}
+        PORT: ${PORT}
     ports:
       - '${PORT}:${PORT}'
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-      PORT: ${PORT}
