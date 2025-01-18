@@ -2,10 +2,11 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
+import { updateUser } from '~/api/generated/sdk.gen'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import Dropdown, { MenuItem } from '../Dropdown'
-
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 interface ProfileDataProps {
   title: string
   value: string
@@ -118,11 +119,29 @@ interface InputProfileDataProps {
 }
 
 export const InputProfileData = (props: InputProfileDataProps) => {
+  const axiosAuth = useAxiosAuth()
   const [value, setValue] = useState<string>(props.default_value)
   const [tempValue, setTempValue] = useState<string>(props.default_value)
 
-  function onSaveInput() {
-    setValue(tempValue)
+  async function onSaveInput() {
+    try {
+      const noSpace = props.title.toLowerCase().replace(' ', '_')
+      const fieldMap: Record<string, string> = {
+        name: 'fullName',
+        phone_number: 'phoneNumber'
+      }
+
+      const fieldName = fieldMap[noSpace]
+
+      const response = await updateUser({
+        client: axiosAuth,
+        body: { [fieldName]: tempValue }
+      })
+      // console.log('API Response:', response)
+      setValue(tempValue)
+    } catch (error) {
+      console.error('Failed to update input:', error)
+    }
   }
 
   function onCancelInput() {
@@ -158,11 +177,31 @@ interface DropdownProfileDataProps {
 }
 
 export const DropdownProfileData = (props: DropdownProfileDataProps) => {
+  const axiosAuth = useAxiosAuth()
   const [value, setValue] = useState<MenuItem>(props.selectedOption)
   const [tempValue, setTempValue] = useState<MenuItem>(props.selectedOption)
 
-  function onSaveInput() {
-    setValue(tempValue)
+  async function onSaveInput() {
+    try {
+      console.log('title', props.title)
+      const noSpace = props.title.toLowerCase().replace(/ /g, '_')
+      console.log(noSpace)
+      const fieldMap: Record<string, string> = {
+        instance: 'instance',
+        education: 'education',
+        how_do_you_know_about_arkavidia: 'entrySource'
+      }
+      const fieldName = fieldMap[noSpace]
+      console.log(tempValue.option)
+      const response = await updateUser({
+        client: axiosAuth,
+        body: { [fieldName]: tempValue.option }
+      })
+      // console.log(response)
+      setValue(tempValue)
+    } catch (error) {
+      console.error('Failed to update dropdown:', error)
+    }
   }
 
   function onCancelInput() {
@@ -196,11 +235,20 @@ interface DatePickerProfileDataProps {
 }
 
 export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
+  const axiosAuth = useAxiosAuth()
   const [selectedDate, setSelectedDate] = useState<Date>(props.default_value)
   const [tempDate, setTempDate] = useState<Date>(props.default_value)
 
-  function onSaveDate() {
-    setSelectedDate(tempDate)
+  async function onSaveDate() {
+    try {
+      await updateUser({
+        client: axiosAuth,
+        body: { birthDate: tempDate.toISOString().split('T')[0] }
+      })
+      setSelectedDate(tempDate)
+    } catch (error) {
+      console.error('Failed to update date:', error)
+    }
   }
 
   function onCancelDate() {
