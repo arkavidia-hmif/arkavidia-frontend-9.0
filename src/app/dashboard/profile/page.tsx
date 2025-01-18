@@ -1,17 +1,15 @@
 'use client'
 
 import { SocialMediaContent } from '~/app/components/profile/social-media-content'
-import { SocialMediaContent } from '~/app/components/profile/social-media-content'
 import {
   PersonalInformationContent,
-  ProfileInformationDefaultValue,
   ProfileInformationDefaultValue,
   ProfileInformationDropdownOptions
 } from '../../components/profile/personal-information-content'
 import { ProfileLayout } from '../../components/profile/profile-content-layout'
 import ProfileHero from '../../components/ProfileHero'
 import { useEffect, useState } from 'react'
-import { JWTPayload, self } from '~/api/generated'
+import { self, SelfResponse } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { MenuItem } from '~/app/components/Dropdown'
@@ -86,7 +84,7 @@ const DummyDropdownOptions: ProfileInformationDropdownOptions = {
 const ProfilePage = () => {
   const axiosAuth = useAxiosAuth()
   const { toast } = useToast()
-  const [userData, setUserData] = useState<JWTPayload>()
+  const [userData, setUserData] = useState<SelfResponse>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {

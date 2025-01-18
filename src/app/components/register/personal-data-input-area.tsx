@@ -121,7 +121,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
         const getLink = await getPresignedLink({
           client: axiosAuth,
           query: {
-            bucket: 'competition-registration',
+            bucket: 'kartu-identitas',
             filename: `${userId}-identity-card.${fileExt}`
           }
         })
