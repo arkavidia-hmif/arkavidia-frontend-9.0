@@ -110,7 +110,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
         variant: 'success'
       })
       router.replace('/login')
-    }, 500)
+    }, 1000)
   }
 
   return (
@@ -197,16 +197,18 @@ function Sidebar({ announcement = false }: SidebarProps) {
                       />
                       <Link href="/">Landing Page</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
-                      <Image
-                        src="/images/sidebar/face.svg"
-                        alt={'Landing Pace Icon'}
-                        width={16}
-                        height={16}
-                        className="mr-2 h-4 w-4"
-                      />
-                      <Link href="/dashboard/profile">Profile</Link>
-                    </DropdownMenuItem>
+                    {!isAdmin && (
+                      <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
+                        <Image
+                          src="/images/sidebar/face.svg"
+                          alt={'Landing Pace Icon'}
+                          width={16}
+                          height={16}
+                          className="mr-2 h-4 w-4"
+                        />
+                        <Link href="/dashboard/profile">Profile</Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       onClick={handleLogout}
                       className="cursor-pointer rounded-lg text-red-500 focus:text-red-400">

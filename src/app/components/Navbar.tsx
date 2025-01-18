@@ -22,6 +22,7 @@ type NavItem = {
 
 function Navbar() {
   const isAuthenticated = useAppSelector(state => state.auth.accessToken !== null)
+  const isAdmin = useAppSelector(state => state.auth.isAdmin)
   const { logout } = useAuth()
   const LOGGED_IN = isAuthenticated // ! hardcode untuk testing
   const pathname = usePathname()
@@ -132,7 +133,9 @@ function Navbar() {
                 <DropdownMenuItem
                   className="cursor-pointer focus:bg-purple-600 focus:text-white"
                   asChild>
-                  <Link href="/dashboard" className="w-full">
+                  <Link
+                    href={isAdmin ? '/dashboard/admin' : '/dashboard'}
+                    className="w-full">
                     Dashboard
                   </Link>
                 </DropdownMenuItem>

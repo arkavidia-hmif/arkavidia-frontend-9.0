@@ -56,6 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (selfReq.data) {
         const hasFilledInfo = selfReq.data.isRegistrationComplete
+        const isAdmin = selfReq.data.role === 'admin'
         const username = selfReq.data.fullName
         if (hasFilledInfo) {
           appDispatch(setFilledInfo(true))
@@ -63,6 +64,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (username) {
           appDispatch(setUsername(username))
+        }
+
+        if (isAdmin) {
+          appDispatch(setAdmin())
         }
       }
     }
