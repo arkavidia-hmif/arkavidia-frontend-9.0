@@ -184,9 +184,10 @@ export const InputArea = () => {
         <div className="flex w-full flex-col text-center max-lg:gap-1.5 max-md:gap-1 max-md:text-xs lg:gap-2">
           {/* TODO: Replace with Login Button Component */}
           <Button
-            className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs'
+            className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] font-semibold text-white hover:opacity-85 max-md:text-xs'
             type="submit"
-            variant={'ghost'}>
+            variant={'ghost'}
+            size={'sm'}>
             Login
           </Button>
           <span className="w-full font-semibold text-white max-md:text-xs lg:text-sm">
@@ -199,6 +200,8 @@ export const InputArea = () => {
               borderImage: 'url(/images/login/gradient-border.svg) 16 / 12px stretch'
             }}
             type="button"
+            variant={'outline'}
+            size={'sm'}
             onClick={onGoogleClick}>
             <Image
               src={'/images/login/google-icon.png'}
