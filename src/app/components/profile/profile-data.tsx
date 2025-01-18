@@ -19,7 +19,7 @@ interface ProfileDataLayoutProps extends ProfileDataProps {
 }
 
 // Base profileData components layout
-const ProfileData = (props: ProfileDataLayoutProps) => {
+export const ProfileData = (props: ProfileDataLayoutProps) => {
   const [isEdit, setIsEdit] = useState<boolean>(false)
 
   function handleCancel() {
