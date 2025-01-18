@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Belanosima, Teachers, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './providers/ThemeProvider'
-import { Provider } from 'react-redux'
 import { Toaster } from './components/ui/toaster'
 import { AuthProvider } from './contexts/AuthContext'
 import { store, persistor } from '~/redux/store'
@@ -47,7 +46,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${BelanosimaFont.variable} ${TeachersFont.variable} ${DM_SansFont.variable} min-h-screen w-full antialiased`}>
-        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ''}>
+        <GoogleOAuthProvider clientId="109603163015-vf1p5anv3t8ugsm7u08370q3d4ubhhao.apps.googleusercontent.com">
           <ReduxProvider>
             <AuthProvider>
               <ThemeProvider

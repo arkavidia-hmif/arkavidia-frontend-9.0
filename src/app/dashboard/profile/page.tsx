@@ -1,8 +1,10 @@
 'use client'
 
 import { SocialMediaContent } from '~/app/components/profile/social-media-content'
+import { SocialMediaContent } from '~/app/components/profile/social-media-content'
 import {
   PersonalInformationContent,
+  ProfileInformationDefaultValue,
   ProfileInformationDefaultValue,
   ProfileInformationDropdownOptions
 } from '../../components/profile/personal-information-content'

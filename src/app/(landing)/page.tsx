@@ -33,7 +33,7 @@ const MainLandingCompetitionPage = () => {
           alt={'Prize'}
           width={1470}
           height={1678}
-          className="w-48 md:w-[320px] lg:w-[500px]"
+          className="w-48 md:w-[320px] lg:w-[500px] z-10"
         />
       </div>
 
