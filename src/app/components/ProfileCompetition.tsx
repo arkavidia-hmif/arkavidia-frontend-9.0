@@ -1,7 +1,7 @@
 "use client"
 
 import { MdCheck, MdExitToApp, MdLink } from 'react-icons/md'
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { User, Team, postQuitTeam } from '~/api/generated'
 
@@ -61,11 +61,16 @@ function ProfileCompetition({
   // Logic to handle leave team
   const leaveTeam = async () => {
     try {
-      await postQuitTeam({
+      if (!profileData.teamId) {
+        alert("No team ID found. Cannot leave team.")
+        return
+      }
+
+      const response = await postQuitTeam({
         path: { teamId: profileData.teamId },
       })
       window.location.reload()
-      alert('Successfully left team')
+      alert('Successfully left team'+ response)
     } catch (error) {
       alert('error leaving team' + error)
     }
