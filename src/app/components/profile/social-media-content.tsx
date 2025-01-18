@@ -1,17 +1,43 @@
-import { InputProfileData } from './profile-data';
-import Image from 'next/image';
+'use client'
+
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import { self } from '~/api/generated'
+import SocialMediaInput from './social-media-input'
 
 export interface SocialMediaDefaultValue {
-  line?: { id: number, value: string };
-  discord?: { id: number, value: string };
-  instagram?: { id: number, value: string };
+  line: string | null
+  discord: string | null
+  instagram: string | null
 }
 
-interface Props extends SocialMediaDefaultValue {}
+export const SocialMediaContent = () => {
+  const [currentValue, setCurrentValue] = useState<SocialMediaDefaultValue>({
+    line: null,
+    discord: null,
+    instagram: null
+  })
+  const axiosAuth = useAxiosAuth()
 
-export const SocialMediaContent = (props: Props) => {
+  useEffect(() => {
+    const fetchSelf = async () => {
+      const res = await self({ client: axiosAuth })
+
+      if (res.data) {
+        setCurrentValue({
+          line: res.data.idLine,
+          discord: res.data.idDiscord,
+          instagram: res.data.idInstagram
+        })
+      }
+    }
+
+    fetchSelf()
+  }, [])
+
   return (
-    <div className="flex flex-col justify-between gap-8 rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 pl-10 pr-32 pb-72 pt-20 shadow-lg md:flex-row md:gap-36">
+    <div className="flex flex-col justify-between gap-8 rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-6 py-8 shadow-lg md:flex-row md:gap-36">
       <div className="flex w-full flex-col gap-8">
         <div className="flex items-center gap-x-2">
           <Image
@@ -19,29 +45,31 @@ export const SocialMediaContent = (props: Props) => {
             alt="Line Logo"
             width={48}
             height={48}
-            className="rounded-full w-12 h-12 mr-2"
+            className="mr-2 h-12 w-12 rounded-full"
           />
-          <div className="w-72"> 
-            <InputProfileData
+          <div className="w-72">
+            <SocialMediaInput
               title={'Line'}
-              default_value={props.line?.value ?? ''}
-              placehodler={'Enter Line ID'}
+              default_value={currentValue.line ?? ''}
+              placeholder={'Enter Line ID'}
+              type="line"
             />
           </div>
         </div>
-        <div className="flex items-center gap-x-2 mt-3">
+        <div className="mt-3 flex items-center gap-x-2">
           <Image
             src="/images/profile/discordlogo.jpg"
             alt="Discord Logo"
             width={48}
             height={48}
-            className="rounded-full w-12 h-12 mr-2"
+            className="mr-2 h-12 w-12 rounded-full"
           />
           <div className="w-72">
-            <InputProfileData
+            <SocialMediaInput
               title={'Discord'}
-              default_value={props.discord?.value ?? ''}
-              placehodler={'Enter Discord ID'}
+              default_value={currentValue.discord ?? ''}
+              placeholder={'Enter Discord ID'}
+              type="discord"
             />
           </div>
         </div>
@@ -53,17 +81,18 @@ export const SocialMediaContent = (props: Props) => {
             alt="Instagram Logo"
             width={48}
             height={48}
-            className="rounded-full w-12 h-12 mr-2"
+            className="mr-2 h-12 w-12 rounded-full"
           />
-          <div className="w-72"> 
-            <InputProfileData
+          <div className="w-72">
+            <SocialMediaInput
               title={'Instagram'}
-              default_value={props.instagram?.value ?? ''}
-              placehodler={'Enter Instagram Name'}
+              default_value={currentValue.instagram ?? ''}
+              placeholder={'Enter Instagram Name'}
+              type="ig"
             />
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
