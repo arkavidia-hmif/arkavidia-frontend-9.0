@@ -20,7 +20,7 @@ const FrameTugas = ({ title, deadline, submitted, total }: FrameTugasProps) => {
           {deadline}
         </p>
       </div>
-      <div className="w-full md:min-w-96">
+      <div className="w-full max-w-[100px] md:min-w-96">
         <p className="text-center font-dmsans text-sm md:text-left">
           {submitted} of {total} participant(s)
         </p>
