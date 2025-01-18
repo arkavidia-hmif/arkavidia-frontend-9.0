@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '../ui/dropdown-menu'
-import { getTeams } from '~/api/generated'
+import { getTeams, GetTeamsResponse } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
 import { useToast } from '~/hooks/use-toast'
@@ -30,10 +30,13 @@ interface SidebarLink {
 }
 
 function Sidebar({ announcement = false }: SidebarProps) {
+  const username = useAppSelector(state => state.auth.username)
+  const [isLoading, setIsLoading] = React.useState(true)
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
   const [sidebarLinks, setSidebarLinks] = React.useState<Array<SidebarLink>>([])
   const [hasScrolled, setHasScrolled] = React.useState(false)
+
   const { toast } = useToast()
   const { logout } = useAuth()
   const router = useRouter()
@@ -54,29 +57,28 @@ function Sidebar({ announcement = false }: SidebarProps) {
 
       if (req.data) {
         setSidebarLinks([]) // Clear the sidebar links
-        const competitionList = req.data
-        competitionList.sort((a, b) =>
-          expandCompetitionName(a.competitionName).localeCompare(
-            expandCompetitionName(b.competitionName)
-          )
-        )
-        competitionList.forEach(competition => {
-          setSidebarLinks(prev => [
-            ...prev,
-            {
-              name: expandCompetitionName(competition.competitionName),
-              link: getSidebarURL({
-                isAdmin,
-                competitionName: competition.competitionName
-              })
-            }
-          ])
-        })
+        const competitionList = JSON.parse(JSON.stringify(req.data)) as GetTeamsResponse
+
+        if (competitionList.length > 0) {
+          competitionList.forEach(competition => {
+            setSidebarLinks(prev => [
+              ...prev,
+              {
+                // @ts-ignore
+                name: expandCompetitionName(competition.competition!.title),
+                link: getSidebarURL({
+                  isAdmin,
+                  // @ts-ignore
+                  competitionName: competition.competition!.title
+                })
+              }
+            ])
+          })
+        }
       }
     }
 
     function handleScroll() {
-      console.log(window.scrollY)
       if (window.scrollY > 0) {
         setHasScrolled(true)
       } else {
@@ -97,7 +99,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
     }
   }, [])
 
-  const USERNAME = 'Ahmad John' // TODO: Get user name from auth context
+  const USERNAME = username
 
   async function handleLogout() {
     await logout()
@@ -156,7 +158,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
                     />
                   ))
                 ) : (
-                  <p>No competitions joined!</p>
+                  <div className="text-center">Loading...</div>
                 )}
               </div>
               <div className="mx-2 mb-4 cursor-pointer lg:mx-2.5">

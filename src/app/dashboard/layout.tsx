@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar/Sidebar'
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <section
-      className="pb-6"
+      className="absolute h-full w-full pb-6"
       style={{
         backgroundImage: "url('/images/profile/bg.png')",
         backgroundPosition: 'center',

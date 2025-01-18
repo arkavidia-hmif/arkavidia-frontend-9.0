@@ -13,6 +13,7 @@ import {
   setAdmin,
   setFilledInfo,
   setNotAdmin,
+  setUsername,
   userLogin,
   userLogout
 } from '~/redux/slices/auth'
@@ -54,13 +55,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (selfReq.data) {
-        // // Logic to get user personal info status
-        // const hasFilledInfo = selfReq.data.hasFilledInfo
-        // if (!hasFilledInfo) {
-        //   router.replace('/register/personal-data')
-        // } else {
-        //   appDispatch(setFilledInfo(true))
-        // }
+        const hasFilledInfo = selfReq.data.isRegistrationComplete
+        const username = selfReq.data.fullName
+        if (hasFilledInfo) {
+          appDispatch(setFilledInfo(true))
+        }
+
+        if (username) {
+          appDispatch(setUsername(username))
+        }
       }
     }
     setIsLoading(false)

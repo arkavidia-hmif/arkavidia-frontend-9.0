@@ -6,10 +6,10 @@ const MainLandingCompetitionPage = () => {
     <div className="md:py-18 relative flex min-h-screen flex-col items-center bg-[linear-gradient(180deg,_#7138C0_-14.45%,_#0F0123_35.71%)] py-10 text-center lg:py-24">
       <div className="relative z-10 flex w-full justify-center px-10">
         <div className="max-w-x flex flex-col items-center gap-2 pt-16 sm:gap-4 md:max-w-2xl lg:max-w-3xl">
-          <h1 className="bg-gradient-to-br from-[#FFB8CF] via-[#AC7CD0] to-[#91F0FF] bg-clip-text font-belanosima text-[56px] font-bold leading-[132px] text-transparent [text-shadow:0px_0px_17.4px_#7138C0] md:text-[90px] lg:text-[120px]">
+          <h1 className="text-glow bg-gradient-to-r from-[#FFB8CF] from-20% via-[#AC7CD0] via-[62%] to-[#91F0FF] bg-clip-text font-belanosima text-[56px] font-bold leading-[132px] text-transparent md:text-[90px] lg:text-[120px]">
             COMPETITION
           </h1>
-          <p className="px-8 text-center font-dmsans text-[16px] leading-5 tracking-wider text-lilac-100 md:text-[20px] md:leading-6 lg:mt-10 lg:px-0 lg:leading-7">
+          <p className="px-8 text-justify font-dmsans text-[16px] leading-5 tracking-wider text-lilac-100 md:text-[20px] md:leading-6 lg:mt-10 lg:px-0 lg:leading-7">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla pulvinar, massa
             eleifend bibendum consectetur, nulla ligula hendrerit sapien, et aliquam orci
             ex vitae odio. Vestibulum ligula nunc, bibendum aliquam orci sed, tempor
