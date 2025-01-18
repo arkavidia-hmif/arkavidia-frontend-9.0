@@ -37,12 +37,12 @@ const FrameSubmissions = ({ compe_id, totalTeam }: FrameSubmissionsProps) => {
           'linear-gradient(90.68deg, rgba(255,255,255,0.24) 0.11%, rgba(255,255,255,0.08) 99.1%)',
         boxShadow: '0px 0px 8px 0px #F5F5F580'
       }}
-      className="flex flex-grow items-center justify-between gap-3 rounded-lg border border-white/25 px-6 py-5 font-teachers">
-      <div className="flex flex-grow flex-col">
-        <h2 className="text-3xl font-bold text-white drop-shadow-[0_0_3px_rgba(255,255,255,0.3)]">
+      className="flex flex-grow items-center justify-between gap-3 rounded-lg border border-white/25 px-4 py-4 font-teachers md:px-6 md:py-5">
+      <div className="flex w-full flex-grow flex-col">
+        <h2 className="text-center text-2xl font-bold text-white drop-shadow-[0_0_3px_rgba(255,255,255,0.3)] md:text-left md:text-3xl">
           Submission
         </h2>
-        <h3 className="font-dmsans text-base text-white drop-shadow-[0_0_3px_rgba(255,255,255,0.3)]">
+        <h3 className="text-center font-dmsans text-sm text-white drop-shadow-[0_0_3px_rgba(255,255,255,0.3)] md:text-left md:text-base">
           Track the number of participants who have submitted each task
         </h3>
 

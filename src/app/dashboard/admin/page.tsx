@@ -31,9 +31,9 @@ const AdminDashboardPage = () => {
   return (
     <>
       {/* Dashboard Title */}
-      <div className="relative flex items-center space-x-4">
+      <div className="relative flex items-center justify-center space-x-4 md:justify-start">
         <div
-          className="h-12 w-12"
+          className="h-8 w-8 md:h-12 md:w-12"
           style={{
             background: 'linear-gradient(180deg, #7138C0 0%, #B89BDF 100%)',
             boxShadow: '0px 0px 8px 0px #F5F5F580',
@@ -47,16 +47,16 @@ const AdminDashboardPage = () => {
             maskPosition: 'center'
           }}
         />
-        <h1 className="font-belanosima text-5xl text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.7)]">
+        <h1 className="font-belanosima text-3xl text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.7)] md:text-5xl">
           Dashboard
         </h1>
       </div>
 
       {/* break line */}
-      <div className="my-4 h-1 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] drop-shadow-[0_0_6px_rgba(255,255,255,0.5)]" />
+      <div className="my-3 h-1 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] drop-shadow-[0_0_6px_rgba(255,255,255,0.5)] md:my-4" />
 
       {/* Overall Participant */}
-      <div className="my-8 flex items-center justify-between gap-10">
+      <div className="my-4 flex flex-col items-center justify-between gap-4 md:my-8 md:flex-row md:gap-10">
         <FrameInfo
           number={overallStats.registered}
           helperText={'Overall Registered Participants'}
@@ -70,7 +70,7 @@ const AdminDashboardPage = () => {
       </div>
 
       {/* break line */}
-      <div className="my-4 h-1 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] drop-shadow-[0_0_6px_rgba(255,255,255,0.5)]" />
+      <div className="my-3 h-1 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] drop-shadow-[0_0_6px_rgba(255,255,255,0.5)] md:my-4" />
 
       {/* Competition */}
       <CompetitionContext
