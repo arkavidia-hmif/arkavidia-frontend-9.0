@@ -224,10 +224,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
       </div>
 
       {isSidebarOpen && (
-        <div
-          className="pointer-events-auto fixed inset-0 z-40 bg-black opacity-50 transition-opacity duration-300"
-          onClick={() => setIsSidebarOpen(false)}
-        />
+        <div className="pointer-events-auto fixed inset-0 z-40 bg-black opacity-50 transition-opacity duration-300" />
       )}
     </>
   )
