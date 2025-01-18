@@ -1,95 +1,109 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { self } from '~/api/generated/sdk.gen'
-import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { SocialMediaContent } from '~/app/components/profile/social-media-content'
 import {
   PersonalInformationContent,
+  ProfileInformationDefaultValue,
   ProfileInformationDropdownOptions
 } from '../../components/profile/personal-information-content'
 import { ProfileLayout } from '../../components/profile/profile-content-layout'
-import ProfileHero from '~/app/components/ProfileHero'
+import ProfileHero from '../../components/ProfileHero'
 
-const DropdownOptions: ProfileInformationDropdownOptions = {
+const DummyPersonalInfoData: ProfileInformationDefaultValue = {
+  name: 'Ahdmad Jone Done',
+  birthdate: new Date('2004-09-09'),
+  education: {
+    id: 1,
+    option: 'Institute'
+  },
+  instance: {
+    id: 2,
+    option: 'Ahdmad Jane'
+  },
+  phoneNumber: '+628211912891381',
+  howDoYouKnowArkavidia: {
+    id: 3,
+    option: 'example@gmail.com'
+  }
+}
+
+const DummyDropdownOptions: ProfileInformationDropdownOptions = {
   educationOptions: [
-    { id: 1, option: 'sma' },
-    { id: 2, option: 's1' },
-    { id: 3, option: 's2' }
+    {
+      id: 1,
+      option: 'Insitute'
+    },
+    {
+      id: 2,
+      option: 'ITB'
+    },
+    {
+      id: 3,
+      option: 'UI'
+    },
+    {
+      id: 4,
+      option: 'UGM'
+    }
   ],
   instanceOptions: [
-    { id: 1, option: 'Ahmad Jane' },
-    { id: 2, option: 'Besok Minggu' },
-    { id: 3, option: 'Object Oriented Programming' }
+    {
+      id: 1,
+      option: 'Ahdmad Jane'
+    },
+    {
+      id: 2,
+      option: 'Besok Minggu'
+    },
+    {
+      id: 3,
+      option: 'Object Oriented Programming'
+    }
   ],
   howDoYouKnowArkavOptions: [
-    { id: 1, option: 'example@gmail.com' },
-    { id: 2, option: 'ITB@gmail.com' },
-    { id: 3, option: 'Social Media' }
+    {
+      id: 1,
+      option: 'example@gmail.com'
+    },
+    {
+      id: 2,
+      option: 'ITB@gmail.com'
+    },
+    {
+      id: 3,
+      option: 'Social Media'
+    }
   ]
 }
 
 const ProfilePage = () => {
-  const [userData, setUserData] = useState<any>(null)
-  const [error, setError] = useState<string>('')
-  const axiosAuth = useAxiosAuth()
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userResponse = await self({
-          client: axiosAuth
-        })
-
-        if (userResponse.data) {
-          // console.log(userResponse.data)
-          setUserData(userResponse.data)
-        } else {
-          throw new Error('Failed to fetch user data.')
-        }
-      } catch (err) {
-        setError('Unable to load user information.')
-        console.error(err)
-      }
-    }
-
-    fetchUserInfo()
-  }, [axiosAuth])
-
-  if (error) {
-    return <p>{error}</p>
-  }
-
-  if (!userData) {
-    return <p>Loading...</p>
-  }
-
   return (
-    <main>
-      <div className="mb-8 pt-20">
+    <div>
+      <div className="mb-8">
         <ProfileHero
           title="Profile"
-          name={userData.fullName}
-          email={userData.email}
+          name="Ahmad John Doe"
+          email="example@example.com"
           isResetProfile={false}
         />
       </div>
       <ProfileLayout
         personalInformation={
           <PersonalInformationContent
-            name={userData.fullName}
-            birthdate={userData.birthdate}
-            education={{ id: 1, option: userData.education }} // Use education
-            howDoYouKnowArkavidia={{ id: 1, option: userData.entrySource }} // Use entry_source
-            instance={{ id: 1, option: userData.instance }} // Use instance
-            phoneNumber={userData.phoneNumber} // Use phone_number
-            educationOptions={DropdownOptions.educationOptions} // Static dropdown options
-            instanceOptions={DropdownOptions.instanceOptions}
-            howDoYouKnowArkavOptions={DropdownOptions.howDoYouKnowArkavOptions}
+            name={DummyPersonalInfoData.name}
+            birthdate={DummyPersonalInfoData.birthdate}
+            education={DummyPersonalInfoData.education}
+            howDoYouKnowArkavidia={DummyPersonalInfoData.howDoYouKnowArkavidia}
+            instance={DummyPersonalInfoData.instance}
+            phoneNumber={DummyPersonalInfoData.phoneNumber}
+            educationOptions={DummyDropdownOptions.educationOptions}
+            instanceOptions={DummyDropdownOptions.instanceOptions}
+            howDoYouKnowArkavOptions={DummyDropdownOptions.howDoYouKnowArkavOptions}
           />
         }
-        socialMedia={<div></div>}
+        socialMedia={<SocialMediaContent />}
       />
-    </main>
+    </div>
   )
 }
 

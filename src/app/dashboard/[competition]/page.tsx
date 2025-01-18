@@ -1,8 +1,13 @@
 import React from 'react'
+import CompetitionPage from './components/CompetitionPage'
 
-async function UserDashboard({ params }: { params: Promise<{ competition: string }> }) {
-  const competitionName = (await params).competition
-  return <div>UserDashboard</div>
+async function CompetitionDashboard({
+  params
+}: {
+  params: Promise<{ competition: string }>
+}) {
+  const param = await params
+  return <CompetitionPage compeName={param.competition} />
 }
 
-export default UserDashboard
+export default CompetitionDashboard

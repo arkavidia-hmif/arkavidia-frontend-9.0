@@ -114,7 +114,8 @@ const ProfileData = (props: ProfileDataLayoutProps) => {
 interface InputProfileDataProps {
   title: string
   default_value: string
-  placeholder: string
+  placehodler: string
+  logoSrc?: React.ReactNode
 }
 
 export const InputProfileData = (props: InputProfileDataProps) => {
@@ -153,14 +154,17 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       title={props.title}
       value={value}
       handleSave={onSaveInput}>
-      <Input
-        placeholder={props.placeholder}
-        className="min-w-72 bg-lilac-100 py-6 text-purple-400"
-        value={tempValue}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setTempValue(e.target.value)
-        }
-      />
+      <div className="flex items-center">
+        {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
+        <Input
+          placeholder={props.placehodler}
+          className="min-w-72 bg-lilac-100 py-6 text-purple-400"
+          value={tempValue}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setTempValue(e.target.value)
+          }
+        />
+      </div>
     </ProfileData>
   )
 }
@@ -169,6 +173,7 @@ interface DropdownProfileDataProps {
   title: string
   dropdownData: MenuItem[]
   selectedOption: MenuItem
+  logoSrc?: React.ReactNode // Tambahkan prop untuk logo
 }
 
 export const DropdownProfileData = (props: DropdownProfileDataProps) => {
@@ -209,13 +214,16 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
       title={props.title}
       value={value.option}
       handleSave={onSaveInput}>
-      <Dropdown
-        data={props.dropdownData}
-        label=""
-        helper_text=""
-        value={tempValue}
-        onChange={selectedItem => setTempValue(selectedItem ?? value)}
-      />
+      <div className="flex items-center">
+        {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
+        <Dropdown
+          data={props.dropdownData}
+          label={''}
+          helper_text={''}
+          value={tempValue}
+          onChange={selectedItem => setTempValue(selectedItem ?? value)}
+        />
+      </div>
     </ProfileData>
   )
 }
@@ -223,6 +231,7 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
 interface DatePickerProfileDataProps {
   title: string
   default_value: Date
+  logoSrc?: React.ReactNode
 }
 
 export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
@@ -254,13 +263,16 @@ export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
       title={props.title}
       value={selectedDate.toDateString()}
       handleSave={onSaveDate}>
-      <input
-        aria-label="Date"
-        type="date"
-        value={formatDate(tempDate)}
-        onChange={e => setTempDate(new Date(e.target.value))}
-        className="w-full rounded-md border border-purple-400 bg-lilac-100 p-2 py-3 pr-40 text-purple-400"
-      />
+      <div className="flex items-center">
+        {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
+        <input
+          aria-label="Date"
+          type="date"
+          value={formatDate(tempDate)}
+          onChange={e => setTempDate(new Date(e.target.value))}
+          className="w-full rounded-md border border-purple-400 bg-lilac-100 p-2 py-3 pr-40 text-purple-400"
+        />
+      </div>
     </ProfileData>
   )
 }
