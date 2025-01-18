@@ -13,14 +13,13 @@ import { ChevronLeft, CloudUpload } from 'lucide-react'
 import {
   getCompetitionSubmissionRequirement,
   GetCompetitionSubmissionRequirementResponse,
-  
-  getTeams,
-  
+  getTeams
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
 import { useRouter } from 'next/navigation'
 import ProfileCompetition from '~/app/components/ProfileCompetition'
+import Dropdown, { MenuItem } from '~/app/components/Dropdown'
 
 // Task interface
 interface Task {
@@ -103,7 +102,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           ])
         } else {
           console.warn('No teams found.')
-          router.push("/dashboard")
+          router.push('/dashboard')
         }
       } catch (error) {
         console.error('Error fetching submission requirements:', error)
@@ -186,6 +185,21 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     event.preventDefault()
   }
   const contentTypes = ['Team Information', 'Announcements', 'Task List', 'Verification']
+
+  const getMenuDataFromContentTypes = () => {
+    const menuItems: MenuItem[] = []
+
+    contentTypes.forEach((content, index) =>
+      menuItems.push({
+        id: index,
+        option: content,
+        iconRight: false,
+        iconLeft: false
+      })
+    )
+    return menuItems
+  }
+
   const contents = [
     <div>Team Information Content</div>,
     <div>Announcements Content</div>,
