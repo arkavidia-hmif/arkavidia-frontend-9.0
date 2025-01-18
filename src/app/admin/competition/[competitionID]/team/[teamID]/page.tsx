@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { getCompetitionSubmissionTeam, getTeamDetail, GetTeamDetailResponse } from "~/api/generated";
 import useAxiosAuth from "~/lib/hooks/useAxiosAuth";
 import { useParams, useRouter } from "next/navigation";
+import Hero from "~/app/components/team-lists/detail/Hero";
 
 type Competition = 'cp' | 'ctf' | 'hackvidia' | 'uxvidia' | 'datavidia';
 
@@ -114,7 +115,7 @@ function TeamDetails() {
 
     return (
         <div
-            className="min-h-screen bg-gradient-to-r from-[#1F0246] to-[#2E046A]"
+            className="flex flex-col gap-7 px-4 min-h-screen bg-gradient-to-r from-[#1F0246] to-[#2E046A]"
             style={{
                 backgroundImage: "url('/images/profile/bg.png')",
                 backgroundPosition: 'center',
@@ -122,6 +123,12 @@ function TeamDetails() {
                 backgroundSize: 'cover',
             }}
         >
+            <Hero
+                teamName={teamData.name}
+                teamID={'#'+teamData.joinCode}
+                teamStatus={teamData.isVerified? 'Verified' : 'Unverified'}
+                teamStage={} 
+            />
             {competition && (
                 competition === 'uxvidia' || competition === 'datavidia' ? (
                     <Tab 
