@@ -16,6 +16,9 @@ import { Input } from '~/app/components/Input'
 import { FaArrowLeft } from 'react-icons/fa'
 import { Button } from '~/app/components/ui/button'
 import { SuccessModal } from './SuccessModal'
+import { useToast } from '~/hooks/use-toast'
+import { forgotPassword } from '~/api/generated'
+import { axiosInstance } from '~/lib/axios'
 
 const loginSchema = z.object({
   email: z.string().email()
@@ -23,6 +26,7 @@ const loginSchema = z.object({
 
 export const FormForgetPassword = () => {
   const router = useRouter()
+  const { toast } = useToast()
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -32,13 +36,37 @@ export const FormForgetPassword = () => {
     }
   })
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
     // Logika untuk validasi email
+    const parsedValues = loginSchema.safeParse(values)
+    if (!parsedValues.success) {
+      toast({
+        title: 'Email tidak valid',
+        variant: 'destructive'
+      })
+      return
+    }
+
     // Send email to user by backend API
+    const res = await forgotPassword({
+      client: axiosInstance,
+      body: {
+        email: values.email
+      }
+    })
+
+    console.log(res)
+
     // If success, open modal
-    // Success
-    // setError(')
-    // setIsSuccessModalOpen(true)
+    if (res.status === 200) {
+      setIsSuccessModalOpen(true)
+    } else {
+      toast({
+        // @ts-expect-error - message is not in the error object
+        title: res.error ? res.error.message : 'Gagal mengirim email',
+        variant: 'destructive'
+      })
+    }
   }
 
   return (
@@ -92,6 +120,7 @@ export const FormForgetPassword = () => {
       <SuccessModal
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
+        email={form.getValues('email')}
       />
     </div>
   )
