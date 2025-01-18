@@ -1,22 +1,82 @@
 'use client'
 
-import React, { createContext, useContext, useState } from 'react'
-import { self, User } from '~/api/generated'
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { client, self, User } from '~/api/generated'
+import { createAxiosAuthInstance } from '~/lib/axios'
 import { basicLogin as login, logout as reqLogout } from '~/api/generated'
 import { authAxiosInstance, axiosInstance } from '~/lib/axios'
 import { useRouter } from 'next/navigation'
 import { AuthContextProps, basicLoginResponse } from './AuthContextTypes'
+import { useAppDispatch, useAppSelector, StoreType } from '~/redux/store'
+import { useToast } from '~/hooks/use-toast'
+import {
+  setAdmin,
+  setFilledInfo,
+  setNotAdmin,
+  setUsername,
+  userLogin,
+  userLogout
+} from '~/redux/slices/auth'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { useStore } from 'react-redux'
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
-  const router = useRouter()
+  const { accessToken, isAdmin, isLoggedIn } = useAppSelector(state => state.auth)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const setIsAuth = (value: boolean) => {
-    setIsAuthenticated(value)
+  const authAxios = useAxiosAuth()
+  const { toast } = useToast()
+  const router = useRouter()
+  const appDispatch = useAppDispatch()
+
+  const logout = async () => {
+    appDispatch(userLogout())
+    appDispatch(setNotAdmin())
+    localStorage.clear()
   }
+
+  const getSelf = async () => {
+    const selfReq = await self({ client: authAxios })
+    return selfReq
+  }
+
+  const sessionCheck = async () => {
+    if (accessToken) {
+      const selfReq = await getSelf()
+      if (selfReq.error || selfReq.status === 401) {
+        await logout()
+        toast({
+          title: 'Session Expired',
+          description: 'Please login again',
+          variant: 'info'
+        })
+      }
+
+      if (selfReq.data) {
+        const hasFilledInfo = selfReq.data.isRegistrationComplete
+        const isAdmin = selfReq.data.role === 'admin'
+        const username = selfReq.data.fullName
+        if (hasFilledInfo) {
+          appDispatch(setFilledInfo(true))
+        }
+
+        if (username) {
+          appDispatch(setUsername(username))
+        }
+
+        if (isAdmin) {
+          appDispatch(setAdmin())
+        }
+      }
+    }
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    sessionCheck()
+  }, [])
 
   const basicLogin = async (email: string, password: string) => {
     const req = await login({
@@ -26,63 +86,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const res: basicLoginResponse = {
       ok: false,
-      error: false
+      error: false,
+      message: ''
     }
 
     if (!req.data) {
       res.error = true
+      // @ts-expect-error
+      res.message = req.error?.message
       return res
     }
 
     if (req.data) {
-      localStorage.setItem('ref_tkn', req.data.refreshToken)
-      setIsAuthenticated(true)
-
-      // Get User Data
-      const userData = await self({ client: authAxiosInstance })
-      setUser(userData.data ?? null)
+      appDispatch(userLogin(req.data.accessToken))
       res.ok = true
-      router.push('/')
+      setTimeout(() => {
+        router.replace('/')
+      }, 500)
     }
 
     return res
   }
 
-  const logout = async () => {
-    localStorage.removeItem('ref_tkn')
-    setIsAuthenticated(false)
-    await reqLogout({
-      client: authAxiosInstance,
-      headers: {
-        'X-Logout-Request': 'true'
-      }
-    }) // Delete cookies
-    router.replace('/login')
-  }
-
-  const getRefreshToken = () => {
-    return localStorage.getItem('ref_tkn')
-  }
-
-  const setRefreshToken = (token: string) => {
-    localStorage.setItem('ref_tkn', token)
-  }
-
-  const clearRefreshToken = () => {
-    localStorage.removeItem('ref_tkn')
-  }
-
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated,
-        user,
-        setIsAuth,
-        basicLogin,
         logout,
-        getRefreshToken,
-        setRefreshToken,
-        clearRefreshToken
+        basicLogin
       }}>
       {children}
     </AuthContext.Provider>
