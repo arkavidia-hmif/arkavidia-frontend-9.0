@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Button } from './ui/button'
+import { Button } from './Button'
 import Image from 'next/image'
 import { LogOut, Menu } from 'lucide-react'
 import {
@@ -11,6 +11,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from './ui/dropdown-menu'
+import { useAuth } from '../contexts/AuthContext'
+import { useAppSelector } from '~/redux/store'
+import { toast } from '~/hooks/use-toast'
 
 type NavItem = {
   name: string
@@ -18,7 +21,10 @@ type NavItem = {
 }
 
 function Navbar() {
-  const LOGGED_IN = true // ! hardcode untuk testing
+  const isAuthenticated = useAppSelector(state => state.auth.accessToken !== null)
+  const isAdmin = useAppSelector(state => state.auth.isAdmin)
+  const { logout } = useAuth()
+  const LOGGED_IN = isAuthenticated // ! hardcode untuk testing
   const pathname = usePathname()
   const NAV_ITEMS: NavItem[] = [
     { name: 'About Us', link: '/aboutus' },
@@ -26,14 +32,19 @@ function Navbar() {
     { name: 'Competition', link: '/competition' }
   ]
 
-  function handleLogout() {
-    // TODO: Implement logout functionality
+  async function handleLogout() {
+    await logout()
+    toast({
+      title: 'Logged out',
+      description: 'You have been logged out',
+      variant: 'info'
+    })
   }
 
   return (
-    <nav className="bg-black px-4 py-3 lg:px-12">
+    <nav className="fixed z-[100] mt-3 w-full bg-transparent px-4 py-3 lg:px-12">
       <div className="flex flex-row items-center justify-between">
-        <Link href="/" className="flex flex-row items-center justify-center gap-2">
+        <Link href="/" className="flex flex-row items-center justify-center gap-2 px-4">
           <Image
             src="/arkavidiaLogo.svg"
             alt="Logo Arkavidia 9.0"
@@ -60,7 +71,7 @@ function Navbar() {
                 key={index}
                 className={pathname === item.link ? 'bg-white text-purple-700' : ''}
                 asChild>
-                <Link href={item.link} className="w-full">
+                <Link href={item.link} className="w-full hover:bg-gray-500">
                   {item.name}
                 </Link>
               </DropdownMenuItem>
@@ -73,7 +84,9 @@ function Navbar() {
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer text-red-500 focus:text-red-400">
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="cursor-pointer text-red-500 focus:text-red-400">
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
@@ -97,7 +110,9 @@ function Navbar() {
               <Link
                 href={item.link}
                 className={`px-6 py-2 font-teachers text-base font-bold ${
-                  pathname === item.link ? 'rounded-full bg-purple-500' : ''
+                  pathname === item.link
+                    ? 'rounded-full bg-purple-500'
+                    : 'hover:rounded-lg hover:bg-black/20 hover:py-4'
                 }`}>
                 {item.name}
               </Link>
@@ -118,7 +133,9 @@ function Navbar() {
                 <DropdownMenuItem
                   className="cursor-pointer focus:bg-purple-600 focus:text-white"
                   asChild>
-                  <Link href="/dashboard" className="w-full">
+                  <Link
+                    href={isAdmin ? '/dashboard/admin' : '/dashboard'}
+                    className="w-full">
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
@@ -132,8 +149,8 @@ function Navbar() {
             </DropdownMenu>
           ) : (
             // * Nanti diganti button dari component Button
-            <Link href="/login">
-              <Button className="font-base h-auto gap-4 rounded-md bg-gradient-to-r from-teal-500 via-[#9274FF] to-[#C159D8] px-8 py-4 font-dmsans text-base">
+            <Link href="/login" className="">
+              <Button className="font-base gap-4 rounded-md bg-gradient-to-r from-teal-500 via-[#9274FF] to-[#C159D8] py-1 font-dmsans text-base lg:px-8 lg:py-4">
                 Login
               </Button>
             </Link>

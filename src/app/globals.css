@@ -147,3 +147,9 @@ body {
 .dashboardTitle {
   text-shadow: 0px 0px 17.7px rgba(255, 255, 255, 0.5);
 }
+
+.text-glow {
+  filter: drop-shadow(0 0 17px #7138c0);
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+  /* Inner shadow */
+}

@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { createClient, createConfig } from '@hey-api/client-axios'
 
 const axiosInstance = createClient(
@@ -17,4 +16,16 @@ const authAxiosInstance = createClient(
   })
 )
 
-export { axiosInstance, authAxiosInstance }
+const createAxiosAuthInstance = (accessToken: string) => {
+  return createClient(
+    createConfig({
+      baseURL: process.env.NEXT_PUBLIC_API_URL ?? '',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+  )
+}
+
+export { axiosInstance, authAxiosInstance, createAxiosAuthInstance }

@@ -1,26 +1,20 @@
-import Sidebar from '../components/Sidebar'
-import Image from 'next/image'
+'use client'
+import { useLoginRedirect } from '~/lib/hooks/useRedirect'
+import Sidebar from '../components/Sidebar/Sidebar'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  useLoginRedirect()
   return (
     <section
-      className="relative h-[100vh] min-h-screen w-full overflow-auto bg-gradient-to-b from-[#1f0246] to-[#2e046a] md:min-h-screen"
-      // style={{
-      //   backgroundImage: "url('/images/profile/bg.png')",
-      //   backgroundPosition: 'center',
-      //   backgroundRepeat: 'no-repeat'
-      // }}
-    >
-      <Image
-        src="/images/profile/reset-password/bg.png"
-        alt="Background"
-        className="fixed left-0 top-0 h-full w-full object-cover"
-        width={1920}
-        height={1080}
-      />
+      className="absolute h-full w-full"
+      style={{
+        backgroundImage: "url('/images/competition/bg.png')",
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover'
+      }}>
       <Sidebar />
-
-      <div className="px-5 pt-32 lg:pl-[220px] lg:pt-[34px] pb-5">{children}</div>
+      <div className="px-8 py-20 lg:py-6 lg:pl-[250px]">{children}</div>
     </section>
   )
 }
