@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import FrameInfo from '../components/admin-dashboard/FrameInfo'
-import CompetitionContext from '../components/admin-dashboard/CompetitionContext'
+import FrameInfo from '../../components/admin-dashboard/FrameInfo'
+import CompetitionContext from '../../components/admin-dashboard/CompetitionContext'
 
 const AdminDashboardPage = () => {
   const IMAGE = '/images/sidebar/item.svg'
