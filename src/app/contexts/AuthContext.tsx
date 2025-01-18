@@ -9,7 +9,14 @@ import { useRouter } from 'next/navigation'
 import { AuthContextProps, basicLoginResponse } from './AuthContextTypes'
 import { useAppDispatch, useAppSelector, StoreType } from '~/redux/store'
 import { useToast } from '~/hooks/use-toast'
-import { setNotAdmin, userLogin, userLogout } from '~/redux/slices/auth'
+import {
+  setAdmin,
+  setFilledInfo,
+  setNotAdmin,
+  setUsername,
+  userLogin,
+  userLogout
+} from '~/redux/slices/auth'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useStore } from 'react-redux'
 
@@ -47,12 +54,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
         router.push('/login');
       }
+
+      if (selfReq.data) {
+        const hasFilledInfo = selfReq.data.isRegistrationComplete
+        const isAdmin = selfReq.data.role === 'admin'
+        const username = selfReq.data.fullName
+        if (hasFilledInfo) {
+          appDispatch(setFilledInfo(true))
+        }
+
+        if (username) {
+          appDispatch(setUsername(username))
+        }
+
+        if (isAdmin) {
+          appDispatch(setAdmin())
+        }
+      }
     }
+    setIsLoading(false)
   }
 
   useEffect(() => {
     sessionCheck()
-    setIsLoading(false)
   }, [])
 
   const basicLogin = async (email: string, password: string) => {
@@ -63,11 +87,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const res: basicLoginResponse = {
       ok: false,
-      error: false
+      error: false,
+      message: ''
     }
 
     if (!req.data) {
       res.error = true
+      // @ts-expect-error
+      res.message = req.error?.message
       return res
     }
 

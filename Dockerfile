@@ -2,6 +2,8 @@
 FROM node:18-alpine AS builder
 
 RUN npm install -g pnpm
+ARG API_URI
+ENV NEXT_PUBLIC_API_URI=${API_URI}
 
 WORKDIR /app
 
@@ -15,6 +17,12 @@ RUN pnpm install --frozen-lockfile
 # Copy the rest of the application
 COPY . .
 
+# Get API Definition
+RUN pnpm dlx @hey-api/openapi-ts \
+-c @hey-api/client-axios \
+-i ${NEXT_PUBLIC_API_URI}/openapi.json \
+-o src/api/generated
+
 # Build the Next.js app
 RUN pnpm build
 
@@ -22,6 +30,8 @@ RUN pnpm build
 FROM node:18-alpine AS runner
 
 RUN npm install -g pnpm
+ARG API_URI
+ENV NEXT_PUBLIC_API_URL=${API_URI}
 
 WORKDIR /app
 
