@@ -2,7 +2,6 @@
 
 import React, { useCallback, useEffect, useState } from 'react'
 import {
-  format,
   startOfMonth,
   endOfMonth,
   startOfWeek,
@@ -12,25 +11,17 @@ import {
   subMonths
 } from 'date-fns'
 import CalendarNavButton from './CalendarNavButton'
-import Dropdown from '../Dropdown'
-import { Select } from '../ui/select'
 import MonthNYearSelect from './MonthNYearSelect'
 import DateComponent from './DateComponent'
 
 const dayList = ['Se', 'Sel', 'Ra', 'Ka', 'Ju', 'Sa', 'Mi']
-
-// const dummyEventDate = [
-//   new Date('2025-01-10'),
-//   new Date('2025-01-16'),
-//   new Date('2025-01-25')
-// ]
 
 interface EventDate {
   date: Date
   information: string
 }
 
-const Calendar: React.FC = ({ eventDate }: { eventDate?: EventDate[] }) => {
+const Calendar: React.FC = ({ events }: { events?: EventDate[] }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [currentDate, setCurrentDate] = useState(new Date())
   const [days, setDays] = useState<Date[]>()
@@ -94,8 +85,8 @@ const Calendar: React.FC = ({ eventDate }: { eventDate?: EventDate[] }) => {
             day={day}
             currentDate={currentDate}
             isEventDate={
-              eventDate ?
-              eventDate.some(event => event.date.toDateString() === day.toDateString()) : false
+              events ?
+              events.some(event => event.date.toDateString() === day.toDateString()) : false
             }
           />
         ))}

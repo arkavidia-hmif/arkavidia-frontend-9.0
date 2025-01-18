@@ -5,7 +5,6 @@ import {
   getTeams,
   Team,
   getUser,
-  User,
   getCompetitionTimelineWithCompetitionId,
   getCompetitionSubmissionRequirement,
   getAdminCompAnnouncement
@@ -23,6 +22,7 @@ import ComponentBox from './components/ComponentBox'
 import Information from './components/Information/Information'
 import Submisi from './components/Submisi'
 import Tag from '../components/Tag'
+import Dropdown from '../components/Dropdown'
 
 const transformEventData = (
   data: { startDate: string; endDate: string | null; title: string }[]
@@ -30,7 +30,6 @@ const transformEventData = (
   const events: { date: Date; information: string }[] = []
 
   data.forEach(item => {
-    // Tambahkan event dari startDate
     if (item.startDate) {
       events.push({
         date: new Date(item.startDate),
@@ -38,7 +37,6 @@ const transformEventData = (
       })
     }
 
-    // Tambahkan event dari endDate jika ada
     if (item.endDate) {
       events.push({
         date: new Date(item.endDate),
@@ -58,12 +56,12 @@ const transformSubmissionData = (
     requirement: { typeName: string; startDate: string; deadline: string }
   }[]
 ) => {
-  const now = new Date() // Waktu sekarang
+  const now = new Date()
   const submissions = submissionData
-    .filter((item) => new Date(item.requirement.startDate) >= now) // Filter berdasarkan startDate
+    .filter(item => new Date(item.requirement.startDate) >= now) // Filter berdasarkan startDate
     .map(item => ({
       title: item.requirement.typeName,
-      link: '#', // Link sementara
+      link: '#',
       date: new Date(item.requirement.deadline)
     }))
 
@@ -75,28 +73,23 @@ const getTeamStage = (
     requirement: { stage: string; startDate: string; deadline: string }
   }[]
 ) => {
-  const now = new Date() // Waktu sekarang
-
-  // Filter data berdasarkan kondisi startDate <= now <= deadline
+  const now = new Date()
   const validStages = submissionData.filter(
     item =>
       new Date(item.requirement.startDate) <= now &&
       now <= new Date(item.requirement.deadline)
   )
 
-  // Jika tidak ada stage yang valid, return null
   if (validStages.length === 0) {
     return null
   }
 
-  // Pilih stage yang startDate paling awal jika ada lebih dari satu
   const selectedStage = validStages.reduce((earliest, current) =>
     new Date(current.requirement.startDate) < new Date(earliest.requirement.startDate)
       ? current
       : earliest
   )
 
-  // Kembalikan stage dan deadline
   return {
     stage: selectedStage.requirement.stage,
     deadline: new Date(selectedStage.requirement.deadline)
@@ -178,7 +171,7 @@ function UserDashboard() {
       if (currentTeam) {
         const competitionData = await getCompetitionTimelineWithCompetitionId({
           client: axiosAuth,
-          path: { competitionId: currentTeam.competition.id }
+          path: { competitionId: currentTeam.competition.id } // typo di setup api nya jd competititon
         })
 
         if (competitionData.error) {
@@ -217,50 +210,53 @@ function UserDashboard() {
         }
 
         if (submissionData.data) {
-          console.log('submissionData: ' + JSON.stringify(submissionData.data))
+          // console.log('submissionData: ' + JSON.stringify(submissionData.data))
           setSubmissionRequirementData(submissionData.data)
-          // console.log('submissionRequirementData: ' + JSON.stringify(submissionRequirementData))
         }
       }
     }
     fetchSubmission()
   }, [currentTeam])
 
-  // Fetching Informations
-  useEffect(() => {
-    async function fetchInformations() {
-      const adminCompAnnouncement = await getAdminCompAnnouncement({
-        client: axiosAuth,
-        path: { competitionId: currentTeam?.competition.id }
-      })
+  // // Fetching Informations => issue, api masih untuk role admin saja
+  // useEffect(() => {
+  //   async function fetchInformations() {
+  //     const adminCompAnnouncement = await getAdminCompAnnouncement({
+  //       client: axiosAuth,
+  //       path: { competitionId: currentTeam?.competition.id } // typo di setup api nya jd competititon
+  //     })
 
-      if (adminCompAnnouncement.error) {
-        toast({
-          title: 'Failed getting data',
-          description: 'Failed to get admin competition announcement',
-          variant: 'destructive'
-        })
-      }
+  //     if (adminCompAnnouncement.error) {
+  //       toast({
+  //         title: 'Failed getting data',
+  //         description: 'Failed to get admin competition announcement',
+  //         variant: 'destructive'
+  //       })
+  //     }
 
-      if (adminCompAnnouncement.data) {
-        console.log(
-          'adminCompAnnouncement: ' + JSON.stringify(adminCompAnnouncement.data)
-        )
-      }
-    }
-    fetchInformations()
-  }, [])
+  //     if (adminCompAnnouncement.data) {
+  //       console.log(
+  //         'adminCompAnnouncement: ' + JSON.stringify(adminCompAnnouncement.data)
+  //       )
+  //     }
+  //   }
+  //   fetchInformations()
+  // }, [])
 
-  // Dummy Data
+  // Data
   const username = userName
+
   const team = currentTeam?.name
-  const category = currentTeam?.competition.title
+
+  const category = currentTeam?.competition.title // typo di setup api nya jd competititon
+
   const team_status = currentTeam?.isVerified
+
   let team_stage = ''
-  let stage_deadline = new Date()
+  let stage_deadline = null
   if (submissionRequirementData) {
-    team_stage = getTeamStage(submissionRequirementData)
-      ?.stage.split(' ')
+    team_stage = (getTeamStage(submissionRequirementData)?.stage || '')
+      .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ')
     stage_deadline = getTeamStage(submissionRequirementData)?.deadline
@@ -271,13 +267,14 @@ function UserDashboard() {
     const transformedData = transformEventData(competitionTimeline)
     events.push(...transformedData)
   }
+
   const submissions = []
   if (submissionRequirementData) {
     const transformedSubmissionData = transformSubmissionData(submissionRequirementData)
     submissions.push(...transformedSubmissionData)
   }
-  console.log('submissions: ' + JSON.stringify(submissions))
 
+  // Masih dummy data
   const informations = [
     {
       id: '1',
@@ -335,9 +332,11 @@ function UserDashboard() {
               {/* Header */}
               <div>
                 {/* Title */}
-                <p className="mb-4 font-belanosima text-[24px] xl:text-[48px]">
-                  Hi, {username}!
-                </p>
+                <div>
+                  <p className="mb-4 font-belanosima text-[24px] xl:text-[48px]">
+                    Hi, {username}!
+                  </p>
+                </div>
 
                 {/* Team Information */}
                 <div className="flex flex-col gap-[18px] text-white xl:flex-row xl:justify-between">
@@ -391,7 +390,7 @@ function UserDashboard() {
 
               {/* Countdown */}
               <div className="xl:hidden">
-                <Countdown eventName="Penyisihan" eventDate={stage_deadline} />
+                <Countdown eventName={team_stage} eventDate={stage_deadline} />
               </div>
 
               {/* Pengunguman */}
@@ -418,7 +417,7 @@ function UserDashboard() {
               {/* Calendar */}
               <ComponentBox title="Calendar" morespace={true}>
                 <div className="x flex flex-col">
-                  <Calendar eventDate={events} />
+                  <Calendar events={events} />
                   {/* Informasi event */}
                   <div className="mt-[23px] flex flex-col self-start">
                     {events &&

@@ -16,7 +16,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       />
       <Sidebar />
 
-      <div className="px-5 pb-5 pt-32 lg:pl-[220px] lg:pt-[34px]">{children}</div>
+      <div className="px-5 pb-5 pt-32 xl:pl-[248px] xl:pt-[34px] xl:pr-[38px] ">{children}</div>
     </section>
   )
 }

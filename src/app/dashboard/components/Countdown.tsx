@@ -4,7 +4,7 @@ import ComponentBox from './ComponentBox'
 
 interface CountdownProps {
   eventName?: string
-  eventDate?: Date
+  eventDate?: Date | null
 }
 
 interface TimeLeft {
