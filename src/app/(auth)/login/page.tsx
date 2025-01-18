@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import { useAppSelector } from '~/redux/store'
 import { useEffect } from 'react'
 import { useToast } from '~/hooks/use-toast'
-import { useLoginRedirect } from '~/lib/hooks/useRedirect'
 
 const LoginPage = () => {
   const router = useRouter()
