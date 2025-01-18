@@ -15,7 +15,6 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
   const axiosInstance = useAxiosAuth()
   const { toast } = useToast()
   const [CompNumber, setCompNumber] = React.useState({ unverified: 0, registered: 0 })
-
   const DROPDOWN_DATA: MenuItem[] = [
     { id: 2, option: 'CP' },
     { id: 3, option: 'CTF' },
@@ -26,7 +25,6 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
     { id: 8, option: 'ArkavX' },
     { id: 9, option: 'Academya' }
   ]
-
   const [selectedCompetition, setSelectedCompetition] = React.useState<MenuItem | null>(
     DROPDOWN_DATA[0]
   )
@@ -37,43 +35,37 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
   useEffect(() => {
     async function fetchCompetitionSubmission(option: string | undefined) {
       if (option === undefined) return
+      try {
+        const res = await getCompetitionIdByName({
+          client: axiosInstance,
+          query: { name: option }
+        } as GetCompetitionIdByNameData)
 
-      await getCompetitionIdByName({
-        client: axiosInstance,
-        query: { name: option }
-      } as GetCompetitionIdByNameData)
-        .then(async res => {
-          try {
-            if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {
-              throw new Error('Competition not found')
-            }
-            setSelectedCompetitionId((res.data as Array<{ id: string }>)[0].id)
-            const data = result.filter(
-              item => item.competitionId === selectedCompetitionId
-            )[0]
+        if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {
+          throw new Error('Competition not found')
+        }
 
-            const total = data?.totalTeam || -1
-            const verified = data?.totalVerifiedTeam || -1
+        const competitionId = (res.data as Array<{ id: string }>)[0].id
+        setSelectedCompetitionId(competitionId)
 
-            setCompNumber({
-              unverified: total - verified,
-              registered: verified
-            })
-          } catch (error) {
-            toast({
-              title: 'Failed to fetch competition participants',
-              description: (error as Error).message,
-              variant: 'warning'
-            })
-          }
+        // Use the competition ID directly from the API response
+        const data = result.filter(item => item.competitionId === competitionId)[0]
+        const total = data?.totalTeam || 0
+        const verified = data?.totalVerifiedTeam || 0
+
+        setCompNumber({
+          unverified: total - verified,
+          registered: verified
         })
-        .catch(err => {
-          toast({
-            title: 'Failed to fetch competition participants',
-            description: err.message,
-            variant: 'warning'
-          })
+      } catch (error) {
+        toast({
+          title: 'Failed to fetch competition participants',
+          description: (error as Error).message,
+          variant: 'warning'
         })
+        // Reset numbers on error
+        setCompNumber({ unverified: 0, registered: 0 })
+      }
     }
 
     fetchCompetitionSubmission(selectedCompetition?.option)
@@ -82,9 +74,9 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
   return (
     <>
       {/* Competition */}
-      <div className="my-8 flex flex-row items-center justify-between gap-10">
-        <h1 className="font-belanosima text-5xl">Competition</h1>
-        <div>
+      <div className="my-4 flex flex-col items-center justify-between gap-4 md:my-8 md:flex-row md:gap-10">
+        <h1 className="font-belanosima text-3xl md:text-5xl">Competition</h1>
+        <div className="w-full md:w-auto">
           <Dropdown
             data={DROPDOWN_DATA}
             label={''}
@@ -93,9 +85,8 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
           />
         </div>
       </div>
-
       {/* Competition Participants */}
-      <div className="my-8 flex items-center justify-between gap-10">
+      <div className="my-4 flex flex-col items-center justify-between gap-4 md:my-8 md:flex-row md:gap-10">
         <FrameInfo
           number={CompNumber.registered}
           helperText={'Registered Participants'}
@@ -107,8 +98,7 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
           imgSrc={'/images/admin-dashboard/unverified-acc.svg'}
         />
       </div>
-
-      {/* Submissions  */}
+      {/* Submissions */}
       <FrameSubmissions
         compe_id={selectedCompetitionId}
         totalTeam={CompNumber.registered}
