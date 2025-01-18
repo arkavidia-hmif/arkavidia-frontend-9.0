@@ -9,11 +9,11 @@ import {
   FormItem,
   FormLabel
 } from '../ui/form'
-import { basicLogin } from '~/api/generated'
+import { googleAuth } from '~/api/generated'
 import { axiosInstance } from '~/lib/axios'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Input } from '../ui/input'
+import { Input } from '../Input'
 import Link from 'next/link'
 import { Button } from '../ui/button'
 import { useToast } from '../../../hooks/use-toast'
@@ -21,6 +21,9 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '~/app/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
+import useGAuth from '~/lib/hooks/useGAuth'
+import { useAppDispatch } from '~/redux/store'
 
 // Link Variable
 const FORGET_PASSWORD_LINK = 'forget-password'
@@ -39,6 +42,7 @@ const loginSchema = z.object({
 export const InputArea = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
   const { basicLogin } = useAuth()
+  const { login } = useGAuth()
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(prev => !prev)
@@ -55,9 +59,9 @@ export const InputArea = () => {
   /**
    * Used when Login with google Button is clicked
    */
-  function onGoogleClick() {
+  async function onGoogleClick() {
     //TODO: Replace with google auth function
-    console.log('Login From Google')
+    login()
   }
 
   /**
@@ -70,18 +74,36 @@ export const InputArea = () => {
     const login = await basicLogin(values.email, values.password)
 
     if (login.error) {
-      toast({
-        title: 'Login Error',
-        description: 'Failed to login',
-        variant: 'destructive'
-      })
+      if (login.message === "User isn't verified") {
+        toast({
+          title: 'Login Error',
+          description: 'Email belum terverifikasi',
+          variant: 'destructive'
+        })
+      } else if (
+        login.message === 'Email not found' ||
+        login.message === 'Wrong password'
+      ) {
+        toast({
+          title: 'Login Error',
+          description: 'Email atau password salah',
+          variant: 'destructive'
+        })
+      } else {
+        toast({
+          title: 'Login Error',
+          description: 'Terjadi kegagalan saat login',
+          variant: 'destructive'
+        })
+      }
+
       return
     }
 
     toast({
       title: 'Login Success',
       description: 'Successfully logged in',
-      variant: 'default'
+      variant: 'success'
     })
   }
 
@@ -118,7 +140,7 @@ export const InputArea = () => {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    className="bg-lilac-100 pr-10 max-md:text-xs"
+                    className="w-full bg-lilac-100 pr-10 max-md:text-xs"
                     placeholder="Masukkan e-mail Anda"
                     {...field}
                   />
@@ -139,7 +161,7 @@ export const InputArea = () => {
                     <Input
                       type={passwordVisible ? 'text' : 'password'}
                       placeholder="Masukkan password Anda"
-                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 max-md:text-xs"
+                      className="w-full border-[1.5px] border-purple-300 bg-lilac-100 pr-10 max-md:text-xs"
                       {...field}
                     />
                     <button
@@ -185,7 +207,7 @@ export const InputArea = () => {
               height={24}
             />
             <span className="bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] bg-clip-text text-transparent">
-              Register dengan Google
+              Login dengan Google
             </span>
           </Button>
         </div>

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -12,7 +12,7 @@ import {
   FormItem,
   FormLabel
 } from '~/app/components/ui/form'
-import { Input } from '~/app/components/ui/input'
+import { Input } from '~/app/components/Input'
 import { FaArrowLeft } from 'react-icons/fa'
 import { Button } from '~/app/components/ui/button'
 import { SuccessModal } from './SuccessModal'
@@ -24,7 +24,6 @@ const loginSchema = z.object({
 export const FormForgetPassword = () => {
   const router = useRouter()
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
-  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false)
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -34,15 +33,12 @@ export const FormForgetPassword = () => {
   })
 
   function onSubmit(values: z.infer<typeof loginSchema>) {
-
-    // Logika untuk validasi email 
-    const isEmailValid = values.email === 'tes@gmail.com'
-
-    if (isEmailValid) {
-      setIsSuccessModalOpen(true)
-    } else {
-      setIsErrorModalOpen(true)
-    }
+    // Logika untuk validasi email
+    // Send email to user by backend API
+    // If success, open modal
+    // Success
+    // setError(')
+    // setIsSuccessModalOpen(true)
   }
 
   return (
@@ -70,8 +66,10 @@ export const FormForgetPassword = () => {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-lilac-100 pr-10 max-md:text-xs"
+                      className="w-full bg-lilac-100 pr-10 max-md:text-xs"
                       placeholder="Masukkan e-mail Anda"
+                      error={form.formState.errors.email?.message}
+                      state={form.formState.errors.email ? 'error' : 'default'}
                       {...field}
                     />
                   </FormControl>

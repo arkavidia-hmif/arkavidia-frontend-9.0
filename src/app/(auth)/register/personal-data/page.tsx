@@ -6,28 +6,20 @@ import { Toaster } from '~/app/components/ui/toaster'
 const DummyPersonalEducation: MenuItem[] = [
   {
     id: 1,
-    option: 'Insitute'
+    option: 'SMA/MA/SMK'
   },
   {
     id: 2,
-    option: 'ITB'
+    option: 'S1'
   },
   {
     id: 3,
-    option: 'UI'
-  },
-  {
-    id: 4,
-    option: 'UGM'
+    option: 'S2'
   }
 ]
 
 const PersonalDataRegisterPage = () => {
-  return (
-    
-      <PersonalDataForm educationOptions={DummyPersonalEducation} />
-    
-  )
+  return <PersonalDataForm educationOptions={DummyPersonalEducation} />
 }
 
 export default PersonalDataRegisterPage
