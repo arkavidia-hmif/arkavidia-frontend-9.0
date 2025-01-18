@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        API_URI: ${NEXT_PUBLIC_API_URL}
+        API_URI: ${API_URI}
     ports:
       - '${PORT}:${PORT}'
     environment:
