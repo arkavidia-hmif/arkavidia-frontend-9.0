@@ -3,13 +3,22 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { client, self, User } from '~/api/generated'
 import { createAxiosAuthInstance } from '~/lib/axios'
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { client, self, User } from '~/api/generated'
+import { createAxiosAuthInstance } from '~/lib/axios'
 import { basicLogin as login, logout as reqLogout } from '~/api/generated'
 import { authAxiosInstance, axiosInstance } from '~/lib/axios'
 import { useRouter } from 'next/navigation'
 import { AuthContextProps, basicLoginResponse } from './AuthContextTypes'
 import { useAppDispatch, useAppSelector, StoreType } from '~/redux/store'
 import { useToast } from '~/hooks/use-toast'
-import { setNotAdmin, userLogin, userLogout } from '~/redux/slices/auth'
+import {
+  setAdmin,
+  setFilledInfo,
+  setNotAdmin,
+  userLogin,
+  userLogout
+} from '~/redux/slices/auth'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useStore } from 'react-redux'
 
@@ -46,12 +55,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           variant: 'info'
         })
       }
+
+      if (selfReq.data) {
+        // // Logic to get user personal info status
+        // const hasFilledInfo = selfReq.data.hasFilledInfo
+        // if (!hasFilledInfo) {
+        //   router.replace('/register/personal-data')
+        // } else {
+        //   appDispatch(setFilledInfo(true))
+        // }
+      }
     }
+    setIsLoading(false)
   }
 
   useEffect(() => {
     sessionCheck()
-    setIsLoading(false)
   }, [])
 
   const basicLogin = async (email: string, password: string) => {
@@ -62,11 +81,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const res: basicLoginResponse = {
       ok: false,
-      error: false
+      error: false,
+      message: ''
     }
 
     if (!req.data) {
       res.error = true
+      // @ts-expect-error
+      res.message = req.error?.message
       return res
     }
 
