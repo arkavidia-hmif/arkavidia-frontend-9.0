@@ -1,8 +1,16 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import FrameTugas from './FrameTugas'
 
-const FrameSubmissions = () => {
+interface FrameSubmissionsProps {
+  compe_id?: string
+}
+
+const FrameSubmissions = ({ compe_id }: FrameSubmissionsProps) => {
+  useEffect(() => {
+    // fetchCompetitionSubmission(compe_id)
+  }, [])
+
   return (
     <div
       style={{

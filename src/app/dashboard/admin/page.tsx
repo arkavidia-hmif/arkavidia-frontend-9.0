@@ -1,13 +1,32 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import FrameInfo from '../../components/admin-dashboard/FrameInfo'
 import CompetitionContext from '../../components/admin-dashboard/CompetitionContext'
+import { getTeamStatistic, GetTeamStatisticResponse } from '~/api/generated'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 
 const AdminDashboardPage = () => {
   const IMAGE = '/images/sidebar/item.svg'
-  const Unverified = 99999
-  const Registered = 99999
+  const axiosInstance = useAxiosAuth()
+  const [overallStats, setOverallStats] = React.useState({
+    unverified: -1,
+    registered: -1
+  })
+  const [stats, setStats] = React.useState<GetTeamStatisticResponse>()
+
+  useEffect(() => {
+    ;(async () => {
+      const statsResponse = await getTeamStatistic({ client: axiosInstance })
+      setStats(statsResponse.data)
+      const registered = statsResponse.data?.totalVerifiedTeam || -1 // -1 if null / undefined
+      const unverified =
+        statsResponse.data?.totalTeam && statsResponse.data?.totalVerifiedTeam
+          ? statsResponse.data.totalTeam - statsResponse.data.totalVerifiedTeam
+          : -1
+      setOverallStats({ unverified, registered })
+    })()
+  }, [])
 
   return (
     <>
@@ -39,12 +58,12 @@ const AdminDashboardPage = () => {
       {/* Overall Participant */}
       <div className="my-8 flex items-center justify-between gap-10">
         <FrameInfo
-          number={Unverified}
+          number={overallStats.registered}
           helperText={'Overall Registered Participants'}
           imgSrc={'/images/admin-dashboard/supervisor-acc.svg'}
         />
         <FrameInfo
-          number={Registered}
+          number={overallStats.unverified}
           helperText={'Overall Unverified Participants'}
           imgSrc={'/images/admin-dashboard/unverified-acc.svg'}
         />
@@ -53,7 +72,12 @@ const AdminDashboardPage = () => {
       {/* break line */}
       <div className="my-4 h-1 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] drop-shadow-[0_0_6px_rgba(255,255,255,0.5)]" />
 
-      <CompetitionContext />
+      {/* Competition */}
+      <CompetitionContext
+        totalTeam={stats?.totalTeam ?? 0}
+        totalVerifiedTeam={stats?.totalVerifiedTeam ?? 0}
+        result={stats?.result || []}
+      />
     </>
   )
 }
