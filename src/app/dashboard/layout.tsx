@@ -2,6 +2,7 @@
 import { useLoginRedirect } from '~/lib/hooks/useRedirect'
 import Sidebar from '../components/Sidebar/Sidebar'
 import Image from 'next/image'
+import Image from 'next/image'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   useLoginRedirect()
