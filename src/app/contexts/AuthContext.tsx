@@ -45,6 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: 'Please login again',
           variant: 'info'
         })
+        router.push('/login');
       }
     }
   }

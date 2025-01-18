@@ -1,18 +1,37 @@
 import { Check, ExternalLink, Pencil, SendHorizonal, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Media, TeamMember } from "~/api/generated";
+import { Media, TeamMember, updateSubmissionFeedback } from "~/api/generated";
 import { Button } from "~/app/components/Button";
 import Tag from "~/app/components/Tag";
 import { cn } from "~/lib/utils";
 import { Input } from "../../Input";
 import Dropdown, { MenuItem } from "../../Dropdown";
+import MoonLoader from "react-spinners/ClipLoader";
+import useAxiosAuth from "~/lib/hooks/useAxiosAuth";
+import axios from "axios";
+import { useToast } from "~/hooks/use-toast";
 
 const DEFAULT_FIELD = "has not been filled";
+const URL_PLACEHOLDER = 'https://picsum.photos/200/300'
+const TYPE_ID_PLACEHOLDER = '6969'
+
+type MediaIDType = {
+    url: string;
+    typeID: string;
+}
 
 type GetTeamDetailResponse = {
+    teamID: string;
     members?: Array<TeamMember> | undefined; // Make members optional
-    existsSubmission?: boolean; 
+    existsSubmission?: boolean;
+    paymentProof: MediaIDType;
+    submissionsTypeID: {
+        name: string;
+        studentCard: string;
+        poster: string;
+        twibbon: string;
+    }[];
 };
 
 function Field({title, value}: {title: string, value: string}) {
@@ -28,18 +47,77 @@ function Field({title, value}: {title: string, value: string}) {
     )
 }
 
-function PaymentProof() {
+function PaymentProof({url, teamID, typeID}: {url?: string | null, teamID: string, typeID: string}) {
     return (
         <div className="mb-6">
                 <div className="border border-white rounded-lg py-3 px-6 ">
-                    <FileRequirements filetype="Payment Proof" url="#" editable={true} isPaymentProof/>
+                    <FileRequirements 
+                        filetype="Payment Proof" 
+                        url={url? url : URL_PLACEHOLDER} 
+                        editable={true} 
+                        isPaymentProof
+                        teamID={teamID}
+                        typeID={typeID}
+                    />
                 </div>
         </div>
     )
 }
 
-function FileRequirements({filetype, url, editable, isPaymentProof}: {filetype: string, url: string, editable?: boolean, isPaymentProof?: boolean}) {
+function FileRequirements(
+    {
+        filetype, 
+        url, 
+        editable, 
+        isPaymentProof, 
+        teamID, 
+        typeID
+    }
+    : 
+    {
+        filetype: string, 
+        url: string, 
+        editable?: boolean, 
+        isPaymentProof?: boolean,
+        teamID: string,
+        typeID: string
+    }
+) {
+    const { toast } = useToast();
+    const axiosAuth = useAxiosAuth();
     const [isFeedback, setIsFeedback] = useState(false);
+    const [feedback, setFeedback] = useState<string>('');
+    const [loading, setLoading] = useState(false);
+
+    async function submitHandler() {
+        setLoading(true);
+        const resp = await updateSubmissionFeedback({
+            client: axiosAuth,
+            path: {
+                teamId: teamID,
+                typeId: typeID
+            },
+            body: {
+                feedback: feedback
+            }
+        })
+        setLoading(false);
+        setIsFeedback(false);
+        if (resp.error) {
+            toast({
+                title: 'Feedback Error',
+                description: 'Failed to submit feedback',
+                variant: 'destructive'
+              })
+            return
+        }
+        toast({
+            title: 'Feedback Success',
+            description: 'Feedback submitted',
+            variant: 'success'
+          })
+
+    }
 
     return (
         <div className={cn("flex justify-between", isFeedback ? 'md:flex-row gap-2 flex-col' : '')}>
@@ -63,9 +141,21 @@ function FileRequirements({filetype, url, editable, isPaymentProof}: {filetype: 
                             </Button>
                         </div>
                         <div className={cn("gap-5 items-center justify-start", isFeedback ? 'flex' : 'hidden')}>
-                                <Input placeholder="Send what's wrong" className="max-w-[250px]" />
-                                <Button size={'sm'} onClick={() => setIsFeedback(false)}>
-                                    <SendHorizonal size={15}  strokeWidth={3}/>
+                                <Input 
+                                    placeholder="Send what's wrong" 
+                                    className="max-w-[250px]"
+                                    onChange={(e) => setFeedback(e.target.value)} 
+                                />
+                                <Button
+                                    className={cn(loading ? 'cursor-not-allowed' : '')}
+                                    size={'sm'} 
+                                    onClick={() => {
+                                        if (!loading) {
+                                            submitHandler();
+                                        }
+                                    }}
+                                >
+                                    {loading ? <MoonLoader color="#fff" size={15} /> : <SendHorizonal size={15}  strokeWidth={3}/>}
                                 </Button>
                         </div> 
                     </>
@@ -82,6 +172,7 @@ function FileRequirements({filetype, url, editable, isPaymentProof}: {filetype: 
 function MemberCard(
     {
         isTeamLeader, 
+        teamID,
         name, 
         email, 
         phone,
@@ -91,17 +182,15 @@ function MemberCard(
     }:
     {
         isTeamLeader?: boolean, 
+        teamID: string,
         name: string, 
         email: string, 
         phone: string,
-        studentCard?: Media,
-        poster?: Media,
-        twibbon?: Media
+        studentCard: MediaIDType,
+        poster: MediaIDType,
+        twibbon: MediaIDType
     }
 ) {
-    const studentCardUrl = studentCard?.url ? studentCard.url : '#';
-    const posterUrl = poster?.url ? poster.url : '#';
-    const twibbonUrl = twibbon?.url ? twibbon.url : '#';
 
     return (
         <div className="relative px-5 py-4 border border-white flex flex-col gap-3 rounded-lg">
@@ -109,9 +198,27 @@ function MemberCard(
             <Field title="Name" value={name} />
             <Field title="Email" value={email} />
             <Field title="Phone" value={phone? phone : '-'} />
-            <FileRequirements filetype="Student ID Card" url={studentCardUrl} editable={!isTeamLeader}/>
-            <FileRequirements filetype="Poster" url={posterUrl}  editable={!isTeamLeader} />
-            <FileRequirements filetype="Twibbon" url={twibbonUrl}  editable={!isTeamLeader}/>
+            <FileRequirements 
+                filetype="Student ID Card" 
+                url={studentCard.url} 
+                editable={!isTeamLeader}
+                teamID={teamID}
+                typeID={studentCard.typeID}
+            />
+            <FileRequirements 
+                filetype="Poster" 
+                url={poster.url}  
+                editable={!isTeamLeader} 
+                teamID={teamID}
+                typeID={poster.typeID}
+            />
+            <FileRequirements 
+                filetype="Twibbon" 
+                url={twibbon.url}  
+                editable={!isTeamLeader}
+                teamID={teamID}
+                typeID={twibbon.typeID}
+            />
         </div>
     )
 }
@@ -184,26 +291,64 @@ export function TeamStatus(
     )
 }
 
-export default function TeamInfo({members, existsSubmission} : GetTeamDetailResponse) {
+export default function TeamInfo(
+    {
+        teamID,
+        members,
+        submissionsTypeID,
+        existsSubmission, 
+        paymentProof
+    } : GetTeamDetailResponse) 
+    {
+
+
+    if (members?.length === 0) {
+        return (
+            <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 shadow-lg px-[2rem] py-[1rem]">
+                    <h1 className="font-teachers font-bold text-[32px]">This team doesn't have any member yet</h1>
+            </div>
+        )
+    } 
     
     return (
         <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 shadow-lg px-[2rem] py-[1rem] font-dmsans">
             <div className="mb-3 mr-2">
                 <h1 className="font-teachers font-bold text-[32px]">Verfication</h1>
             </div>
-            <PaymentProof />
+            <PaymentProof url={paymentProof.url} teamID={teamID} typeID={paymentProof.typeID} />
             <div className={cn("xl:grid-cols-3 grid-cols-1 gap-7", members ? 'grid' : 'hidden')}>
                 {
                     members && 
-                    members.map((member, index) => (
-                        <MemberCard 
-                            key={index} 
-                            name={member.user?.fullName ? member.user.fullName : DEFAULT_FIELD } 
-                            email={member.user?.email ? member.user?.email : DEFAULT_FIELD} 
-                            phone={member.user?.phoneNumber ? member.user.phoneNumber.toString() : DEFAULT_FIELD} 
-                            isTeamLeader={member.role === 'leader'}
-                        />
-                    ))
+                    members.map((member, index) => {
+                        const data = submissionsTypeID.find((data) => data.name === member.user?.fullName);
+
+                        const studentCard = {
+                            url: member.kartu?.url ? member.kartu.url : URL_PLACEHOLDER,
+                            typeID: data?.studentCard ? data.studentCard : TYPE_ID_PLACEHOLDER
+                        }
+                        const poster = {
+                            url: member.poster?.url ? member.poster.url : URL_PLACEHOLDER,
+                            typeID: data?.poster ? data.poster : TYPE_ID_PLACEHOLDER
+                        }
+                        const twibbon = {
+                            url: member.twibbon?.url ? member.twibbon.url : URL_PLACEHOLDER,
+                            typeID: data?.twibbon ? data.twibbon : TYPE_ID_PLACEHOLDER
+                        }
+
+                        return (
+                            <MemberCard 
+                                key={index} 
+                                teamID={teamID}
+                                name={member.user?.fullName ? member.user.fullName : DEFAULT_FIELD } 
+                                email={member.user?.email ? member.user?.email : DEFAULT_FIELD} 
+                                phone={member.user?.phoneNumber ? member.user.phoneNumber.toString() : DEFAULT_FIELD} 
+                                isTeamLeader={member.role === 'leader'}
+                                studentCard={studentCard}
+                                poster={poster}
+                                twibbon={twibbon}
+                            />
+                        )
+                    })
                 }
             </div>
             {
