@@ -4,9 +4,28 @@ import FrameTugas from './FrameTugas'
 
 interface FrameSubmissionsProps {
   compe_id?: string
+  totalTeam: number
 }
 
-const FrameSubmissions = ({ compe_id }: FrameSubmissionsProps) => {
+const FrameSubmissions = ({ compe_id, totalTeam }: FrameSubmissionsProps) => {
+  const date = new Date()
+
+  const COMPETITION_SUBMISSIONS = [
+    {
+      title: 'Tugas 1',
+      deadline: '12/12/2021 00:00 WIB',
+      submitted: 9122,
+      total: 12731
+    },
+    {
+      title: 'Tugas 2',
+      deadline: date,
+      submitted: 11,
+      total: 40
+    },
+    { title: 'Tugas 3', deadline: '12/12/2021 00:00 WIB', submitted: 0, total: totalTeam }
+  ]
+
   useEffect(() => {
     // fetchCompetitionSubmission(compe_id)
   }, [])
@@ -29,9 +48,15 @@ const FrameSubmissions = ({ compe_id }: FrameSubmissionsProps) => {
 
         {/* List Tugas */}
         <div className="mt-4 flex flex-col gap-4">
-          <FrameTugas title={'Tugas 1'} deadline={'12/12/2021 00:00 WIB'} />
-          <FrameTugas title={'Tugas 2'} deadline={'12/12/2021 00:00 WIB'} />
-          <FrameTugas title={'Tugas 3'} deadline={'12/12/2021 00:00 WIB'} />
+          {COMPETITION_SUBMISSIONS.map((item, index) => (
+            <FrameTugas
+              key={index}
+              title={item.title}
+              deadline={item.deadline.toLocaleString()}
+              submitted={item.submitted}
+              total={item.total}
+            />
+          ))}
         </div>
       </div>
     </div>

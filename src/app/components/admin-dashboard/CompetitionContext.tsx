@@ -109,7 +109,10 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
       </div>
 
       {/* Submissions  */}
-      <FrameSubmissions compe_id={selectedCompetitionId} />
+      <FrameSubmissions
+        compe_id={selectedCompetitionId}
+        totalTeam={CompNumber.registered}
+      />
     </>
   )
 }
