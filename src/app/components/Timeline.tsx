@@ -1,14 +1,14 @@
 import React from 'react'
-import { FaCircle } from "react-icons/fa";
 
-type TimelineEventProps = {
+export type TimelineEventProps = {
   title: string
-  description: string
-  time?: Date
+  description?: string
+  timeStart?: Date
+  timeEnd?: Date
   logoPath?: string
 }
 
-type TimelineProps = {
+export type TimelineProps = {
   events: TimelineEventProps[]
   variant: 'horizontal' | 'vertical'
 }
@@ -17,14 +17,14 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
   return (
     <div
       className={`flex ${
-        variant === 'horizontal' ? 'flex-row' : 'flex-col'
+        variant === 'horizontal' ? 'flex-row flex-wrap gap-y-28' : 'flex-col'
       } w-full items-center justify-center`}>
       {events.map((event, index) => (
         <div
           key={index}
           className={`flex ${
             variant === 'horizontal' ? 'w-96 flex-col items-center' : 'flex-row'
-          } gap-4`}>
+          } gap-6`}>
           {/* Timeline Line */}
           <div
             className={`flex ${
@@ -64,14 +64,18 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
           <div
             className={`${
               variant === 'horizontal' ? 'w-96 text-center' : 'w-96 px-8 text-left'
-            }`}>
-            <h1 className="text-lg font-bold">{event.title}</h1>
+            } space-y-2`}>
+            <h1 className="text-2xl font-bold text-purple-100 ">{event.title}</h1>
             <p className="text-sm">{event.description}</p>
-            {event.time && (
-              <p className="text-xs text-gray-400">
-                {event.time.toLocaleDateString()} {event.time.toLocaleTimeString()}
-              </p>
+            <p className="text-md text-gray-400">
+            {event.timeStart && (
+                event.timeStart.toLocaleDateString() + " - "
+              )}
+            {event.timeEnd && (
+              event.timeEnd?.toLocaleDateString()
             )}
+            {(event.timeStart || event.timeEnd) ? "" : "-"}
+            </p>
           </div>
         </div>
       ))}
