@@ -71,7 +71,7 @@ const ProfileData = ({ verified, name, title, userRole, teamId, userId, currentU
         {userRole === 'leader' && currentUserId !== userId && (
           <Button variant={'ghost'} onClick={handleKickMember} disabled={loading}>
             {loading ? (
-              <span>Loading...</span>
+              <span>Loading</span>
             ) : (
               <Image src={'/images/profile/close.svg'} alt={'Kick Button'} width={24} height={24} />
             )}
@@ -243,7 +243,7 @@ const TeamInformationContent = () => {
   }, [authAxios]);
 
   if (loading) {
-    return <div>Loading Team Information...</div>;
+    return <div>Loading Team Information</div>;
   }
 
   if (!teamName) {

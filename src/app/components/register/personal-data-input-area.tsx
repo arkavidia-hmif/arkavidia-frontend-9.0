@@ -16,6 +16,15 @@ import { Button } from '../ui/button'
 import { useToast } from '../../../hooks/use-toast'
 import Dropdown, { MenuItem } from '../Dropdown'
 import { Checkbox } from '../Checkbox'
+import CustomDatePicker from '../date-picker/CustomDatePicker'
+import { getPresignedLink, self, updateUser } from '~/api/generated'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { axiosInstance } from '~/lib/axios'
+import { useRouter } from 'next/navigation'
+import { getEducation, getFormattedBirthDate } from '~/lib/utils'
+import { setFilledInfo } from '~/redux/slices/auth'
+import { useAppDispatch } from '~/redux/store'
+import useCheckFillInfo from '~/lib/hooks/useCheckFillInfo'
 
 interface PersonalDataProps {
   educationOptions: MenuItem[]
@@ -23,30 +32,45 @@ interface PersonalDataProps {
 
 // Form Schema
 const registerPersonalDataSchema = z.object({
-  fullname: z.string().min(1),
-  birthdate: z.date({
-    invalid_type_error: 'Birthdate must be a valid date'
-  }),
-  education: z.string().min(1),
-  institution: z.string(),
+  fullname: z.string().min(1, { message: 'Nama lengkap wajib diisi' }),
+  birthdate: z.date({ message: 'Tanggal lahir harus valid' }),
+  education: z
+    .string()
+    .refine(val => val !== '', { message: 'Jenjang pendidikan wajib diisi' }),
+  institution: z.string().min(1, { message: 'Institusi wajib diisi' }),
   phonenumber: z
     .string()
     .refine(val => !isNaN(Number(val)), {
-      message: 'Phone number must be a valid number'
+      message: 'Nomor telepon tidak valid'
     })
     .refine(val => val.length >= 8, {
-      message: 'Phone number must be more than 8 digits'
+      message: 'Nomor telepon minimal memiliki 8 digit'
     }),
+  identityCard: z
+    .array(z.instanceof(File))
+    .refine(val => val.length > 0, { message: 'Kartu identitas wajib diunggah' }),
   lineid: z.string().optional(),
   instagram: z.string().optional(),
   discord: z.string().optional(),
-  formacceptance: z.boolean({
-    message: 'Please fill the form Consent'
+  formacceptance: z.boolean().refine(val => val === true, {
+    message: 'Anda harus menyetujui pernyataan kebenaran data'
   })
 })
 
 export const PersonalDataForm = (props: PersonalDataProps) => {
+  const hasFinishedRegis = useCheckFillInfo()
   const { toast } = useToast()
+  const axiosAuth = useAxiosAuth()
+  const router = useRouter()
+  const appDispatch = useAppDispatch()
+
+  if (hasFinishedRegis) {
+    setTimeout(() => {
+      router.push('/')
+    }, 1000)
+    return null
+  }
+
   const form = useForm<z.infer<typeof registerPersonalDataSchema>>({
     resolver: zodResolver(registerPersonalDataSchema),
     defaultValues: {
@@ -55,6 +79,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
       education: '',
       institution: '',
       phonenumber: '',
+      identityCard: undefined,
       lineid: '',
       instagram: '',
       discord: '',
@@ -68,12 +93,106 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
    * Used when form submitted
    * @param values Schema data
    */
-  function onSubmit(values: z.infer<typeof registerPersonalDataSchema>) {
+  async function onSubmit(values: z.infer<typeof registerPersonalDataSchema>) {
     // TODO: Replace with backend logic
     if (isFormAccepted) {
-      console.log('Register Value: ' + values)
+      toast({
+        title: 'Mohon ditunggu',
+        description: 'Sedang menyimpan data Anda...',
+        variant: 'info'
+      })
+
+      // Upload to S3
+      // Get User ID to be embedded into file name
+      const getSelf = await self({ client: axiosAuth })
+      if (getSelf.error) {
+        toast({
+          title: 'Error',
+          description: 'Gagal mengirimkan data',
+          variant: 'destructive'
+        })
+      }
+
+      if (getSelf.data) {
+        // Generate presigned link with userID-embedded file name
+        const userId = getSelf.data.id
+        const fileName = values.identityCard[0].name
+        const fileExt = fileName.slice(((fileName.lastIndexOf('.') - 1) >>> 0) + 2)
+        const getLink = await getPresignedLink({
+          client: axiosAuth,
+          query: {
+            bucket: 'competition-registration',
+            filename: `${userId}-identity-card.${fileExt}`
+          }
+        })
+        if (getLink.error) {
+          toast({
+            title: 'Error',
+            description: 'Gagal melakukan upload data',
+            variant: 'destructive'
+          })
+        }
+
+        if (getLink.data) {
+          // If we get the link, do a PUT rqeuest to S3
+          const upload = await axiosInstance.put({
+            url: getLink.data.presignedUrl,
+            body: values.identityCard[0]
+          })
+
+          if (upload.status === 200) {
+            // If the upload is successful, save the data to the backend
+            // Logic to save new user profile data
+            const updateProfile = await updateUser({
+              client: axiosAuth,
+              body: {
+                fullName: values.fullname,
+                birthDate: getFormattedBirthDate(values.birthdate),
+                education: getEducation(values.education),
+                instance: values.institution,
+                phoneNumber: values.phonenumber,
+                idLine: values.lineid,
+                idInstagram: values.instagram,
+                idDiscord: values.discord,
+                consent: values.formacceptance
+              }
+            })
+            if (updateProfile.error) {
+              toast({
+                title: 'Error',
+                description: 'Gagal melakukan pembaruan data',
+                variant: 'destructive'
+              })
+            }
+
+            if (updateProfile.data) {
+              appDispatch(setFilledInfo(true))
+            }
+            // TODO: Add logic to save S3 data to backend database here
+            toast({
+              title: 'Success',
+              description: 'Data berhasil disimpan',
+              variant: 'success'
+            })
+
+            setTimeout(() => {
+              router.replace('/')
+            }, 1000)
+          } else {
+            toast({
+              title: 'Error',
+              description: 'Gagal melakukan upload data',
+              variant: 'destructive'
+            })
+          }
+        }
+      }
     } else {
-      console.error('Error register value')
+      toast({
+        title: 'Validasi Gagal',
+        description: 'Anda harus menyetujui pernyataan kebenaran data',
+        variant: 'destructive'
+      })
     }
   }
 
@@ -86,18 +205,21 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
         toast({
           title: 'Validation Error',
           description: error.message,
-          variant: 'destructive'
+          variant: 'destructive',
+          duration: 10000
         })
       }
     })
   }
+
+  const fileRef = form.register('identityCard')
 
   return (
     //TODO : Replace padding and gap into design system pad and gap
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}
-        className="flex flex-col gap-12 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[60px] max-md:px-[36px] max-md:py-[40px] lg:px-[72px] lg:py-[80px]">
+        className="my-6 mr-4 flex flex-col gap-12 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[60px] max-md:px-[36px] max-md:py-[40px] lg:px-[72px] lg:py-[80px]">
         <h1 className="w-full text-center font-teachers text-3xl font-bold text-lilac-200">
           Lengkapi Data Dirimu!
         </h1>
@@ -129,17 +251,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                   Tanggal Lahir <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    type="date"
-                    className="border-[1.5px] border-purple-300 bg-lilac-100 text-purple-500 max-md:text-xs"
-                    placeholder="Masukkan tanggal lahir Anda"
-                    value={
-                      field.value ? new Date(field.value).toISOString().split('T')[0] : ''
-                    }
-                    onChange={e =>
-                      field.onChange(e.target.value ? new Date(e.target.value) : null)
-                    }
-                  />
+                  <CustomDatePicker onChange={date => field.onChange(date)} />
                 </FormControl>
               </FormItem>
             )}
@@ -206,6 +318,27 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                     className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 [appearance:textfield] placeholder:text-purple-500 max-md:text-xs [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                     placeholder="Masukkan nomor Whatsapp aktif"
                     {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="identityCard"
+            render={({ field }) => (
+              <FormItem className={`flex flex-col gap-2`}>
+                <FormLabel className="text-lilac-200 max-md:text-xs">
+                  Kartu Identitas (Kartu Pelajar atau Kartu Tanda Mahasiswa){' '}
+                  <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl className="flex items-center">
+                  <Input
+                    type="file"
+                    className="cursor-pointer gap-x-1 border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 file:cursor-pointer file:rounded-md file:border file:bg-purple-800 file:text-xs placeholder:text-purple-500 max-md:text-xs"
+                    placeholder=""
+                    {...fileRef}
+                    onChange={e => field.onChange(e.target?.files?.[0] ?? undefined)}
                   />
                 </FormControl>
               </FormItem>
