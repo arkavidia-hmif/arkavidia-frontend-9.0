@@ -4,8 +4,10 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import { FaArrowRight } from 'react-icons/fa'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import Link from 'next/link'
+import { randomInt } from 'crypto'
 
 interface CardCompetitionProps {
   title: string
@@ -18,7 +20,7 @@ const competitions = [
     title: 'Arkalogica',
     description:
       'Arkalogica merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
-    preview: '/images/competition/datavidia-preview.png',
+    preview: '/images/competition/arkalogica-preview.png',
     carousel: '/images/competition/arkalogica-logo.png',
     link: '/competition/arkalogica'
   },
@@ -26,7 +28,7 @@ const competitions = [
     title: 'Capture The Flag',
     description:
       'Capture The Flag merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
-    preview: '/images/competition/datavidia-preview.png',
+    preview: '/images/competition/ctf-preview.png',
     carousel: '/images/competition/ctf-logo.png',
     link: '/competition/ctf'
   },
@@ -34,7 +36,7 @@ const competitions = [
     title: 'Competitive Programming',
     description:
       'Competitive Programming merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
-    preview: '/images/competition/datavidia-preview.png',
+    preview: '/images/competition/cp-preview.png',
     carousel: '/images/competition/cp-logo.png',
     link: '/competition/cp'
   },
@@ -50,7 +52,7 @@ const competitions = [
     title: 'Hackvidia',
     description:
       'Hackvidia merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
-    preview: '/images/competition/datavidia-preview.png',
+    preview: '/images/competition/hackvidia-preview.png',
     carousel: '/images/competition/hackvidia-logo.png',
     link: '/competition/hackvidia'
   },
@@ -58,7 +60,7 @@ const competitions = [
     title: 'UXvidia',
     description:
       'UXvidia merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
-    preview: '/images/competition/datavidia-preview.png',
+    preview: '/images/competition/uxvidia-preview.png',
     carousel: '/images/competition/uxvidia-logo.png',
     link: '/competition/uxvidia'
   }
@@ -67,13 +69,17 @@ const competitions = [
 const CardCompetition = ({ title, logo, isActive }: CardCompetitionProps) => {
   let imageStyle = ''
   if (title === 'Hackvidia') {
-    imageStyle = 'w-14 md:w-20 -top-3 md:-top-5'
+    imageStyle = 'w-[64px] md:w-[120px] -top-3 md:-top-7'
   } else if (title === 'Datavidia') {
-    imageStyle = 'w-[40px] md:w-16 -top-3 md:-top-5'
+    imageStyle = 'w-[48px] md:w-[72px] -top-5 md:-top-7'
   } else if (title === 'Competitive Programming') {
-    imageStyle = 'w-[40px] md:w-[70px] -top-5 md:-top-10'
+    imageStyle = 'w-[48px] md:w-[84px] -top-8 md:-top-[56px] lg:-top-[60px]'
+  } else if (title === 'UXvidia') {
+    imageStyle = 'w-10 md:w-[72px] -top-4 md:-top-8'
+  } else if (title === 'Arkalogica') {
+    imageStyle = 'w-10 md:w-[72px] -top-6 md:-top-12'
   } else {
-    imageStyle = 'w-8 md:w-16 -top-3 md:-top-8'
+    imageStyle = 'w-8 md:w-[64px] -top-5 md:-top-9'
   }
 
   return (
@@ -86,7 +92,7 @@ const CardCompetition = ({ title, logo, isActive }: CardCompetitionProps) => {
             : '[box-shadow:0px_0px_15px_#FF4E884D] md:[box-shadow:0px_0px_20px_#FF4E884D]'
         }`}>
         <div className="flex items-center">
-          <h1 className="text-center text-[10px] font-semibold [text-shadow:0px_0px_10px_#FFFFFF] md:text-base">
+          <h1 className="text-center font-dmsans text-[10px] font-semibold [text-shadow:0px_0px_10px_#FFFFFF] md:text-base lg:text-xl">
             {title}
           </h1>
         </div>
@@ -103,27 +109,29 @@ const CardCompetition = ({ title, logo, isActive }: CardCompetitionProps) => {
 }
 
 const CompetitionCarousel = () => {
-  const [activeIndex, setActiveIndex] = useState(2)
+  const [activeIndex, setActiveIndex] = useState(
+    Math.floor(Math.random() * competitions.length)
+  )
 
   return (
     <div>
       {/* Preview */}
       <div className="flex w-full justify-center">
-        <div className="min-h-[250px] grid max-w-3xl grid-cols-2 items-center gap-2 px-8 lg:px-0">
+        <div className="grid min-h-[250px] max-w-3xl grid-cols-2 items-center justify-center gap-2 px-8 lg:max-w-[900px] lg:px-0">
           <div className="flex items-center justify-center">
             <Image
               src={competitions[activeIndex].preview}
               alt={competitions[activeIndex].title}
               width={1013}
               height={763}
-              className="w-full max-w-64"
+              className="w-full"
             />
           </div>
           <div className="flex flex-col gap-2 sm:gap-3 md:gap-4">
-            <h1 className="text-xs font-bold [text-shadow:0px_0px_20px_#FFFFFF] sm:text-base md:text-2xl">
+            <h1 className="font-belanosima text-[24px] font-bold [text-shadow:0px_0px_20px_#FFFFFF] md:text-[42px] lg:text-[56px]">
               {competitions[activeIndex].title}
             </h1>
-            <p className="text-justify text-[10px] leading-5 text-lilac-100 sm:text-xs md:text-base md:leading-6">
+            <p className="text-justify font-dmsans text-xs leading-5 text-lilac-100 md:text-[14px] md:leading-6 lg:text-[16px]">
               {competitions[activeIndex].description}
             </p>
             <Link href={competitions[activeIndex].link} className="hover:cursor-pointer">
@@ -135,36 +143,42 @@ const CompetitionCarousel = () => {
               </div>
             </Link>
           </div>
+          <div className="col-span-2 mt-6 flex w-full justify-center px-4 md:mt-14 lg:px-0 lg:pl-24">
+            <div className="w-full max-w-3xl">
+              <Swiper
+                modules={[Autoplay]}
+                autoplay={{ delay: 8000 }}
+                centeredSlides={true}
+                slidesPerView={3}
+                spaceBetween={20}
+                initialSlide={activeIndex}
+                onSlideChange={swiper => setActiveIndex(swiper.realIndex)}
+                loop={true}
+                breakpoints={{
+                  450: {
+                    slidesPerView: 3,
+                    spaceBetween: 30
+                  }
+                }}>
+                {competitions.map((competition, index) => (
+                  <SwiperSlide
+                    key={index}
+                    className="flex items-center hover:cursor-grab active:cursor-grabbing"
+                    onClick={() => setActiveIndex(index)}>
+                    <CardCompetition
+                      title={competition.title}
+                      logo={competition.carousel}
+                      isActive={index === activeIndex}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Carousel */}
-      <div className="mt-12 flex justify-center px-4 md:mt-20 lg:px-0">
-        <div className="w-full max-w-3xl">
-          <Swiper
-            centeredSlides={true}
-            slidesPerView={3}
-            spaceBetween={20}
-            initialSlide={1}
-            onSlideChange={swiper => setActiveIndex(swiper.realIndex)}
-            breakpoints={{
-              450: {
-                slidesPerView: 3,
-                spaceBetween: 30
-              }
-            }}>
-            {competitions.map((competition, index) => (
-              <SwiperSlide key={index} className="flex items-center">
-                <CardCompetition
-                  title={competition.title}
-                  logo={competition.carousel}
-                  isActive={index === activeIndex}
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </div>
     </div>
   )
 }

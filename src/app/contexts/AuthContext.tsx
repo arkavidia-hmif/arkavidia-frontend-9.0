@@ -3,9 +3,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { client, self, User } from '~/api/generated'
 import { createAxiosAuthInstance } from '~/lib/axios'
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import { client, self, User } from '~/api/generated'
-import { createAxiosAuthInstance } from '~/lib/axios'
 import { basicLogin as login, logout as reqLogout } from '~/api/generated'
 import { authAxiosInstance, axiosInstance } from '~/lib/axios'
 import { useRouter } from 'next/navigation'
@@ -16,6 +13,7 @@ import {
   setAdmin,
   setFilledInfo,
   setNotAdmin,
+  setUsername,
   userLogin,
   userLogout
 } from '~/redux/slices/auth'
@@ -57,13 +55,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (selfReq.data) {
-        // // Logic to get user personal info status
-        // const hasFilledInfo = selfReq.data.hasFilledInfo
-        // if (!hasFilledInfo) {
-        //   router.replace('/register/personal-data')
-        // } else {
-        //   appDispatch(setFilledInfo(true))
-        // }
+        const hasFilledInfo = selfReq.data.isRegistrationComplete
+        const isAdmin = selfReq.data.role === 'admin'
+        const username = selfReq.data.fullName
+        if (hasFilledInfo) {
+          appDispatch(setFilledInfo(true))
+        }
+
+        if (username) {
+          appDispatch(setUsername(username))
+        }
+
+        if (isAdmin) {
+          appDispatch(setAdmin())
+        }
       }
     }
     setIsLoading(false)
