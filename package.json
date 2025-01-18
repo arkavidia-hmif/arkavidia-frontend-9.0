@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "type": "module",
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
+    "lint": "next lint",
+    "openapi-ts": "openapi-ts"
     "lint": "next lint",
     "openapi-ts": "openapi-ts"
   },
@@ -38,7 +41,9 @@
     "lucide-react": "^0.462.0",
     "next": "15.0.3",
     "next-auth": "^4.24.11",
+    "next-auth": "^4.24.11",
     "next-themes": "^0.4.3",
+    "openapi3-ts": "^4.4.0",
     "openapi3-ts": "^4.4.0",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-day-picker": "^8.10.1",
@@ -52,8 +57,11 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "^0.59.0",
     "@hey-api/openapi-ts": "^0.59.0",
     "@next/eslint-plugin-next": "^15.0.3",
     "@types/node": "^20",
@@ -67,6 +75,7 @@
     "prettier": "3.4.1",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.19.2",
     "tsx": "^4.19.2",
     "typescript": "^5"
   }
