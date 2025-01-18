@@ -47,7 +47,7 @@ const registerPersonalDataSchema = z.object({
       message: 'Nomor telepon minimal memiliki 8 digit'
     }),
   identityCard: z
-    .instanceof(FileList)
+    .array(z.instanceof(File))
     .refine(val => val.length > 0, { message: 'Kartu identitas wajib diunggah' }),
   lineid: z.string().optional(),
   instagram: z.string().optional(),

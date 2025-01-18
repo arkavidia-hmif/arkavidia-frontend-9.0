@@ -7,6 +7,8 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import Dropdown, { MenuItem } from '../Dropdown'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { getFormattedBirthDate } from '~/lib/utils'
+import { useToast } from '~/hooks/use-toast'
 interface ProfileDataProps {
   title: string
   value: string
@@ -19,6 +21,7 @@ interface ProfileDataLayoutProps extends ProfileDataProps {
 }
 
 // Base profileData components layout
+export const ProfileData = (props: ProfileDataLayoutProps) => {
 export const ProfileData = (props: ProfileDataLayoutProps) => {
   const [isEdit, setIsEdit] = useState<boolean>(false)
 
@@ -183,16 +186,13 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
 
   async function onSaveInput() {
     try {
-      console.log('title', props.title)
       const noSpace = props.title.toLowerCase().replace(/ /g, '_')
-      console.log(noSpace)
       const fieldMap: Record<string, string> = {
         instance: 'instance',
         education: 'education',
         how_do_you_know_about_arkavidia: 'entrySource'
       }
       const fieldName = fieldMap[noSpace]
-      console.log(tempValue.option)
       const response = await updateUser({
         client: axiosAuth,
         body: { [fieldName]: tempValue.option }
@@ -230,29 +230,45 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
 
 interface DatePickerProfileDataProps {
   title: string
-  default_value: Date
+  default_value: string
   logoSrc?: React.ReactNode
 }
 
 export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
+  const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
-  const [selectedDate, setSelectedDate] = useState<Date>(props.default_value)
-  const [tempDate, setTempDate] = useState<Date>(props.default_value)
+  const [selectedDate, setSelectedDate] = useState<string>(props.default_value)
+  const [tempDate, setTempDate] = useState<Date>(new Date(props.default_value))
 
   async function onSaveDate() {
     try {
-      await updateUser({
+      const update = await updateUser({
         client: axiosAuth,
-        body: { birthDate: tempDate.toISOString().split('T')[0] }
+        body: { birthDate: getFormattedBirthDate(tempDate) }
       })
-      setSelectedDate(tempDate)
+      if (update.error) {
+        toast({
+          title: 'Failed to update birth date',
+          description: 'Something went wrong',
+          variant: 'destructive'
+        })
+      }
+
+      if (update.data) {
+        setSelectedDate(getFormattedBirthDate(tempDate))
+        toast({
+          title: 'Success',
+          description: 'Update successful',
+          variant: 'success'
+        })
+      }
     } catch (error) {
       console.error('Failed to update date:', error)
     }
   }
 
   function onCancelDate() {
-    setTempDate(selectedDate)
+    setTempDate(new Date(selectedDate))
   }
 
   const formatDate = (date: Date) => date.toISOString().split('T')[0]
@@ -261,14 +277,14 @@ export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
     <ProfileData
       handleCancel={onCancelDate}
       title={props.title}
-      value={selectedDate.toDateString()}
+      value={selectedDate}
       handleSave={onSaveDate}>
       <div className="flex items-center">
         {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
         <input
           aria-label="Date"
           type="date"
-          value={formatDate(tempDate)}
+          value={tempDate.toLocaleString('id-ID')}
           onChange={e => setTempDate(new Date(e.target.value))}
           className="w-full rounded-md border border-purple-400 bg-lilac-100 p-2 py-3 pr-40 text-purple-400"
         />
