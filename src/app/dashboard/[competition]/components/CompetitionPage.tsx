@@ -1,6 +1,6 @@
 'use client'
 
-import { ElementType, useEffect, useState } from 'react'
+import { ElementType, useEffect, useRef, useState } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -13,15 +13,16 @@ import { ChevronLeft, CloudUpload } from 'lucide-react'
 import {
   getCompetitionSubmissionRequirement,
   GetCompetitionSubmissionRequirementResponse,
-  
   getTeams,
-  
+  GetTeamsResponse,
+  Team
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
 import { useRouter } from 'next/navigation'
 import ProfileCompetition from '~/app/components/ProfileCompetition'
 import TeamInformationContent from '~/app/components/competition/TeamInformationContent'
+import Dropdown, { MenuItem } from '~/app/components/Dropdown'
 
 // Task interface
 interface Task {
@@ -52,8 +53,12 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
   const router = useRouter()
   const [tasks, setTasks] = useState<Task[]>([])
   const [verifications, setVerificatons] = useState<Verif[]>([])
+
+  const hasFetched = useRef(false)
   // Call the requirement api
   useEffect(() => {
+    if (hasFetched.current) return
+    hasFetched.current = true
     const fetchSubmissionRequirements = async () => {
       try {
         if (!isLoggedIn) {
@@ -63,7 +68,22 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
         const teamsResponse = await getTeams({ client: axiosInstance })
         if (teamsResponse.data && teamsResponse.data.length > 0) {
-          const teamId = teamsResponse.data[0].id // Get Current user ID
+          let teamData: GetTeamsResponse = []
+
+          teamsResponse.data.forEach(team => {
+            if (team.competition?.title.toLowerCase() === compeName.toLowerCase()) {
+              teamData.push(team)
+            }
+          })
+
+          // Handle case where no matching team is found
+          if (!teamData || teamData.length <= 0) {
+            console.log('No matching team found for competition name:', compeName)
+            router.push('/')
+            return
+          }
+          const teamId = teamData[0].id // Get Current user ID
+
           const requirementsResponse = await getCompetitionSubmissionRequirement({
             client: axiosInstance,
             path: { teamId }
@@ -104,7 +124,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           ])
         } else {
           console.warn('No teams found.')
-          router.push("/dashboard")
+          router.push('/')
         }
       } catch (error) {
         console.error('Error fetching submission requirements:', error)
@@ -187,13 +207,28 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     event.preventDefault()
   }
   const contentTypes = ['Team Information', 'Announcements', 'Task List', 'Verification']
+
+  const getMenuDataFromContentTypes = () => {
+    const menuItems: MenuItem[] = []
+
+    contentTypes.forEach((content, index) =>
+      menuItems.push({
+        id: index,
+        option: content,
+        iconRight: false,
+        iconLeft: false
+      })
+    )
+    return menuItems
+  }
+
   const contents = [
     // Team Information Content
-    <TeamInformationContent  />,
+    <TeamInformationContent />,
 
     // Announcements Content
     <div>Announcements Content</div>,
-    
+
     // Task List Content
     <div className="font-dmsans">
       {selectedTask ? (
