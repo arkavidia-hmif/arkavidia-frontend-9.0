@@ -62,7 +62,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
         const teamsResponse = await getTeams({ client: axiosInstance })
         if (teamsResponse.data && teamsResponse.data.length > 0) {
-          const teamId = teamsResponse.data[0].id
+          const teamId = teamsResponse.data[0].id // Get Current user ID
           const requirementsResponse = await getCompetitionSubmissionRequirement({
             client: axiosInstance,
             path: { teamId }
@@ -103,6 +103,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           ])
         } else {
           console.warn('No teams found.')
+          router.push("/dashboard")
         }
       } catch (error) {
         console.error('Error fetching submission requirements:', error)
