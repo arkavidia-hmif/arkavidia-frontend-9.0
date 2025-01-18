@@ -1,13 +1,21 @@
 'use client'
 
 import { SocialMediaContent } from '~/app/components/profile/social-media-content'
+import { SocialMediaContent } from '~/app/components/profile/social-media-content'
 import {
   PersonalInformationContent,
+  ProfileInformationDefaultValue,
   ProfileInformationDefaultValue,
   ProfileInformationDropdownOptions
 } from '../../components/profile/personal-information-content'
 import { ProfileLayout } from '../../components/profile/profile-content-layout'
 import ProfileHero from '../../components/ProfileHero'
+import { useEffect, useState } from 'react'
+import { JWTPayload, self } from '~/api/generated'
+import { useToast } from '~/hooks/use-toast'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { MenuItem } from '~/app/components/Dropdown'
+import Loading from '~/app/components/Loading'
 
 const DummyPersonalInfoData: ProfileInformationDefaultValue = {
   name: 'Ahdmad Jone Done',
@@ -27,23 +35,22 @@ const DummyPersonalInfoData: ProfileInformationDefaultValue = {
   }
 }
 
+export type educationOptionsType = 'SMA/MA/SMK' | 'S1' | 'S2'
+const dropdownEducationOptions: Array<educationOptionsType> = ['SMA/MA/SMK', 'S1', 'S2']
+
 const DummyDropdownOptions: ProfileInformationDropdownOptions = {
   educationOptions: [
     {
       id: 1,
-      option: 'Insitute'
+      option: 'SMA/MA/SMK'
     },
     {
       id: 2,
-      option: 'ITB'
+      option: 'S1'
     },
     {
       id: 3,
-      option: 'UI'
-    },
-    {
-      id: 4,
-      option: 'UGM'
+      option: 'S2'
     }
   ],
   instanceOptions: [
@@ -77,34 +84,66 @@ const DummyDropdownOptions: ProfileInformationDropdownOptions = {
 }
 
 const ProfilePage = () => {
-  return (
-    <div>
-      <div className="mb-8">
-        <ProfileHero
-          title="Profile"
-          name="Ahmad John Doe"
-          email="example@example.com"
-          isResetProfile={false}
+  const axiosAuth = useAxiosAuth()
+  const { toast } = useToast()
+  const [userData, setUserData] = useState<JWTPayload>()
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const getSelf = async () => {
+      setIsLoading(true)
+      const res = await self({ client: axiosAuth })
+      if (res.error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch data',
+          variant: 'destructive'
+        })
+      }
+
+      if (res.data) {
+        setUserData(res.data)
+      }
+    }
+
+    getSelf()
+  }, [])
+
+  useEffect(() => {
+    if (userData) {
+      setIsLoading(false)
+    }
+  }, [userData])
+
+  if (isLoading) {
+    return <Loading />
+  } else {
+    return (
+      <div>
+        <div className="mb-8">
+          <ProfileHero
+            title="Profile"
+            name="Ahmad John Doe"
+            email="example@example.com"
+            isResetProfile={false}
+          />
+        </div>
+        <ProfileLayout
+          personalInformation={
+            <PersonalInformationContent
+              name={userData?.fullName ?? ''}
+              birthdate={userData?.birthDate ?? ''}
+              education={userData?.education ?? ''}
+              instance={userData?.instance ?? ''}
+              phoneNumber={userData?.phoneNumber ?? ''}
+              educationOptions={dropdownEducationOptions}
+            />
+          }
+          socialMedia={<SocialMediaContent />}
         />
       </div>
-      <ProfileLayout
-        personalInformation={
-          <PersonalInformationContent
-            name={DummyPersonalInfoData.name}
-            birthdate={DummyPersonalInfoData.birthdate}
-            education={DummyPersonalInfoData.education}
-            howDoYouKnowArkavidia={DummyPersonalInfoData.howDoYouKnowArkavidia}
-            instance={DummyPersonalInfoData.instance}
-            phoneNumber={DummyPersonalInfoData.phoneNumber}
-            educationOptions={DummyDropdownOptions.educationOptions}
-            instanceOptions={DummyDropdownOptions.instanceOptions}
-            howDoYouKnowArkavOptions={DummyDropdownOptions.howDoYouKnowArkavOptions}
-          />
-        }
-        socialMedia={<SocialMediaContent />}
-      />
-    </div>
-  )
+    )
+  }
 }
 
 export default ProfilePage
