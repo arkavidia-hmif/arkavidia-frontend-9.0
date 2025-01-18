@@ -48,7 +48,6 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
         const competitionId = (res.data as Array<{ id: string }>)[0].id
         setSelectedCompetitionId(competitionId)
 
-        // Use the competition ID directly from the API response
         const data = result.filter(item => item.competitionId === competitionId)[0]
         const total = data?.totalTeam || 0
         const verified = data?.totalVerifiedTeam || 0
@@ -63,7 +62,6 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
           description: (error as Error).message,
           variant: 'warning'
         })
-        // Reset numbers on error
         setCompNumber({ unverified: 0, registered: 0 })
       }
     }
