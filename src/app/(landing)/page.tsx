@@ -33,7 +33,7 @@ const MainLandingCompetitionPage = () => {
           alt={'Prize'}
           width={1470}
           height={1678}
-          className="w-48 md:w-[320px] lg:w-[500px] z-10"
+          className="z-10 w-48 md:w-[320px] lg:w-[500px]"
         />
       </div>
 
@@ -45,7 +45,7 @@ const MainLandingCompetitionPage = () => {
         src={'/images/competition/bg-competition.png'}
         alt={'bg-competition'}
         fill
-        className="absolute top-16 z-0 w-full"
+        className="absolute top-16 z-0 object-contain"
       />
     </div>
   )
