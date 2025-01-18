@@ -146,33 +146,30 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   const { days, hours, minutes, seconds } = formatTimeUnits(timeLeft)
 
   return (
-    <div className="min-h-[100vh] min-w-[100vw] bg-[url('/images/competition/landing-page.jpg')] bg-cover bg-no-repeat">
+    <div className="min-h-screen min-w-full bg-[url('/images/competition/landing-page.jpg')] bg-cover bg-no-repeat">
       <Navbar />
-      <div className="mx-24 flex flex-col items-center gap-32 py-36 font-dmsans">
+      <div className="mx-4 sm:mx-8 md:mx-12 lg:mx-24 flex flex-col items-center gap-16 md:gap-24 lg:gap-32 py-12 md:py-24 lg:py-36 font-dmsans">
+        {/* Competition Information Section */}
         <section
-          className="flex flex-col items-center justify-around gap-12"
+          className="flex flex-col items-center justify-around gap-8 md:gap-12"
           id="competition-information">
-          <div className="flex flex-row gap-8">
-            <div className="flex w-1/3 items-center justify-center">
+          <div className="flex flex-col gap-4 md:flex-row md:gap-8">
+            <div className="flex w-full md:w-1/3 items-center justify-center">
               <Image
-                width={200}
-                height={200}
-                src={
-                  props.competitionLogoPath !== '' && props.competitionLogoPath !== null
-                    ? props.competitionLogoPath
-                    : '/arkavidiaLogo.svg'
-                }
+                width={600}
+                height={600}
+                src={props.competitionLogoPath || '/arkavidiaLogo.svg'}
                 alt={props.competitionName}
               />
             </div>
-            <div className="flex w-1/2 flex-col justify-between text-wrap">
-              <h1 className="text-bold font-belanosima text-6xl uppercase">
+            <div className="flex w-full md:w-1/2 flex-col gap-4 md:gap-8 justify-start text-wrap">
+              <h1 className="text-bold font-belanosima text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase text-center md:text-left">
                 {props.competitionName}
               </h1>
-              <p className="text-justify font-dmsans text-lg leading-7">
+              <p className="text-justify font-dmsans text-sm sm:text-base md:text-lg leading-6 md:leading-7">
                 {props.competitionDescription}
               </p>
-              <p className="text-lg font-bold">
+              <p className="text-base md:text-lg font-bold text-center md:text-left">
                 {currentOrClosestEvent
                   ? 'Close ' +
                     currentOrClosestEvent.title +
@@ -185,121 +182,106 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
         </section>
 
         {/* Time Left Section */}
-        <section className="flex flex-col gap-12" id="registration-time">
-          <div className="flex flex-row items-center justify-center gap-10">
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex flex-row gap-3">
-                <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-6 py-6 text-3xl font-bold">
-                  {Math.floor(days / 10)}
-                </div>
-                <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-6 py-6 text-3xl font-bold text-white">
-                  <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
-                    {days % 10}
+        <section className="flex flex-col gap-8 md:gap-12" id="registration-time">
+          <div className="flex flex-row items-center justify-center gap-2 sm:gap-6 md:gap-10">
+            {/* Timer Blocks */}
+            {[
+              { value: days, label: 'Days' },
+              { value: hours, label: 'Hours' },
+              { value: minutes, label: 'Minutes' },
+              { value: seconds, label: 'Seconds' }
+            ].map((unit) => (
+              <div key={unit.label} className="flex flex-col items-center gap-2">
+                <div className="flex flex-row gap-1 sm:gap-2 md:gap-3">
+                  <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                    <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
+                      {Math.floor(unit.value / 10)}
+                    </div>
+                  </div>
+                  <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                    <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
+                      {unit.value % 10}
+                    </div>
                   </div>
                 </div>
+                <div className="font-bold text-white text-sm sm:text-base">{unit.label}</div>
               </div>
-              <div className="font-bold text-white">Days</div>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex flex-row gap-3">
-                <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-6 py-6 text-3xl font-bold text-white">
-                  <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
-                    {Math.floor(hours / 10)}
-                  </div>
-                </div>
-                <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-6 py-6 text-3xl font-bold text-white">
-                  <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
-                    {hours % 10}
-                  </div>
-                </div>
-              </div>
-              <div className="font-bold text-white">Hours</div>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex flex-row gap-3">
-                <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-6 py-6 text-3xl font-bold text-white">
-                  <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
-                    {Math.floor(minutes / 10)}
-                  </div>
-                </div>
-                <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-6 py-6 text-3xl font-bold text-white">
-                  <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
-                    {minutes % 10}
-                  </div>
-                </div>
-              </div>
-              <div className="font-bold text-white">Minutes</div>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex flex-row gap-3">
-                <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-6 py-6 text-3xl font-bold text-white">
-                  <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
-                    {Math.floor(seconds / 10)}
-                  </div>
-                </div>
-                <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-6 py-6 text-3xl font-bold text-white">
-                  <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
-                    {seconds % 10}
-                  </div>
-                </div>
-              </div>
-              <div className="font-bold text-white">Seconds</div>
-            </div>
+            ))}
           </div>
 
-          {/* Button for registration and handbook */}
-          <div className="flex flex-row justify-center gap-12">
-            <Button variant="outline">
-              <IoMdDownload className="text-[#48E6FF]" />
-              Download Handbook
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 md:gap-12">
+            <Button variant="outline" className="w-full sm:w-auto">
+              <div className='flex flex-row gap-2 justify-center items-center'>
+                <IoMdDownload className="text-[#48E6FF]" />
+                <span>Download Handbook</span>
+              </div>
             </Button>
-            <Button>
+            <Button className="w-full sm:w-auto">
               Register Now <FaArrowRight />
             </Button>
           </div>
         </section>
 
-        <section className="flex flex-col items-center gap-16" id="competition-timeline">
-          <h1 className="font-belanosima text-5xl font-extrabold uppercase">
+        {/* Timeline Section */}
+        <section className="flex flex-col items-center gap-8 md:gap-16" id="competition-timeline">
+          <h1 className="font-belanosima text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase text-center">
             Competition Timeline
           </h1>
-          <div className="flex flex-col items-center justify-center">
-            <Timeline events={props.registrationDeadline} variant="horizontal" />
+          <div className="w-full flex flex-col items-center justify-center">
+            <Timeline events={props.registrationDeadline} variant="vertical" />
           </div>
         </section>
 
+        {/* Prize Section */}
         {props.winnerPrize && (
-          <section className="flex flex-col items-center gap-12" id="competition-prizes">
-            <h1 className="font-belanosima text-5xl font-extrabold uppercase">Prize</h1>
-            <div className='flex flex-row gap-48 flex-wrap justify-around'>
+          <section className="flex flex-col items-center gap-8 md:gap-12" id="competition-prizes">
+            <h1 className="font-belanosima text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase text-center">
+              Prize
+            </h1>
+            <div className="flex flex-col sm:flex-row gap-12 sm:gap-24 md:gap-48 flex-wrap justify-around">
               {props.winnerPrize?.map(winner => (
-                <div key={winner.position} className='flex flex-col gap-4 items-center justify-center'>
-                  <Image src={winner.positionLogo || "/images/competition/champion-logo.svg"} alt={winner.position} width={280} height={280}/>
-                  <h3 className='text-2xl font-bold font-belanosima'>{winner.position}</h3>
-                  <p className='text-xl'>{winner.prize}</p>
+                <div key={winner.position} className="flex flex-col gap-4 items-center justify-center">
+                  <Image
+                    src={winner.positionLogo || "/images/competition/champion-logo.svg"}
+                    alt={winner.position}
+                    width={280}
+                    height={280}
+                    className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72"
+                  />
+                  <h3 className="text-xl sm:text-2xl font-bold font-belanosima text-center">
+                    {winner.position}
+                  </h3>
+                  <p className="text-lg sm:text-xl text-center">{winner.prize}</p>
                 </div>
               ))}
             </div>
           </section>
         )}
 
+        {/* FAQ Section */}
         {props.faqs && (
-          <section className="flex flex-col items-center gap-12" id="competition-faq">
-            <h1 className="font-belanosima text-5xl font-extrabold uppercase">FAQ</h1>
-            <div className="flex flex-col items-center gap-6">
+          <section className="flex flex-col items-center gap-8 md:gap-12 w-full" id="competition-faq">
+            <h1 className="font-belanosima text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase text-center">
+              FAQ
+            </h1>
+            <div className="flex flex-col items-center gap-6 w-full px-4 sm:px-8 md:px-12">
               <FAQAccordion items={props.faqs} />
             </div>
           </section>
         )}
 
+        {/* Contact Person Section */}
         {props.contactPerson && (
-          <section className="" id="competition-contact">
-            <div className="flex flex-row items-center justify-around gap-28">
-              <div className="font-dmsans text-lg font-bold">Contact Person</div>
-              <div className="flex flex-row gap-2">
+          <section className="w-1/2 px-4 sm:px-8" id="competition-contact">
+            <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-around gap-6 sm:gap-12 md:gap-28">
+              <div className="font-dmsans text-base sm:text-lg font-bold text-center sm:text-left">
+                Contact Person
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-2">
                 {props.contactPerson?.map(contact => (
-                  <Button variant="outline" key={contact.contact}>
-                    <div className="flex flex-row gap-2">
+                  <Button variant="outline" key={contact.contact} className="w-full sm:w-auto">
+                    <div className="flex flex-row gap-2 items-center justify-center">
                       <Image
                         src={contact.iconPath || ''}
                         alt={contact.name}
@@ -316,5 +298,5 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
         )}
       </div>
     </div>
-  )
+  );
 }
