@@ -1,3 +1,4 @@
+import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
 
 export default function LandingPageLayout({ children }: { children: React.ReactNode }) {
@@ -11,6 +12,7 @@ export default function LandingPageLayout({ children }: { children: React.ReactN
       }}>
       <Navbar />
       <div>{children}</div>
+      <Footer />
     </section>
   )
 }

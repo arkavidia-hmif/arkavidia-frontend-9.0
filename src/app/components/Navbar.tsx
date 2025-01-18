@@ -14,9 +14,6 @@ import {
 import { useAuth } from '../contexts/AuthContext'
 import { useAppSelector } from '~/redux/store'
 import { toast } from '~/hooks/use-toast'
-import { useAuth } from '../contexts/AuthContext'
-import { useAppSelector } from '~/redux/store'
-import { toast } from '~/hooks/use-toast'
 
 type NavItem = {
   name: string
@@ -44,9 +41,9 @@ function Navbar() {
   }
 
   return (
-    <nav className="fixed z-10 mt-3 w-full bg-transparent px-4 py-3 lg:px-12">
+    <nav className="fixed z-[100] mt-3 w-full bg-transparent px-4 py-3 lg:px-12">
       <div className="flex flex-row items-center justify-between">
-        <Link href="/" className="flex flex-row items-center justify-center gap-2">
+        <Link href="/" className="flex flex-row items-center justify-center gap-2 px-4">
           <Image
             src="/arkavidiaLogo.svg"
             alt="Logo Arkavidia 9.0"

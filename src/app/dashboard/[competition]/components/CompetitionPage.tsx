@@ -6,9 +6,9 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger
-} from '../components/ui/accordion'
-import { Button } from '../components/ui/button'
-import { Tab } from '../components/Tab'
+} from '../../../components/ui/accordion'
+import { Button } from '../../../components/ui/button'
+import { Tab } from '../../../components/Tab'
 import { ChevronLeft, CloudUpload } from 'lucide-react'
 
 // Task interface
@@ -89,7 +89,8 @@ const formatDate = (date: Date): string => {
   }).format(date)
 }
 
-const CompetitionPage = () => {
+const CompetitionPage = ({ params }: { params: { competition: string } }) => {
+  const competitionName = params.competition
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [selectedVerif, setSelectedVerif] = useState<Verif | null>(null)
 
