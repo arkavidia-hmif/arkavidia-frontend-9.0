@@ -158,7 +158,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
                     />
                   ))
                 ) : (
-                  <div className="text-center">Loading...</div>
+                  <div className="px-2 text-center">No competitions joined!</div>
                 )}
               </div>
               <div className="mx-2 mb-4 cursor-pointer lg:mx-2.5">

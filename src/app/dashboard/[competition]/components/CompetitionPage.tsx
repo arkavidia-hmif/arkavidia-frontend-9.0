@@ -10,6 +10,7 @@ import {
 import { Button } from '../../../components/ui/button'
 import { Tab } from '../../../components/Tab'
 import { ChevronLeft, CloudUpload } from 'lucide-react'
+import ProfileCompetition from '~/app/components/ProfileCompetition'
 
 // Task interface
 interface Task {
@@ -89,8 +90,7 @@ const formatDate = (date: Date): string => {
   }).format(date)
 }
 
-const CompetitionPage = ({ params }: { params: { competition: string } }) => {
-  const competitionName = params.competition
+const CompetitionPage = ({ compeName }: { compeName: string }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [selectedVerif, setSelectedVerif] = useState<Verif | null>(null)
 
@@ -369,17 +369,8 @@ const CompetitionPage = ({ params }: { params: { competition: string } }) => {
 
   return (
     <main>
-      <div
-        className="relative min-h-screen w-full bg-gradient-to-r from-[#1F0246] to-[#2E046A] px-6"
-        style={{
-          backgroundImage: "url('/images/competition/bg.png')",
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
-          backgroundAttachment: 'fixed'
-        }}>
-        <Tab contentType={contentTypes} content={contents} />
-      </div>
+      <ProfileCompetition competitionName={compeName} />
+      <Tab contentType={contentTypes} content={contents} />
     </main>
   )
 }
