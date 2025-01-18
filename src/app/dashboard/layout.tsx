@@ -13,7 +13,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         src={'/images/competition/bg.png'}
         alt={'bg-competition'}
         fill
-        className="absolute z-[-10] w-full object-cover"
+        className="absolute z-[-10] w-full object-cover min-h-screen"
       />
     </section>
   )
