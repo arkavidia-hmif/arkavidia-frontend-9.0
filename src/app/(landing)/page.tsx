@@ -44,8 +44,7 @@ const MainLandingCompetitionPage = () => {
       <Image
         src={'/images/competition/bg-competition.png'}
         alt={'bg-competition'}
-        width={3024}
-        height={3016}
+        fill
         className="absolute top-16 z-0 w-full"
       />
     </div>
