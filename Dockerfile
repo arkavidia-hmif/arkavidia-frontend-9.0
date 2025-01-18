@@ -31,7 +31,12 @@ FROM node:18-alpine AS runner
 
 RUN npm install -g pnpm
 ARG API_URI
+ARG PORT
+ARG NODE_ENV
+
+ENV NODE_ENV=${NODE_ENV}
 ENV NEXT_PUBLIC_API_URL=${API_URI}
+ENV PORT=${PORT}
 
 WORKDIR /app
 
