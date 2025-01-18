@@ -21,7 +21,7 @@ export const SocialMediaContent = (props: Props) => {
             height={48}
             className="rounded-full w-12 h-12 mr-2"
           />
-          <div className="w-72"> {/* Atur lebar input field */}
+          <div className="w-72"> 
             <InputProfileData
               title={'Line'}
               default_value={props.line?.value ?? ''}
@@ -37,7 +37,7 @@ export const SocialMediaContent = (props: Props) => {
             height={48}
             className="rounded-full w-12 h-12 mr-2"
           />
-          <div className="w-72"> {/* Atur lebar input field */}
+          <div className="w-72">
             <InputProfileData
               title={'Discord'}
               default_value={props.discord?.value ?? ''}
@@ -55,7 +55,7 @@ export const SocialMediaContent = (props: Props) => {
             height={48}
             className="rounded-full w-12 h-12 mr-2"
           />
-          <div className="w-72"> {/* Atur lebar input field */}
+          <div className="w-72"> 
             <InputProfileData
               title={'Instagram'}
               default_value={props.instagram?.value ?? ''}
