@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getTeams, getTeamMember, putChangeTeamName } from '~/api/generated';
+import { getTeams, getTeamMember, putChangeTeamName, getUser } from '~/api/generated';
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth';
 import Image from 'next/image';
 import { Input } from '../ui/input';
@@ -14,10 +14,11 @@ interface ProfileDataProps {
   verified: boolean;
   handleSave: () => void;
   handleCancel: () => void;
+  userRole: string; 
   children: React.ReactNode;
 }
 
-const ProfileData = ({ title, value, verified, handleSave, handleCancel, children }: ProfileDataProps) => {
+const ProfileData = ({ title, value, verified, handleSave, handleCancel, userRole, children }: ProfileDataProps) => {
   const [isEdit, setIsEdit] = useState(false);
 
   return (
@@ -73,7 +74,8 @@ const ProfileData = ({ title, value, verified, handleSave, handleCancel, childre
             {!isEdit && <h1 className="font-dmsans text-[1rem] text-lg font-normal mt-0">{title}</h1>}
           </div>
         </div>
-        {!isEdit && (
+        {/* Tampilkan edit button hanya jika userRole adalah 'leader' */}
+        {userRole === 'leader' && !isEdit && (
           <Button variant={'ghost'} onClick={() => setIsEdit(true)}>
             <Image src={'/images/profile/edit.svg'} alt={'Edit Button'} width={24} height={24} />
           </Button>
@@ -88,9 +90,10 @@ interface InputDataProps {
   verified: boolean;
   name: string;
   title: string;
+  userRole: string; 
 }
 
-const InputData = ({ verified, name, title }: InputDataProps) => {
+const InputData = ({ verified, name, title, userRole }: InputDataProps) => {
   const [value, setValue] = useState(name);
   const [tempValue, setTempValue] = useState(name);
 
@@ -103,7 +106,14 @@ const InputData = ({ verified, name, title }: InputDataProps) => {
   }
 
   return (
-    <ProfileData title={title} value={value} verified={verified} handleSave={handleSave} handleCancel={handleCancel}>
+    <ProfileData
+      title={title}
+      value={value}
+      verified={verified}
+      handleSave={handleSave}
+      handleCancel={handleCancel}
+      userRole={userRole} 
+    >
       <div className="flex items-center gap-2 w-full">
         <Input
           placeholder="Enter name"
@@ -218,25 +228,29 @@ export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
   );
 };
 
-
 const TeamInformationContent = () => {
   const [teamName, setTeamName] = useState<string>('');
-  const [teamId, setTeamId] = useState<string>(''); 
+  const [teamId, setTeamId] = useState<string>('');
+  const [currentUserId, setCurrentUserId] = useState<string>(''); 
   const [userRole, setUserRole] = useState<string>('Member'); 
   const [members, setMembers] = useState<{ name: string; verified: boolean; title: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const authAxios = useAxiosAuth();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchUserAndTeamData = async () => {
       try {
+        const userResponse = await getUser({ client: authAxios });
+        const userId = userResponse.data?.id;
+        setCurrentUserId(userId || "null");
+
         const teamsResponse = await getTeams({ client: authAxios });
         const teams = teamsResponse.data;
 
         if (Array.isArray(teams) && teams.length > 0) {
           const selectedTeam = teams[0];
           setTeamName(selectedTeam.name);
-          setTeamId(selectedTeam.id); 
+          setTeamId(selectedTeam.id);
 
           const membersResponse = await getTeamMember({
             client: authAxios,
@@ -245,8 +259,8 @@ const TeamInformationContent = () => {
 
           const transformedMembers = Array.isArray(membersResponse.data)
             ? membersResponse.data.map((member) => {
-                if (member.role === 'leader') {
-                  setUserRole('leader'); 
+                if (member.userId === userId) {
+                  setUserRole(member.role); 
                 }
                 return {
                   name: member.user?.fullName || 'No Name',
@@ -267,7 +281,7 @@ const TeamInformationContent = () => {
       }
     };
 
-    fetchData();
+    fetchUserAndTeamData();
   }, [authAxios]);
 
   if (loading) {
@@ -283,7 +297,7 @@ const TeamInformationContent = () => {
       <div className="flex w-1/2 flex-col gap-8">
         <TeamData name={teamName} title="Team Name" teamId={teamId} userRole={userRole} />
         {members.map((member, index) => (
-          <InputData key={index} verified={member.verified} name={member.name} title={member.title} />
+          <InputData key={index} verified={member.verified} name={member.name} title={member.title} userRole={userRole} />
         ))}
       </div>
     </div>
