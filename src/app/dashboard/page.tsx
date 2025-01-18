@@ -1,20 +1,15 @@
 import React from 'react'
 import Countdown from './components/Countdown'
-// import Countdown from './components/countdown'
-import { addMonths } from 'date-fns'
 import Image from 'next/image'
 import Tag from '../components/Tag'
 import Category from './components/Category'
 import Calendar from '../components/CustomCalendar/CustomCalendar'
-import Pengumuman from './components/Pengumuman'
 import ComponentBox from './components/ComponentBox'
 import Information from './components/Information/Information'
 import Submisi from './components/Submisi'
-import { link } from 'fs'
-import { map } from 'zod'
+
 
 function DashboardPage() {
-  const currDate = new Date()
   const username = 'User'
   const team = 'Arkavidia sssr'
   const informations = [
