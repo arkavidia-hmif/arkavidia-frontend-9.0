@@ -118,7 +118,13 @@ export default function FileInput({onUpload, className, displaySucces}: Componen
             const userId = getSelf.data.id
             const fileName = selectedFile.name
             const fileExt = fileName.slice(((fileName.lastIndexOf('.') - 1) >>> 0) + 2)
-            const formattedFileName = `${userId}-identity-card.${fileExt}`
+            // Get the current date and time
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[-:.]/g, '').slice(0, 15); // Format as YYYYMMDDTHHmmss
+
+            // Add the timestamp to the formatted file name
+            const formattedFileName = `${userId}-identity-card-${timestamp}.${fileExt}`;
+
             const getLink = await getPresignedLink({
                 client: axiosAuth,
                 query: {
@@ -126,6 +132,7 @@ export default function FileInput({onUpload, className, displaySucces}: Componen
                   filename: formattedFileName
                 }  
             })
+
 
             if (getLink.error) {
                 toast({
@@ -154,6 +161,12 @@ export default function FileInput({onUpload, className, displaySucces}: Componen
                         fileName: formattedFileName,
                         mediaURL: getLink.data.mediaUrl
                     });
+                } else {
+                    toast({
+                        title: 'Error',
+                        description: 'Gagal melakukan upload data',
+                        variant: 'destructive'
+                    })
                 }
             }
 

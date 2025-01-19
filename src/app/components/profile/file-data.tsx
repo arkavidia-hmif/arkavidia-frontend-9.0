@@ -51,40 +51,40 @@ const handleUpload: (e: uploadedFileState | null ) => void = async (e) => {
 
 return (
     <div>
-    <div className='flex justify-between items-center'>
-        <div className='flex items-center gap-2'>
-            <h1 className='font-teachers font-bold text-2xl'>Student Card</h1>
-            <ExternalLink strokeWidth={2.5} />
+        <div className='flex justify-between items-center'>
+            <div className='flex items-center gap-2'>
+                <h1 className='font-teachers font-bold text-2xl'>Student Card</h1>
+                <ExternalLink strokeWidth={2.5} />
+            </div>
+            <Button variant={'ghost'} onClick={() => setHidden((a) => !a)}>
+            <Image
+                src={'/images/profile/edit.svg'}
+                alt={'Edit Button'}
+                width={24}
+                height={24}
+            />
+            </Button>
         </div>
-        <Button variant={'ghost'} onClick={() => setHidden((a) => !a)}>
-        <Image
-            src={'/images/profile/edit.svg'}
-            alt={'Edit Button'}
-            width={24}
-            height={24}
-        />
-        </Button>
-    </div>
-    <div className='overflow-hidden transition-all duration-300 ease-in-out'
-        style={{ 
-            maxHeight: isHidden ? '50px' : '0',
-            opacity: isHidden ? 1 : 0,
-            marginBottom: isHidden ? '12px' : '0'
-        }}>
-        <Link href={fileURL}>
-            <p className='font-dmsans text-[1rem] text-lg font-normal hover:underline'>{fileName}</p>
-        </Link>
-    </div>
-    <div className='overflow-hidden transition-all duration-300 ease-in-out'
-        style={{ 
-            maxHeight: !isHidden ? '200px' : '0',
-            opacity: !isHidden ? 1 : 0
-        }}>
-        <FileInput 
-        onUpload={handleUpload} 
-        className='mt-3 w-full' 
-        />
-    </div>
+        <div className='overflow-hidden transition-all duration-300 ease-in-out'
+            style={{ 
+                maxHeight: isHidden ? '50px' : '0',
+                opacity: isHidden ? 1 : 0,
+                marginBottom: isHidden ? '12px' : '0'
+            }}>
+            <Link href={fileURL}>
+                <p className='font-dmsans text-[1rem] text-lg font-normal hover:underline'>{fileName}</p>
+            </Link>
+        </div>
+        <div className='overflow-hidden transition-all duration-300 ease-in-out'
+            style={{ 
+                maxHeight: !isHidden ? '200px' : '0',
+                opacity: !isHidden ? 1 : 0
+            }}>
+            <FileInput 
+            onUpload={handleUpload} 
+            className='mt-3 w-full' 
+            />
+        </div>
     </div>
 )
 }
