@@ -39,7 +39,7 @@ export const LandingCardCompetition = ({
           </h1>
 
           <div className="z-10 flex flex-col items-center gap-4">
-            <p>{description}</p>
+            <p className='lg:text-xl md:text-lg '>{description}</p>
             <Button onClick={GoToPage} className="flex flex-row gap-3 rounded-xl px-5">
               <p className="mx-5 text-base">Go To Page</p>
 

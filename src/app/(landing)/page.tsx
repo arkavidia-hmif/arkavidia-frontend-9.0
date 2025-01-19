@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import { CompetitionSwiper } from '../components/landing/CompetitionSwiper'
 import GalleryCarousel from '../components/landing/GalleryCarousel'
+import Timeline from '../components/Timeline'
+import { CompetitionGaleryTimeline } from '../components/landing/CompetitionGalleryTimeLine'
 
 const competitions = [
   {
@@ -71,21 +73,19 @@ const MainLandingCompetitionPage = () => {
           boxShadow:
             '0 0 -5px 5px rgba(72, 230, 255, 0.2), 0 0 10px rgba(72, 230, 255, 0.2)'
         }}>
-        <p className="lg-[20px] md:text-[18px ] text-justify font-dmsans text-[16px] leading-5 tracking-wider text-lilac-100 md:leading-6 lg:leading-7">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla pulvinar, massa
-          eleifend bibendum consectetur, nulla ligula hendrerit sapien, et aliquam orci ex
-          vitae odio. Vestibulum ligula nunc, bibendum aliquam orci sed, tempor varius
-          turpis. Praesent interdum lacus lectus, a aliquet lectus tempus sit amet. Fusce
-          cursus tempus euismod. Praesent nec risus a tellus pellentesque aliquet nec vel
-          nulla. Curabitur non elit elementum dolor pellentesque gravida eget eu purus.
+        <p className="lg-[32px] text-justify font-dmsans text-[20px] leading-5 tracking-wider text-lilac-100 md:text-[24px] md:leading-6 lg:leading-7">
+          Arkavidia merupakan acara IT tahunan yang diadakan oleh Himpunan Mahasiswa
+          Informatika ITB. Dengan tema “Adaptive Collaboration to Encounter Digital
+          Disruption”, Arkavidia 8.0 diharapkan akan lebih banyak individu sadar akan hak
+          dan kewajibannya di dunia digital, sehingga dapat mewujudkan kemerdekaan digital
+          bagi dirinya. Diharapkan dengan diadakannya acara ini, dapat memberikan manfaat
+          bagi pelajar, civitas akademik, dan masyarakat umum seluruh Indonesia.
         </p>
       </div>
-      <div className="col-span-3 mt-6 flex h-fit w-full items-center justify-center px-10 md:mt-14">
+      <div className="col-span-3 mt-6 flex h-fit w-full items-center justify-center pl-10 md:mt-48 md:px-10">
         <CompetitionSwiper competitions={competitions} />
       </div>
-      <div className='mt-12'>
-        <GalleryCarousel />
-      </div>
+      <CompetitionGaleryTimeline />
 
       <Image
         src={'/images/competition/bg-landing.png'}

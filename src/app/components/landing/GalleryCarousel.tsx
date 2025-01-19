@@ -35,8 +35,8 @@ const GalleryCarousel = () => {
   }
 
   return (
-    <div className="flex w-full max-w-[400px] justify-center">
-      <div className="flex w-full max-w-[400px] items-center justify-center gap-3">
+    <div className="md:w- flex w-[300px] justify-center md:w-[400px] lg:w-[600px]">
+      <div className="flex w-full items-center justify-center gap-3">
         <Button onClick={handleLeft} className="cursor-pointer">
           <FaArrowLeft />
         </Button>

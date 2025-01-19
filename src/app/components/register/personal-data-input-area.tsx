@@ -23,9 +23,11 @@ import { axiosInstance } from '~/lib/axios'
 import { useRouter } from 'next/navigation'
 import { getEducation, getFormattedBirthDate } from '~/lib/utils'
 import { setFilledInfo } from '~/redux/slices/auth'
-import { useAppDispatch } from '~/redux/store'
+import { useAppDispatch, useAppSelector } from '~/redux/store'
 import useCheckFillInfo from '~/lib/hooks/useCheckFillInfo'
 import { useState } from 'react'
+import { FaArrowRight } from 'react-icons/fa'
+import Link from 'next/link'
 
 interface PersonalDataProps {
   educationOptions: MenuItem[]
@@ -60,12 +62,25 @@ const registerPersonalDataSchema = z.object({
 })
 
 export const PersonalDataForm = (props: PersonalDataProps) => {
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
   const hasFinishedRegis = useCheckFillInfo()
   const [isSMAPicked, setIsSMAPicked] = useState(false)
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
   const router = useRouter()
   const appDispatch = useAppDispatch()
+
+  if (!isLoggedIn) {
+    toast({
+      title: 'Tidak terotorisasi',
+      description: 'Anda harus login untuk mengakses halaman ini',
+      variant: 'destructive'
+    })
+    setTimeout(() => {
+      router.push('/')
+    }, 1000)
+    return null
+  }
 
   if (hasFinishedRegis) {
     setTimeout(() => {
@@ -259,7 +274,12 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}
-        className="my-6 mr-4 flex flex-col gap-12 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[60px] max-md:px-[36px] max-md:py-[40px] lg:px-[72px] lg:py-[80px]">
+        className="my-6 mr-4 flex flex-col gap-6 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[40px] max-md:px-[36px] max-md:py-[30px] lg:px-[72px] lg:py-[60px]">
+        <Link href="/" className="flex w-full justify-end">
+          <p className="flex items-center gap-x-2 text-lg text-lilac-300 hover:text-lilac-200">
+            Isi Nanti <FaArrowRight size={16} />
+          </p>
+        </Link>
         <h1 className="w-full text-center font-teachers text-3xl font-bold text-lilac-200">
           Lengkapi Data Dirimu!
         </h1>
@@ -332,7 +352,9 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
               name="nisn"
               render={({ field }) => (
                 <FormItem className={`flex flex-col gap-2`}>
-                  <FormLabel className="text-lilac-200 max-md:text-xs">NISN</FormLabel>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">
+                    NISN <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
@@ -481,7 +503,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
           className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs'
           type="submit"
           variant={'ghost'}>
-          Register
+          Simpan Data
         </Button>
       </form>
     </Form>

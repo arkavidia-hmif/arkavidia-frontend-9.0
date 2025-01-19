@@ -1,7 +1,7 @@
 'use client';
 
-import { CreateTeamPopup } from "./join-competition/create-team";
-import { JoinCompetitionPopup } from "./join-competition/join-competition";
+import { CreateTeamPopup } from "./join-competition/create-team-popup";
+import { JoinTeamPopup } from "./join-competition/join-competition-popup";
 import {
     Dialog,
     DialogContent,
@@ -14,9 +14,6 @@ import {
 import { useState, useEffect } from "react";
 import { Button } from "~/app/components/Button";
 import { ArrowLeft, ArrowRight, UserPlus, UserSearch } from "lucide-react";
-import useAxiosAuth from "~/lib/hooks/useAxiosAuth";
-import { getCompetitionNameById } from "~/api/generated";
-import { useRouter } from "next/navigation";
 
 export type CompetitionType = 'CP' | 'CTF' | 'Hackvidia' | 'UXvidia' | 'Datavidia' | 'Arkalogica' | 'Default'
 
@@ -30,32 +27,13 @@ export const competitionAbbr: Record<CompetitionType, string> = {
     Default: 'Competition Name'
   }
 
-export default function CompetitionRegistration({ competitionID }: { competitionID: string }) {
+export default function CompetitionRegistration({ competitionAbbreviation, competitionID }: { competitionAbbreviation: string, competitionID: string }) {
     const [isOpen, setIsOpen] = useState(false)
-    const axiosAuth = useAxiosAuth();
-    const router = useRouter();
     const [competitionType, setCompetitionType] = useState<CompetitionType>('Default');
     
     
     useEffect(() => {
-        const fetchCommpetitionName = async () => {
-          const response = await getCompetitionNameById({
-            client: axiosAuth,
-            path: {
-              competitionId: competitionID
-            }
-          })
-    
-          if (response.error || !response.data.title) {
-            // console.log(response);
-            router.push('/404');
-            return;
-          }
-    
-          setCompetitionType(response.data.title as CompetitionType);
-        }
-    
-        fetchCommpetitionName();
+        setCompetitionType(competitionAbbreviation as CompetitionType)
       },[])
     
 
@@ -81,7 +59,7 @@ export default function CompetitionRegistration({ competitionID }: { competition
             <div className="grow-1 flex flex-col md:gap-12">
                 <DialogHeader className="flex flex-col gap-4">
                     <DialogTitle className="text-2xl md:text-5xl font-bold">
-                    Competition Name Registration
+                    {competitionAbbr[competitionType]} Registration
                     </DialogTitle>
                     <DialogDescription className="text-base md:text-xl">
                     Build your team or join forces with others
@@ -94,7 +72,7 @@ export default function CompetitionRegistration({ competitionID }: { competition
                     </div>
                     <div className="flex flex-col gap-4 items-center">
                         <UserSearch strokeWidth={2.5} size={120}/>
-                        <JoinCompetitionPopup competitionID={competitionID} competitionType={competitionType} />
+                        <JoinTeamPopup competitionID={competitionID} competitionType={competitionType} />
                     </div>
                 </div>
             </div>

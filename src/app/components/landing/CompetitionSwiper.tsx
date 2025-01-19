@@ -45,7 +45,7 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
       {competitions.map((competition, index) => (
         <SwiperSlide
           key={index}
-          className="flex items-center hover:cursor-grab active:cursor-grabbing"
+          className="flex items-center overflow-visible hover:cursor-grab active:cursor-grabbing"
           onClick={() => setActiveIndex(index)}>
           <LandingCardCompetition
             title={competition.title}
