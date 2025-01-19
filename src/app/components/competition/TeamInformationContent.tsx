@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import {
   getTeams,
-  getTeamMember,
+  getTeamMembers,
   putChangeTeamName,
   getUser,
   deleteTeamMember
@@ -259,7 +259,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
             setTeamName(selectedTeam.name)
             setTeamId(selectedTeam.id)
 
-            const membersResponse = await getTeamMember({
+            const membersResponse = await getTeamMembers({
               client: authAxios,
               path: { teamId: selectedTeam.id }
             })
@@ -271,7 +271,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
                   }
                   return {
                     name: member.user?.fullName || 'No Name',
-                    verified: member.isVerified,
+                    verified: member.document.isVerified || false,
                     title: member.role || 'Member',
                     id: member.userId || 'null'
                   }
