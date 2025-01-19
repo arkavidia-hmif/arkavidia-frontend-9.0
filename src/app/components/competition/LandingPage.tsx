@@ -26,12 +26,23 @@ const options: Intl.DateTimeFormatOptions = {
   second: 'numeric'
 }
 
-type ContactPersonProps = {
+export type ContactPersonProps = {
   name: string
-  type?: 'phone' | 'email' | 'line' | 'whatsapp' | 'instagram' | string
+  type: SocialMedia
   contact?: string
-  iconPath?: string
 }
+
+export type SocialMedia = 'phone' | 'email' | 'line' | 'whatsapp' | 'discord' | 'instagram'
+
+export const contactLogo: Record<SocialMedia, string> = {
+  'line': '/images/profile/linelogo.svg',
+  'discord': '/images/profile/discordlogo.jpg',
+  'instagram': '/images/profile/iglogo.png',
+  'whatsapp': '/images/profile/whatsapplogo.svg',
+  'phone': '',
+  'email': ''
+}
+
 
 type CompetitionLandingPageProps = {
   competitionCode: string
@@ -55,10 +66,6 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   useEffect(() => {
     const now = new Date();
   
-    // Separate events into past and future
-    const pastEvents = props.registrationDeadline.filter(
-      event => event.timeEnd && new Date(event.timeEnd).getTime() < now.getTime()
-    );
     const futureEvents = props.registrationDeadline.filter(event => {
       const startTime = event.timeStart
         ? new Date(event.timeStart).getTime()
@@ -182,7 +189,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           : 'Date Not Available'
       }`
     ) : (
-      'CLOSED'
+      <span className='text-center px-6 py-2 border-red-400 rounded-sm'>DITUTUP</span>
     )
   ) : (
     'CLOSED'
@@ -226,7 +233,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           {/* Buttons */}
           <div className="flex flex-col justify-center gap-4 sm:flex-row sm:gap-8 md:gap-12">
             <Button variant="outline" className="w-full sm:w-auto">
-              <a href={props.handbookLink} target='_blank' rel="noopener noreferrer">
+              <a href={props.handbookLink === "#" ? "#" : props.handbookLink} target={(props.handbookLink === "#" || props.handbookLink === "") ? '' : '_blank'} rel="noopener noreferrer">
               <div className="flex flex-row items-center justify-center gap-2">
                 <IoMdDownload className="text-[#48E6FF]" />
                 <span>Download Handbook</span>
@@ -295,20 +302,20 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
         {/* Contact Person Section */}
         {props.contactPerson && (
-          <section className="w-1/2 px-4 sm:px-8" id="competition-contact">
-            <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:justify-around sm:gap-12 md:gap-28">
-              <div className="text-center font-dmsans text-base font-bold sm:text-left sm:text-lg">
+          <section className="w-full px-4 sm:px-8 flex justify-center items-center" id="competition-contact">
+            <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:justify-around sm:items-center sm:gap-12 md:gap-28">
+              <div className="text-center font-dmsans text-base font-bold text-nowrap sm:text-lg">
                 Contact Person
               </div>
-              <div className="flex flex-col gap-4 sm:flex-row sm:gap-2">
+              <div className="flex w-full flex-col gap-4 sm:flex-row flex-wrap sm:gap-2">
                 {props.contactPerson?.map(contact => (
                   <Button
                     variant="outline"
                     key={contact.contact}
                     className="w-full sm:w-auto">
-                    <div className="flex flex-row items-center justify-center gap-2">
+                    <div className="px-4 flex flex-row items-center justify-center gap-2">
                       <Image
-                        src={contact.iconPath || ''}
+                        src={contactLogo[contact.type] || ''}
                         alt={contact.name}
                         width={20}
                         height={20}
