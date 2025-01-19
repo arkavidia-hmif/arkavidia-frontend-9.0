@@ -32,7 +32,7 @@ const competitions = [
       'Capture The Flag merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
     preview: '/images/competition/ctf-preview.png',
     carousel: '/images/competition/ctf-logo.png',
-    link: '/competition/ctf'
+    link: '/competition/capture-the-flag'
   },
   {
     title: 'Competitive Programming',
@@ -40,7 +40,7 @@ const competitions = [
       'Competitive Programming merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
     preview: '/images/competition/cp-preview.png',
     carousel: '/images/competition/cp-logo.png',
-    link: '/competition/cp'
+    link: '/competition/competitive-programming'
   },
   {
     title: 'Datavidia',

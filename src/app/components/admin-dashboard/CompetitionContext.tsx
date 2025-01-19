@@ -5,8 +5,8 @@ import FrameInfo from './FrameInfo'
 import FrameSubmissions from './FrameSubmissions'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import {
-  getCompetitionIdByName,
-  GetCompetitionIdByNameData,
+  getCompetitionByName,
+  GetCompetitionByNameData,
   GetTeamStatisticResponse
 } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
@@ -23,7 +23,7 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
     { id: 4, option: 'UXvidia' },
     { id: 5, option: 'Arkalogica' },
     { id: 6, option: 'Datavidia' },
-    { id: 7, option: 'Hackvidia' },
+    { id: 7, option: 'Hackvidia' }
     // { id: 8, option: 'ArkavX' },
     // { id: 9, option: 'Academya' }
   ]
@@ -37,10 +37,10 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
     async function fetchCompetitionSubmission(option: string) {
       setIsLoading(true)
       try {
-        const res = await getCompetitionIdByName({
+        const res = await getCompetitionByName({
           client: axiosInstance,
           query: { name: option }
-        } as GetCompetitionIdByNameData)
+        } as GetCompetitionByNameData)
 
         if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {
           throw new Error('Competition not found')

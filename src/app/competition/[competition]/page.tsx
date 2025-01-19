@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import {
+  Competition,
   CompetitionTimeline,
   getCompetitionByName,
   getCompetitionTimelineWithCompetitionId,
@@ -12,16 +13,6 @@ import { CompetitionLandingPage } from '~/app/components/competition/LandingPage
 import { useRouter } from 'next/navigation'
 import { TimelineEventProps } from '~/app/components/Timeline'
 
-// Define the expected API competitionResponse type
-type Competition = {
-  id: string
-  title: string
-  description: string
-  maxParticipants: number
-  maxTeamMember: number
-  guidebookUrl: string | null
-}
-
 type CompetitionMap = {
   [key: string]: {
     title: string
@@ -30,7 +21,7 @@ type CompetitionMap = {
   }
 }
 
-export const COMPETITIONMAP: CompetitionMap = {
+const COMPETITIONMAP: CompetitionMap = {
   'competitive-programming': {
     title: 'Competitive Programming',
     abbr: 'CP',
@@ -63,7 +54,7 @@ export const COMPETITIONMAP: CompetitionMap = {
   }
 }
 
-export const transformToTimelineEvents = (
+const transformToTimelineEvents = (
   competitionTimeline: CompetitionTimeline[]
 ): TimelineEventProps[] => {
   const data: TimelineEventProps[] = []
@@ -131,7 +122,7 @@ function CompetitionLanding({ params }: { params: Promise<{ competition: string 
               path: { competitionId: matchedCompetition.id }
             })
           const competitionTimelineData: GetCompetitionTimelineWithCompetitionIdResponse =
-            competitionTimelineResponse?.data
+            competitionTimelineResponse?.data || []
           const competitionTimelineTemp = transformToTimelineEvents(
             competitionTimelineData
           )
