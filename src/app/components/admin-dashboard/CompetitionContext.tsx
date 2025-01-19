@@ -20,12 +20,12 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
   const DROPDOWN_DATA: MenuItem[] = [
     { id: 2, option: 'CP' },
     { id: 3, option: 'CTF' },
-    { id: 4, option: 'UXVidia' },
-    { id: 5, option: 'Arcalogica' },
+    { id: 4, option: 'UXvidia' },
+    { id: 5, option: 'Arkalogica' },
     { id: 6, option: 'Datavidia' },
     { id: 7, option: 'Hackvidia' },
-    { id: 8, option: 'ArkavX' },
-    { id: 9, option: 'Academya' }
+    // { id: 8, option: 'ArkavX' },
+    // { id: 9, option: 'Academya' }
   ]
 
   const [selectedCompetition, setSelectedCompetition] = React.useState<MenuItem | null>(
