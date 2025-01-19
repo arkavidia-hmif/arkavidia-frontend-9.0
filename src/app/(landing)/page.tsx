@@ -76,7 +76,7 @@ const MainLandingCompetitionPage = () => {
         <p className="lg-[32px] text-justify font-dmsans text-[20px] leading-5 tracking-wider text-lilac-100 md:text-[24px] md:leading-6 lg:leading-7">
           Arkavidia merupakan acara IT tahunan yang diadakan oleh Himpunan Mahasiswa
           Informatika ITB. Dengan tema “Adaptive Collaboration to Encounter Digital
-          Disruption”, Arkavidia 8.0 diharapkan akan lebih banyak individu sadar akan hak
+          Disruption”, Arkavidia 9.0 diharapkan akan lebih banyak individu sadar akan hak
           dan kewajibannya di dunia digital, sehingga dapat mewujudkan kemerdekaan digital
           bagi dirinya. Diharapkan dengan diadakannya acara ini, dapat memberikan manfaat
           bagi pelajar, civitas akademik, dan masyarakat umum seluruh Indonesia.
