@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import {
   getTeams,
-  getTeamMember,
+  getTeamMembers,
   putChangeTeamName,
   getUser,
   deleteTeamMember
@@ -40,7 +40,7 @@ const ProfileData = ({
 }: ProfileDataProps) => {
   const authAxios = useAxiosAuth()
   const { toast } = useToast()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const handleKickMember = async () => {
     if (loading) return
@@ -58,8 +58,11 @@ const ProfileData = ({
         description: `Kicked ${name} from team`,
         variant: 'success'
       })
+
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
     } catch (error) {
-      console.error('Failed to kick member:', error)
       toast({
         title: 'Kick Failed',
         description: 'Unable to kick member. Please try again.',
@@ -259,7 +262,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
             setTeamName(selectedTeam.name)
             setTeamId(selectedTeam.id)
 
-            const membersResponse = await getTeamMember({
+            const membersResponse = await getTeamMembers({
               client: authAxios,
               path: { teamId: selectedTeam.id }
             })
@@ -271,7 +274,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
                   }
                   return {
                     name: member.user?.fullName || 'No Name',
-                    verified: member.isVerified,
+                    verified: member.document.isVerified,
                     title: member.role || 'Member',
                     id: member.userId || 'null'
                   }
@@ -309,7 +312,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
   }
 
   return (
-    <div className="flex flex-col justify-between gap-8 rounded-lg border border-[rgba(255,255,255,0.80)] bg-[linear-gradient(93deg,rgba(2,2,2,0.30)_7.52%,rgba(113,56,192,0.60)_104.77%)] px-10 pb-72 pt-20 shadow-lg backdrop-blur-[5px] md:flex-row md:gap-36">
+    <div className="flex flex-col justify-between gap-8 rounded-lg border border-[rgba(255,255,255,0.80)] bg-[linear-gradient(93deg,rgba(2,2,2,0.30)_7.52%,rgba(113,56,192,0.60)_104.77%)] px-10 pb-72 pt-20 shadow-lg md:flex-row md:gap-36">
       <div className="flex w-1/2 flex-col gap-8">
         <TeamData name={teamName} title="Team Name" teamId={teamId} userRole={userRole} />
         {members.map((member, index) => (
