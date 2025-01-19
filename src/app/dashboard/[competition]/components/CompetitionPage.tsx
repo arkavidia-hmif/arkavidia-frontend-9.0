@@ -22,6 +22,7 @@ import { useAppSelector } from '~/redux/store'
 import { useRouter } from 'next/navigation'
 import ProfileCompetition from '~/app/components/ProfileCompetition'
 import Dropdown, { MenuItem } from '~/app/components/Dropdown'
+import { toast, useToast } from '~/hooks/use-toast'
 
 // Task interface
 interface Task {
@@ -44,6 +45,7 @@ const formatDate = (date: Date): string => {
 }
 
 const CompetitionPage = ({ compeName }: { compeName: string }) => {
+  const { toast } = useToast()
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [selectedVerif, setSelectedVerif] = useState<Verif | null>(null)
 
@@ -67,7 +69,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
         const teamsResponse = await getTeams({ client: axiosInstance })
         if (teamsResponse.data && teamsResponse.data.length > 0) {
-          let teamData: GetTeamsResponse = []
+          const teamData: GetTeamsResponse = []
 
           teamsResponse.data.forEach(team => {
             if (team.competition?.title.toLowerCase() === compeName.toLowerCase()) {
@@ -77,7 +79,6 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
           // Handle case where no matching team is found
           if (!teamData || teamData.length <= 0) {
-            console.log('No matching team found for competition name:', compeName)
             router.push('/')
             return
           }
@@ -111,7 +112,6 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             }
           })
 
-          console.log(newVerifications)
           setVerificatons(prev => [
             ...prev.filter(v => !newVerifications.some(nv => nv.id === v.id)),
             ...newVerifications
@@ -122,11 +122,19 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             ...newTasks
           ])
         } else {
-          console.warn('No teams found.')
+          toast({
+            title: 'No teams found',
+            description: 'Anda belum bergabung dalam kompetisi ini',
+            variant: 'destructive'
+          })
           router.push('/')
         }
       } catch (error) {
-        console.error('Error fetching submission requirements:', error)
+        toast({
+          title: 'Gagal',
+          description: 'Gagal mendapatkan data',
+          variant: 'destructive'
+        })
       }
     }
 
@@ -141,9 +149,9 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     const isDeadline = Date.now() > new Date(data.requirement.deadline ?? '').getTime()
     if (data.media == null && !isDeadline) {
       return 'notopened'
-    } else if (data.media != null && !isDeadline) {
+    } else if (data.media !== null && !isDeadline) {
       return 'ongoing'
-    } else if (data.media != null && isDeadline) {
+    } else if (data.media !== null && isDeadline) {
       return 'complete'
     }
     return 'notopened'
@@ -223,7 +231,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
   const contents = [
     <div>Team Information Content</div>,
-    <div>Announcements Content</div>,
+    <div></div>,
     // Task List Content
     <div className="font-dmsans">
       {selectedTask ? (
