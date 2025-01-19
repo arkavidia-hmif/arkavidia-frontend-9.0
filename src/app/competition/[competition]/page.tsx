@@ -97,6 +97,7 @@ function CompetitionLanding({ params }: { params: Promise<{ competition: string 
 
         // Validate COMPETITIONMAP entry
         const competitionMeta = COMPETITIONMAP[competition]
+        
         if (!competitionMeta) {
           router.push('/404')
           return
