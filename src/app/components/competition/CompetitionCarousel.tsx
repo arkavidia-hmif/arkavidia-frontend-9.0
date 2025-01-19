@@ -104,7 +104,7 @@ const CardCompetition = ({ title, logo, isActive }: CardCompetitionProps) => {
   }
 
   return (
-    <div
+     <div
       className={`my-16 flex items-center justify-center transition-transform duration-300 ${
         isActive ? 'scale-110 opacity-100' : 'scale-90 opacity-80'
       }`}>
