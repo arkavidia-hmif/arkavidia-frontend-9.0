@@ -156,7 +156,7 @@ const CompetitionCarousel = () => {
             <p className="text-justify font-dmsans text-xs leading-5 text-lilac-100 md:text-[14px] md:leading-6 lg:text-[16px]">
               {competitions[activeIndex].description}
             </p>
-            <Link href={competitions[activeIndex].link} className="hover:cursor-pointer">
+            <Link href={competitions[activeIndex].link} className="hover:cursor-pointer hover:opacity-75">
               <div className="flex w-full items-center rounded-sm bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] px-3 py-2">
                 <p className="grow text-center font-dmsans text-xs md:text-base">
                   Go To Page
