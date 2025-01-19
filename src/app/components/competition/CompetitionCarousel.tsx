@@ -164,7 +164,7 @@ const CompetitionCarousel = () => {
                 href={competitions[activeIndex].link}
                 className="flex w-full items-center rounded-sm bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] px-3 py-2">
                 <p className="grow text-center font-dmsans text-xs md:text-base">
-                  Go To Page
+                  Lihat Detail
                 </p>
                 <FaArrowRight className="ml-2 justify-self-end text-xs md:text-base" />
               </Link>

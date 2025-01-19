@@ -110,7 +110,7 @@ function Navbar() {
                   onClick={handleLogout}
                   className="cursor-pointer text-red-500 focus:text-red-400">
                   <LogOut className="mr-2 h-4 w-4" />
-                  Log out
+                  Keluar
                 </DropdownMenuItem>
               </>
             ) : (
@@ -163,7 +163,7 @@ function Navbar() {
                   className="cursor-pointer text-red-500 focus:bg-purple-600 focus:text-red-400"
                   onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
-                  Log out
+                  Keluar
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
