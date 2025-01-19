@@ -10,10 +10,10 @@ import {
   DialogDescription,
   DialogClose,
   DialogTrigger
-} from './../ui/dialog'
-import { Button } from './../Button'
-import { Input } from './../ui/input'
-import { Label } from './../ui/label'
+} from '../ui/dialog'
+import { Button } from '../Button'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
 import { cn } from '~/lib/utils'
 import { postCreateTeam } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
@@ -26,11 +26,11 @@ import {
 interface SuccessDialogProps {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
-  competitionType: CompetitionType
   teamCode: string
+  competitionLink: string
 }
 
-const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCode }) => {
+const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCode, competitionLink }) => {
   const [isCopied, setIsCopied] = useState(false)
 
   const copyToClipboard = useCallback(() => {
@@ -75,7 +75,7 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCo
         </div>
         <div className="mt-4 flex justify-end">
           <DialogClose asChild>
-            <Button size="xl" className="w-full" onClick={() => setIsOpen(false)}>
+            <Button size="xl" className="w-full" onClick={() => window.location.href = competitionLink}>
               Go to Dashboard
             </Button>
           </DialogClose>
@@ -191,7 +191,7 @@ export const CreateTeamPopup: React.FC<{
       <SuccessDialog
         isOpen={isSuccess}
         setIsOpen={setIsSuccess}
-        competitionType={competitionType}
+        competitionLink={''}
         teamCode={generatedTeamCode}
       />
     </>
