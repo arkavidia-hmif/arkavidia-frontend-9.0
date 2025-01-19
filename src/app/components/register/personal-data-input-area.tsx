@@ -17,7 +17,7 @@ import { useToast } from '../../../hooks/use-toast'
 import Dropdown, { MenuItem } from '../Dropdown'
 import { Checkbox } from '../Checkbox'
 import CustomDatePicker from '../date-picker/CustomDatePicker'
-import { getPresignedLink, self, updateUser, uploadUserIdCard } from '~/api/generated'
+import { getPresignedLink, self, updateUser, updateUserDocument } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { axiosInstance } from '~/lib/axios'
 import { useRouter } from 'next/navigation'
@@ -25,6 +25,7 @@ import { getEducation, getFormattedBirthDate } from '~/lib/utils'
 import { setFilledInfo } from '~/redux/slices/auth'
 import { useAppDispatch } from '~/redux/store'
 import useCheckFillInfo from '~/lib/hooks/useCheckFillInfo'
+import { useState } from 'react'
 
 interface PersonalDataProps {
   educationOptions: MenuItem[]
@@ -47,8 +48,9 @@ const registerPersonalDataSchema = z.object({
       message: 'Nomor telepon minimal memiliki 8 digit'
     }),
   identityCard: z
-    .array(z.instanceof(File))
+    .instanceof(FileList)
     .refine(val => val.length > 0, { message: 'Kartu identitas wajib diunggah' }),
+  nisn: z.string().optional(),
   lineid: z.string().optional(),
   instagram: z.string().optional(),
   discord: z.string().optional(),
@@ -59,6 +61,7 @@ const registerPersonalDataSchema = z.object({
 
 export const PersonalDataForm = (props: PersonalDataProps) => {
   const hasFinishedRegis = useCheckFillInfo()
+  const [isSMAPicked, setIsSMAPicked] = useState(false)
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
   const router = useRouter()
@@ -111,7 +114,6 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
           description: 'Gagal mengirimkan data',
           variant: 'destructive'
         })
-        return
       }
 
       if (getSelf.data) {
@@ -126,13 +128,13 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
             filename: `${userId}-identity-card.${fileExt}`
           }
         })
+
         if (getLink.error) {
           toast({
             title: 'Error',
             description: 'Gagal melakukan upload data',
             variant: 'destructive'
           })
-          return
         }
 
         if (getLink.data) {
@@ -144,11 +146,21 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
 
           if (upload.status === 200) {
             // If the upload is successful, save the data to the backend
-            const uploadIDCardURL = await uploadUserIdCard({
-              client: axiosAuth,
-              body: {
-                userIdCardUrl: getLink.data.mediaUrl
+            let body
+            // KTM
+            if (values.education !== 'sma') {
+              body = {
+                kartuMediaId: getLink.data.mediaId
               }
+            } else {
+              // Kartu Pelajar
+              body = {
+                nisnMediaId: getLink.data.mediaId
+              }
+            }
+            const uploadIDCardURL = await updateUserDocument({
+              client: axiosAuth,
+              body: body
             })
 
             if (uploadIDCardURL.error) {
@@ -157,7 +169,6 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                 description: 'Gagal melakukan upload data',
                 variant: 'destructive'
               })
-              return
             }
 
             if (uploadIDCardURL.data) {
@@ -183,11 +194,9 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                   description: 'Gagal melakukan pembaruan data',
                   variant: 'destructive'
                 })
-                return
               }
 
               if (updateProfile.data) {
-                appDispatch(setFilledInfo(true))
                 toast({
                   title: 'Success',
                   description: 'Data berhasil disimpan',
@@ -205,7 +214,6 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
               description: 'Gagal melakukan upload data',
               variant: 'destructive'
             })
-            return
           }
         }
       }
@@ -235,6 +243,16 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
   }
 
   const fileRef = form.register('identityCard')
+  function handleEducationChange(item: MenuItem | null) {
+    if (item) {
+      if (getEducation(item.option) === 'sma') {
+        setIsSMAPicked(true)
+      } else {
+        setIsSMAPicked(false)
+      }
+      form.setValue('nisn', undefined)
+    }
+  }
 
   return (
     //TODO : Replace padding and gap into design system pad and gap
@@ -294,7 +312,10 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                         option => option.option === field.value
                       ) || null
                     }
-                    onChange={item => field.onChange(item?.option ?? null)}
+                    onChange={item => {
+                      field.onChange(item?.option ?? null)
+                      handleEducationChange(item ?? null)
+                    }}
                     placeholder="Pilih jenjang pendidikan anda"
                     data={props.educationOptions}
                     label={''}
@@ -305,6 +326,23 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
               </FormItem>
             )}
           />
+          {isSMAPicked && (
+            <FormField
+              control={form.control}
+              name="nisn"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">NISN</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
+                      placeholder="Masukkan NISN Anda"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}></FormField>
+          )}
           <FormField
             control={form.control}
             name="institution"
@@ -360,7 +398,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                     className="cursor-pointer gap-x-1 border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 file:cursor-pointer file:rounded-md file:border file:bg-purple-800 file:text-xs placeholder:text-purple-500 max-md:text-xs"
                     placeholder=""
                     {...fileRef}
-                    onChange={e => field.onChange(e.target?.files?.[0] ?? undefined)}
+                    onChange={e => field.onChange(e.target?.files ?? undefined)}
                   />
                 </FormControl>
               </FormItem>
