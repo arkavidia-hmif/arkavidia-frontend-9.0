@@ -134,7 +134,8 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       const fieldMap: Record<string, string> = {
         name: 'fullName',
         phone_number: 'phoneNumber',
-        instance: 'instance'
+        instance: 'instance',
+        nisn: 'nisn'
       }
 
       const fieldName = fieldMap[noSpace]
@@ -165,7 +166,7 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       }
       // console.log('API Response:', response)
       setValue(tempValue)
-    } catch (error) {
+    } catch {
       toast({
         title: 'Failed to update',
         description: 'Something went wrong',

@@ -66,6 +66,15 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   const [currentOrClosestEvent, setCurrentOrClosestEvent] =
     useState<TimelineEventProps | null>(null)
   const [timeLeft, setTimeLeft] = useState<number>(0) // Time left in milliseconds
+  const [isRegistrationActive, setIsRegistrationActive] = useState<boolean>(false)
+
+  const registrationKeywords = [
+    "Register",
+    "Registration",
+    "Pendaftaran",
+    "Daftar",
+    "Registrasi",
+  ]
 
   useEffect(() => {
     const now = new Date()
@@ -80,7 +89,6 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
       return startTime > now.getTime() || endTime > now.getTime()
     })
 
-    // Check for current event
     const currentEvent = props.registrationDeadline.find(event => {
       const startTime = event.timeStart
         ? new Date(event.timeStart).getTime()
@@ -101,11 +109,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               now.getTime()
             : 0
       )
-      return
-    }
-
-    // Find the closest future event
-    if (futureEvents.length > 0) {
+    } else if (futureEvents.length > 0) {
       const closestFutureEvent = futureEvents.sort((a, b) => {
         const timeA = a.timeStart
           ? new Date(a.timeStart).getTime()
@@ -122,12 +126,30 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
       setCurrentOrClosestEvent(closestFutureEvent)
       setTimeLeft(remainingTime)
-      return
+    } else {
+      setCurrentOrClosestEvent(null)
+      setTimeLeft(0)
     }
 
-    // If all events are in the past or none exist
-    setCurrentOrClosestEvent(null)
-    setTimeLeft(0)
+    // Check for registration event
+    const isRegistrationOngoing = props.registrationDeadline.some(event => {
+      const titleIncludesRegistrationKeyword = registrationKeywords.some(keyword =>
+        event.title.toLowerCase().includes(keyword.toLowerCase())
+      )
+
+      if (!titleIncludesRegistrationKeyword) return false
+
+      const startTime = event.timeStart
+        ? new Date(event.timeStart).getTime()
+        : Number.MIN_SAFE_INTEGER
+      const endTime = event.timeEnd
+        ? new Date(event.timeEnd).getTime()
+        : Number.MAX_SAFE_INTEGER
+
+      return now.getTime() >= startTime && now.getTime() <= endTime
+    })
+
+    setIsRegistrationActive(isRegistrationOngoing)
   }, [props.registrationDeadline])
 
   useEffect(() => {
@@ -158,27 +180,27 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   const { days, hours, minutes, seconds } = formatTimeUnits(timeLeft)
 
   return (
-    <div className="min-h-screen min-w-full bg-[url('/images/competition/landing-page.jpg')] bg-cover bg-no-repeat">
+    <div className="min-h-screen min-w-full">
       <Navbar />
-      <div className="mx-4 flex flex-col items-center gap-16 py-12 font-dmsans sm:mx-8 md:mx-12 md:gap-16 md:py-24 lg:mx-24 lg:gap-24 lg:py-36">
+      <div className="mx-4 flex flex-col items-center gap-16 py-6 font-dmsans sm:mx-8 md:mx-12 md:gap-16 md:py-24 lg:mx-16 lg:gap-18 lg:py-24">
         {/* Competition Information Section */}
         <section
           className="flex flex-col items-center justify-around gap-8 md:gap-12"
           id="competition-information">
-          <div className="flex flex-col gap-4 md:flex-row md:gap-8">
-            <div className="flex w-full items-center justify-center md:w-1/3">
+          <div className="flex flex-col justify-center gap-2 lg:flex-row md:gap-0">
+            <div className="flex w-full items-center justify-center lg:w-auto">
               <Image
-                width={700}
-                height={700}
+                width={650}
+                height={650}
                 src={props.competitionLogoPath || '/arkavidiaText.svg'}
                 alt={props.competitionName}
               />
             </div>
-            <div className="flex w-full flex-col justify-start gap-4 text-wrap md:w-1/2 md:gap-10">
-              <h1 className="text-bold text-center font-belanosima text-3xl uppercase sm:text-4xl md:text-left md:text-5xl lg:text-6xl">
+            <div className="flex w-full flex-col justify-center gap-4 text-wrap md:gap-0 lg:gap-10 lg:w-1/2">
+              <h1 className="text-bold text-center font-belanosima text-3xl uppercase sm:text-3xl lg:text-left md:text-4xl lg:text-6xl">
                 {props.competitionName}
               </h1>
-              <p className="text-justify font-dmsans text-sm leading-6 sm:text-base md:text-lg md:leading-7">
+              <p className="text-justify font-dmsans text-sm leading-6 md:text-base lg:text-lg md:leading-10">
                 {props.competitionDescription}
               </p>
 
@@ -213,10 +235,10 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           <div className="flex flex-row items-center justify-center gap-2 sm:gap-6 md:gap-10">
             {/* Timer Blocks */}
             {[
-              { value: days, label: 'Days' },
-              { value: hours, label: 'Hours' },
-              { value: minutes, label: 'Minutes' },
-              { value: seconds, label: 'Seconds' }
+              { value: days, label: 'Hari' },
+              { value: hours, label: 'Jam' },
+              { value: minutes, label: 'Menit' },
+              { value: seconds, label: 'Detik' }
             ].map(unit => (
               <div key={unit.label} className="flex flex-col items-center gap-2">
                 <div className="flex flex-row gap-1 sm:gap-2 md:gap-3">
@@ -256,6 +278,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
             <CompetitionRegistration
               competitionID={props.competitionCode}
               competitionAbbreviation={props.competitionAbbr}
+              disabled={!isRegistrationActive}
             />
           </div>
         </section>
@@ -321,11 +344,11 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           <section
             className="flex w-full items-center justify-center px-4 sm:px-8"
             id="competition-contact">
-            <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:items-center sm:justify-around sm:gap-12 md:gap-28">
+            <div className="flex flex-col items-center justify-center gap-6 md:flex-row md:items-center md:justify-around md:gap-12">
               <div className="text-nowrap text-center font-dmsans text-base font-bold sm:text-lg">
                 Contact Person
               </div>
-              <div className="flex w-full flex-col flex-wrap gap-4 sm:flex-row sm:gap-2">
+              <div className="flex w-full flex-col flex-wrap gap-4 md:flex-row sm:gap-2">
                 {props.contactPerson?.map(contact => (
                   <Button
                     variant="outline"
@@ -347,6 +370,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           </section>
         )}
       </div>
+      <Image src={'/images/competition/landing-page.png'} fill className='absolute top-0 z-[-1]' alt='Landing Background'/>
     </div>
   )
 }
