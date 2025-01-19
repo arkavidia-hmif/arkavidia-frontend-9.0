@@ -64,6 +64,7 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
           variant: 'warning'
         })
         setCompNumber({ unverified: 0, registered: 0 })
+        setSelectedCompetitionId('')
       } finally {
         setIsLoading(false)
       }
