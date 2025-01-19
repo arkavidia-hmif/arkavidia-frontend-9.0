@@ -253,10 +253,10 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           </div>
           <p className="mt-10">{selectedTask.description}</p>
           {/* Task Dropzone */}
-          <TaskDropzone
+          {/*<TaskDropzone
             bucket="competition-registration"
             onSubmitMedia={handleMediaSubmit}
-          />
+          /> */}
         </div>
       ) : (
         // Task List
@@ -323,10 +323,10 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           </div>
           <p className="mt-10">{selectedVerif.description}</p>
           {/* Task Dropzone */}
-          <TaskDropzone
+          {/* <TaskDropzone
             bucket="competition-registration"
             onSubmitMedia={handleMediaSubmit}
-          />
+          /> */}
         </div>
       ) : (
         // Task List
