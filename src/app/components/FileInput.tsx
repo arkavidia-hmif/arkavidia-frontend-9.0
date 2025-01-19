@@ -1,25 +1,27 @@
 "use client"
 
-import { ChangeEvent, useState, useCallback } from "react"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
+import { useState, useCallback } from "react"
 import {useDropzone} from 'react-dropzone'
-import axios from "axios";
 import Image from "next/image";
 import { X } from "lucide-react";
 import ProgressBar from "./ProgressBar";
 import { cn } from "~/lib/utils";
 import { useToast } from "~/hooks/use-toast"
+import { getPresignedLink, self } from "~/api/generated"
+import useAxiosAuth from "~/lib/hooks/useAxiosAuth"
+import { axiosInstance } from "~/lib/axios"
 
-type MediaResponse = {
-    presignedUrl: string,
-    mediaUrl: string,
-    expiresIn: number
+export type uploadedFileState = {
+    mediaID: string,
+    fileName: string,
+    mediaURL: string
 }
 
 type ComponentProps = {
-    onUpload?: (e: string | null ) => void,
-    className?: string
+    onUpload?: (e: uploadedFileState | null ) => void,
+    className?: string,
+    displaySucces?: boolean,
+    supportedFormats: string[]
 }
 
 function fileExt(filename: string) {
@@ -33,7 +35,7 @@ function uploadedStatus(success?: boolean) {
             <div className="bg-white size-1 rounded-full" />
             <div className="flex gap-2 text-sm">
                 <Image
-                    src={cn(`icons/fileinputassets/${success? "check_circle" : "error"}.svg`)}
+                    src={cn(`/icons/fileinputassets/${success? "check_circle" : "error"}.svg`)}
                     alt="status icon"
                     width={20}
                     height={20}
@@ -45,16 +47,34 @@ function uploadedStatus(success?: boolean) {
 }
 
 
-export default function FileInput({onUpload, className}: ComponentProps) {
+export default function FileInput({onUpload, className, displaySucces, supportedFormats}: ComponentProps) {
     const [file, setFile] = useState<File | null>(null);
     const [progress, setProgress] = useState(0)
     const [uploaded, setUploaded] = useState(false);
     const [isUploadSucces, setUploadSucces] = useState<boolean>(false);
     const { toast } = useToast()
+    const axiosAuth = useAxiosAuth();
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
-        // Do something with the files
         if(acceptedFiles.length > 1) {
-            throw new Error("Only single file allowed")
+            toast({
+                title: "File failed to upload",
+                description: "Only single file allowed",
+                variant: "destructive"
+            })
+            return;
+        }
+
+        const file = acceptedFiles[0];
+        const fileExt = file.name.split(".").pop()?.toLowerCase(); // Get file extension
+
+        // Check if the file extension is supported
+        if (!fileExt || !supportedFormats.includes(fileExt)) {
+            toast({
+            title: "Unsupported File Format",
+            description: `Allowed formats: ${supportedFormats.join(", ")}`,
+            variant: "destructive",
+            });
+            return;
         }
 
         setFile(acceptedFiles[0])
@@ -75,42 +95,91 @@ export default function FileInput({onUpload, className}: ComponentProps) {
             }
             setUploadSucces(false);
         } finally {
-            setUploaded(true);
+            if (displaySucces) {
+                setUploaded(true);
+            } else {
+                setUploaded(true);
+                setFile(null);
+            }
         }
       }, [])
     const {getRootProps, getInputProps, isDragActive, open} = useDropzone({onDrop})
 
-    const fetchPresigned = async (filename:string) => {
-        const resp = await axios.get("https://api-staging.arkavidia.com/api/media/upload", {params: {
-            filename,
-            bucket: "competition-registration"
-        }})
-
-        const data: MediaResponse = resp.data;
-
-        return data;
-    }
-
-    const handleUpload = async (presignedUrl: string) => {
-        setUploaded(false);
-        await axios.put(presignedUrl, file, {
-            headers: {
-                'Content-Type': file?.type
-            },
-            onUploadProgress: (progressEvent) => {
-                if(progressEvent.total) {
-                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    setProgress(percentCompleted)
-                }
-            }
-        })
-    }
-
     const handleChange = async (selectedFile:File) => {
         setFile(selectedFile);
-        const mediaPresigned = await fetchPresigned(selectedFile.name);
-        await handleUpload(mediaPresigned.presignedUrl);
-        onUpload && onUpload(mediaPresigned.mediaUrl);
+        const getSelf = await self({
+            client: axiosAuth
+        });
+
+        if (getSelf.error) {
+            toast({
+              title: 'Error',
+              description: 'Gagal mengirimkan data',
+              variant: 'destructive'
+            })
+        }
+
+        if (getSelf.data) {
+            const userId = getSelf.data.id
+            const fileName = selectedFile.name
+            const fileExt = fileName.slice(((fileName.lastIndexOf('.') - 1) >>> 0) + 2)
+            // Get the current date and time
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[-:.]/g, '').slice(0, 15); // Format as YYYYMMDDTHHmmss
+
+            // Add the timestamp to the formatted file name
+            const formattedFileName = `${userId}-identity-card-${timestamp}.${fileExt}`;
+
+            const getLink = await getPresignedLink({
+                client: axiosAuth,
+                query: {
+                  bucket: 'kartu-identitas',
+                  filename: formattedFileName
+                }  
+            })
+
+
+            if (getLink.error) {
+                toast({
+                  title: 'Error',
+                  description: 'Gagal melakukan upload data',
+                  variant: 'destructive'
+                })
+              }
+      
+            if (getLink.data) {
+                setUploaded(false);
+                const upload = await axiosInstance.put({
+                    url: getLink.data.presignedUrl,
+                    headers: {
+                        "Content-Type": selectedFile.type
+                    },
+                    body: selectedFile,
+                    onUploadProgress: (progressEvent) => {
+                        if(progressEvent.total) {
+                            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                            setProgress(percentCompleted)
+                        }
+                    }
+                })
+                
+
+                if (upload.status === 200) {
+                    onUpload && onUpload({
+                        mediaID: getLink.data.mediaId,
+                        fileName: formattedFileName,
+                        mediaURL: getLink.data.mediaUrl
+                    });
+                } else {
+                    toast({
+                        title: 'Error',
+                        description: 'Gagal melakukan upload data',
+                        variant: 'destructive'
+                    })
+                }
+            }
+
+        }
     }
 
     const handleDelete = () => {
@@ -124,7 +193,7 @@ export default function FileInput({onUpload, className}: ComponentProps) {
                 <div className={cn("flex items-center justify-between", uploaded? '' : 'mb-2')}>
                     <div className="flex items-center gap-3 mr-4">
                         <Image
-                            src={`icons/fileinputassets/${fileExt(file.type)}.svg`}
+                            src={`/icons/fileinputassets/${fileExt(file.type)}.svg`}
                             alt="File icon"
                             width={50}
                             height={50}
@@ -140,7 +209,7 @@ export default function FileInput({onUpload, className}: ComponentProps) {
                     {!uploaded && <X onClick={handleDelete} className="hover:cursor-pointer" strokeWidth={2.5}/>}
                     {uploaded && 
                         <Image
-                            src="icons/fileinputassets/delete.svg"
+                            src="/icons/fileinputassets/delete.svg"
                             alt="File icon"
                             width={30}
                             height={30}
@@ -167,7 +236,7 @@ export default function FileInput({onUpload, className}: ComponentProps) {
             >
                 <input {...getInputProps()} />
                 <Image
-                    src="icons/fileinputassets/cloud_upload.svg"
+                    src="/icons/fileinputassets/cloud_upload.svg"
                     alt="File icon"
                     width={30}
                     height={30}
@@ -187,7 +256,7 @@ export default function FileInput({onUpload, className}: ComponentProps) {
                         }
                     </h1>
                     <div className="text-neutral-450">
-                        <p>Supported formats: JPEG, PNG, PDF, DOCX</p>
+                        <p>Supported formats: {`${supportedFormats.join(", ")}`}</p>
                         <p>Maximum file size 20 MB</p>
                     </div>
                 </div>
