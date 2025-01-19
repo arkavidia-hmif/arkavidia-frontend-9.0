@@ -158,27 +158,27 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   const { days, hours, minutes, seconds } = formatTimeUnits(timeLeft)
 
   return (
-    <div className="min-h-screen min-w-full bg-[url('/images/competition/landing-page.jpg')] bg-cover bg-no-repeat">
+    <div className="min-h-screen min-w-full bg-purple-900">
       <Navbar />
-      <div className="mx-4 flex flex-col items-center gap-16 py-12 font-dmsans sm:mx-8 md:mx-12 md:gap-16 md:py-24 lg:mx-24 lg:gap-24 lg:py-36">
+      <div className="mx-4 flex flex-col items-center gap-16 py-6 font-dmsans sm:mx-8 md:mx-12 md:gap-16 md:py-24 lg:mx-16 lg:gap-18 lg:py-24">
         {/* Competition Information Section */}
         <section
           className="flex flex-col items-center justify-around gap-8 md:gap-12"
           id="competition-information">
-          <div className="flex flex-col gap-4 md:flex-row md:gap-8">
-            <div className="flex w-full items-center justify-center md:w-1/3">
+          <div className="flex flex-col justify-center gap-2 lg:flex-row md:gap-0">
+            <div className="flex w-full items-center justify-center lg:w-auto">
               <Image
-                width={700}
-                height={700}
+                width={650}
+                height={650}
                 src={props.competitionLogoPath || '/arkavidiaText.svg'}
                 alt={props.competitionName}
               />
             </div>
-            <div className="flex w-full flex-col justify-start gap-4 text-wrap md:w-1/2 md:gap-10">
-              <h1 className="text-bold text-center font-belanosima text-3xl uppercase sm:text-4xl md:text-left md:text-5xl lg:text-6xl">
+            <div className="flex w-full flex-col justify-center gap-4 text-wrap md:gap-0 lg:gap-10 lg:w-1/2">
+              <h1 className="text-bold text-center font-belanosima text-3xl uppercase sm:text-3xl lg:text-left md:text-4xl lg:text-6xl">
                 {props.competitionName}
               </h1>
-              <p className="text-justify font-dmsans text-sm leading-6 sm:text-base md:text-lg md:leading-7">
+              <p className="text-justify font-dmsans text-sm leading-6 md:text-base lg:text-lg md:leading-10">
                 {props.competitionDescription}
               </p>
 
@@ -347,6 +347,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           </section>
         )}
       </div>
+      <Image src={'/images/competition/landing-page.png'} fill className='absolute top-0' alt='Landing Background'/>
     </div>
   )
 }
