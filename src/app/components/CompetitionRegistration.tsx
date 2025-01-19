@@ -102,11 +102,11 @@ export default function CompetitionRegistration({
         <Button
           size="sm"
           onClick={() => handleOpenDialog()}
-          className="flex w-[200px] justify-center gap-[3rem]">
-          <div>
-            <p>Register Now</p>
-          </div>
-          <ArrowRight strokeWidth={3} />
+          className="">
+            <div className='flex gap-2 lg:gap-5 lg:text-base lg:w-[200px] items-center justify-center'>
+            <p>Register Now </p>
+            <ArrowRight />
+            </div>
         </Button>
       </DialogTrigger>
       <DialogContent className="flex max-w-5xl items-center gap-4 bg-[url('/images/join-competition/bg.png')] bg-cover bg-center bg-no-repeat px-[3rem] py-[3rem] font-teachers md:justify-center">
