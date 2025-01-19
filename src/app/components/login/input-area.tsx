@@ -42,7 +42,7 @@ const loginSchema = z.object({
 export const InputArea = () => {
   const [passwordVisible, setPasswordVisible] = useState(false)
   const { basicLogin } = useAuth()
-  const { login } = useGAuth()
+  // const { login } = useGAuth()
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(prev => !prev)

@@ -24,7 +24,7 @@ export default function Dropdown({
   placeholder,
   onChange,
   value,
-  className,
+  className
 }: {
   data: MenuItem[]
   label: string
@@ -34,7 +34,6 @@ export default function Dropdown({
   onChange?: (selectedItem: MenuItem | null) => void
   value?: MenuItem | null
   className?: string
-  
 }) {
   const [inputValue, setInputValue] = useState('') // For filtering only
   const [isLoading, setIsLoading] = useState<boolean>(false)
