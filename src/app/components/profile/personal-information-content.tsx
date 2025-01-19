@@ -45,8 +45,6 @@ export const PersonalInformationContent = (props: PersonalInfoProps) => {
       option
     })
   )
-  console.log(educationOptions[0])
-  console.log(props.education)
   const currentEducation = educationOptions.find(
     options => options.option.toLowerCase() === props.education.toLowerCase()
   )
