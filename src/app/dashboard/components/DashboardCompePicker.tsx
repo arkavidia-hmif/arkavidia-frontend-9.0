@@ -41,7 +41,7 @@ function DashboardCompePicker(props: DashboardCompePickerProps) {
       label=""
       onChange={handleChange}
       value={currentCompetition}
-      className="!max-w-[250px] grow-0"
+      className="!md:mx-auto !mx-0 !max-w-[180px] grow-0 p-1 text-xs md:!max-w-[300px] md:text-lg"
     />
   )
 }

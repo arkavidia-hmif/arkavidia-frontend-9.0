@@ -24,7 +24,7 @@ export default function Information({
             <AccordionItem
               key={index}
               value={String(index)}
-              className="rounded-xl border border-[#E66DD0] bg-white/10 px-4 backdrop-blur-sm">
+              className="rounded-xl border border-[#E66DD0] bg-white/10 px-4">
               <AccordionTrigger className="hover:no-underline">
                 <div className="text-left">
                   <h2 className="text-[14px] font-semibold text-white">

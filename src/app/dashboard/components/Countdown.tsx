@@ -4,7 +4,7 @@ import ComponentBox from './ComponentBox'
 
 interface CountdownProps {
   eventName?: string
-  eventDate?: Date
+  eventDate?: Date | null
 }
 
 interface TimeLeft {
@@ -110,7 +110,7 @@ function Countdown({ eventName, eventDate }: CountdownProps) {
             <p className="font-belanosima text-[48px] xl:text-[64px]">:</p>
             <CountdownPart
               type="seconds"
-              number={getDisplayNumber(timeLeft.seconds ?? -1)}
+              number={getDisplayNumber(timeLeft?.seconds ?? -1)}
             />
           </div>
         </div>
