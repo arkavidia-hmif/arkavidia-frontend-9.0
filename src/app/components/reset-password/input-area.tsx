@@ -1,7 +1,14 @@
 'use client'
 
 import { useForm } from 'react-hook-form'
-import { Form, FormControl, FormField, FormItem, FormLabel } from '../ui/form'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '../ui/form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '../ui/input'
@@ -10,21 +17,24 @@ import { useState } from 'react'
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md'
 import { useToast } from '~/hooks/use-toast'
 import { useSearchParams } from 'next/navigation'
+import { resetPassword } from '~/api/generated'
+import { axiosInstance } from '~/lib/axios'
 
-const ResetPasswordSchema = z
-  .object({
-    newPassword: z.string().min(8, { message: 'Password harus minimal 8 karakter' }),
-    confirmPassword: z.string().min(8, { message: 'Password harus minimal 8 karakter' })
-  })
-  .refine(data => data.newPassword === data.confirmPassword, {
-    message: 'Password tidak cocok',
-    path: ['confirmPassword']
-  })
+const ResetPasswordSchema = z.object({
+  newPassword: z.string().min(8, { message: 'Password harus minimal 8 karakter' }),
+  confirmPassword: z.string().min(8, { message: 'Password harus minimal 8 karakter' })
+})
+// di cek di onSubmit saja
+// .refine(data => data.newPassword === data.confirmPassword, {
+//   message: 'Password tidak cocok',
+//   path: ['confirmPassword']
+// })
 
 export const ResetPasswordForm = () => {
   const { toast } = useToast()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
+  const userId = searchParams.get('user')
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
     defaultValues: {
@@ -39,12 +49,55 @@ export const ResetPasswordForm = () => {
     setShowPassword(!showPassword)
   }
 
-  const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
-    toast({
-      title: 'Password Changed',
-      description: 'Passwordmu sudah berhasil diganti'
+  const onSubmit = async (values: z.infer<typeof ResetPasswordSchema>) => {
+    const parsedValues = ResetPasswordSchema.safeParse(values)
+    if (!parsedValues.success) {
+      toast({
+        title: 'Password tidak valid',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    // validate password
+    if (values.newPassword !== values.confirmPassword) {
+      toast({
+        title: 'Password tidak cocok',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    if (!token || !userId) {
+      toast({
+        title: 'Invalid Token',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    // send request to backend
+    const res = await resetPassword({
+      client: axiosInstance,
+      body: {
+        password: values.newPassword,
+        confirmPassword: values.confirmPassword,
+        userId: userId,
+        token: token
+      }
     })
-    // TODO: Add backend logic for password reset
+
+    if (res.status === 200) {
+      toast({
+        title: 'Password Changed',
+        description: 'Passwordmu sudah berhasil diganti'
+      })
+    } else {
+      toast({
+        title: 'Gagal mengganti password',
+        variant: 'destructive'
+      })
+    }
   }
 
   return (
@@ -84,6 +137,7 @@ export const ResetPasswordForm = () => {
                     )}
                   </button>
                 </div>
+                <FormMessage className="text-red-500 max-md:text-xs" />
               </FormItem>
             )}
           />
@@ -115,6 +169,7 @@ export const ResetPasswordForm = () => {
                     )}
                   </button>
                 </div>
+                <FormMessage className="text-red-500 max-md:text-xs" />
               </FormItem>
             )}
           />

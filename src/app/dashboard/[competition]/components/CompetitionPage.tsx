@@ -1,6 +1,6 @@
 'use client'
 
-import { ElementType, useEffect, useState } from 'react'
+import { ElementType, useEffect, useRef, useState } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -9,18 +9,22 @@ import {
 } from '../../../components/ui/accordion'
 import { Button } from '../../../components/ui/button'
 import { Tab } from '../../../components/Tab'
-import { ChevronLeft, CloudUpload } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import {
   getCompetitionSubmissionRequirement,
   GetCompetitionSubmissionRequirementResponse,
-  
   getTeams,
-  
+  GetTeamsResponse,
+  Team
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
 import { useRouter } from 'next/navigation'
 import ProfileCompetition from '~/app/components/ProfileCompetition'
+import TaskDropzone from './TaskDropzone'
+import TeamInformationContent from '~/app/components/competition/TeamInformationContent'
+import Dropdown, { MenuItem } from '~/app/components/Dropdown'
+import { toast, useToast } from '~/hooks/use-toast'
 
 // Task interface
 interface Task {
@@ -43,6 +47,7 @@ const formatDate = (date: Date): string => {
 }
 
 const CompetitionPage = ({ compeName }: { compeName: string }) => {
+  const { toast } = useToast()
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [selectedVerif, setSelectedVerif] = useState<Verif | null>(null)
 
@@ -51,18 +56,41 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
   const router = useRouter()
   const [tasks, setTasks] = useState<Task[]>([])
   const [verifications, setVerificatons] = useState<Verif[]>([])
+
+  const hasFetched = useRef(false)
   // Call the requirement api
   useEffect(() => {
+    if (hasFetched.current) return
+    hasFetched.current = true
     const fetchSubmissionRequirements = async () => {
       try {
         if (!isLoggedIn) {
-          router.push('/login')
+          toast({
+            title: 'Not Logged In',
+            description: 'You need to be logged in to access this page',
+            variant: 'destructive'
+          })
+          router.push('/')
           return
         }
 
         const teamsResponse = await getTeams({ client: axiosInstance })
         if (teamsResponse.data && teamsResponse.data.length > 0) {
-          const teamId = teamsResponse.data[0].id // Get Current user ID
+          const teamData: GetTeamsResponse = []
+
+          teamsResponse.data.forEach(team => {
+            if (team.competition?.title.toLowerCase() === compeName.toLowerCase()) {
+              teamData.push(team)
+            }
+          })
+
+          // Handle case where no matching team is found
+          if (!teamData || teamData.length <= 0) {
+            router.push('/')
+            return
+          }
+          const teamId = teamData[0].id // Get Current user ID
+
           const requirementsResponse = await getCompetitionSubmissionRequirement({
             client: axiosInstance,
             path: { teamId }
@@ -91,7 +119,6 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             }
           })
 
-          console.log(newVerifications)
           setVerificatons(prev => [
             ...prev.filter(v => !newVerifications.some(nv => nv.id === v.id)),
             ...newVerifications
@@ -102,11 +129,19 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             ...newTasks
           ])
         } else {
-          console.warn('No teams found.')
-          router.push("/dashboard")
+          toast({
+            title: 'No teams found',
+            description: 'Anda belum bergabung dalam kompetisi ini',
+            variant: 'destructive'
+          })
+          router.push('/')
         }
       } catch (error) {
-        console.error('Error fetching submission requirements:', error)
+        toast({
+          title: 'Gagal',
+          description: 'Gagal mendapatkan data',
+          variant: 'destructive'
+        })
       }
     }
 
@@ -121,9 +156,9 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     const isDeadline = Date.now() > new Date(data.requirement.deadline ?? '').getTime()
     if (data.media == null && !isDeadline) {
       return 'notopened'
-    } else if (data.media != null && !isDeadline) {
+    } else if (data.media !== null && !isDeadline) {
       return 'ongoing'
-    } else if (data.media != null && isDeadline) {
+    } else if (data.media !== null && isDeadline) {
       return 'complete'
     }
     return 'notopened'
@@ -163,32 +198,34 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     if (item.status === 'complete') return 'Complete'
     return ''
   }
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  const handleFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-      const file = event.dataTransfer.files[0]
-      setSelectedFile(file)
-      console.log('Dropped file:', file)
-    }
+  const handleMediaSubmit = async (mediaUrl: string) => {
+    console.log('Uploading file:', mediaUrl)
   }
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0]
-      setSelectedFile(file)
-      console.log('Selected file:', file)
-    }
-  }
-
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-  }
   const contentTypes = ['Team Information', 'Announcements', 'Task List', 'Verification']
+
+  const getMenuDataFromContentTypes = () => {
+    const menuItems: MenuItem[] = []
+
+    contentTypes.forEach((content, index) =>
+      menuItems.push({
+        id: index,
+        option: content,
+        iconRight: false,
+        iconLeft: false
+      })
+    )
+    return menuItems
+  }
+
   const contents = [
-    <div>Team Information Content</div>,
-    <div>Announcements Content</div>,
+    // Team Information Content
+    <TeamInformationContent compeName={compeName} />,
+
+    // Announcements Content
+    <div></div>,
+
     // Task List Content
     <div className="font-dmsans">
       {selectedTask ? (
@@ -216,46 +253,10 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           </div>
           <p className="mt-10">{selectedTask.description}</p>
           {/* Task Dropzone */}
-          <div
-            onDrop={handleFileDrop}
-            onDragOver={handleDragOver}
-            className="mt-6 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#DBCDEF] bg-transparent px-4 py-10 text-center">
-            <CloudUpload className="mb-6" />
-            <div className="flex text-sm text-[#DBCDEF] md:text-base">
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className="mt-4 hidden"
-                id="file-upload"
-              />
-              <label
-                htmlFor="file-upload"
-                className="mr-2 cursor-pointer font-semibold underline">
-                Click to upload
-              </label>
-              <p className="font-light">or drag and drop</p>
-            </div>
-            <p className="mt-1 text-xs text-[#8C8C8C]">
-              Supported formats: JPEG, PNG, PDF, DOCX (Max 20MB)
-            </p>
-          </div>
-
-          {/* Display Selected File */}
-          {selectedFile && (
-            <div className="mt-4 text-xs text-[#DBCDEF] md:text-sm">
-              <p>Selected File:</p>
-              <p className="font-bold">{selectedFile.name}</p>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <div className="flex justify-end">
-            <Button
-              size="lg"
-              className="mt-2 bg-gradient-to-br from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white">
-              Submit Task
-            </Button>
-          </div>
+          {/*<TaskDropzone
+            bucket="competition-registration"
+            onSubmitMedia={handleMediaSubmit}
+          /> */}
         </div>
       ) : (
         // Task List
@@ -322,46 +323,10 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           </div>
           <p className="mt-10">{selectedVerif.description}</p>
           {/* Task Dropzone */}
-          <div
-            onDrop={handleFileDrop}
-            onDragOver={handleDragOver}
-            className="mt-6 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-[#DBCDEF] bg-transparent px-4 py-10 text-center">
-            <CloudUpload className="mb-6" />
-            <div className="flex text-sm text-[#DBCDEF] md:text-base">
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className="mt-4 hidden"
-                id="file-upload"
-              />
-              <label
-                htmlFor="file-upload"
-                className="mr-2 cursor-pointer font-semibold underline">
-                Click to upload
-              </label>
-              <p className="font-light">or drag and drop</p>
-            </div>
-            <p className="mt-1 text-xs text-[#8C8C8C]">
-              Supported formats: JPEG, PNG, PDF, DOCX (Max 20MB)
-            </p>
-          </div>
-
-          {/* Display Selected File */}
-          {selectedFile && (
-            <div className="mt-4 text-xs text-[#DBCDEF] md:text-sm">
-              <p>Selected File:</p>
-              <p className="font-bold">{selectedFile.name}</p>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <div className="flex justify-end">
-            <Button
-              size="lg"
-              className="mt-2 bg-gradient-to-br from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white">
-              Submit Verification
-            </Button>
-          </div>
+          {/* <TaskDropzone
+            bucket="competition-registration"
+            onSubmitMedia={handleMediaSubmit}
+          /> */}
         </div>
       ) : (
         // Task List
