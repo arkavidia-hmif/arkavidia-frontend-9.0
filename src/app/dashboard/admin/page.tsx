@@ -13,17 +13,22 @@ import { getTeamStatistic, GetTeamStatisticResponse } from '~/api/generated'
 const AdminDashboardPage = () => {
   const isAuthenticated = useAppSelector(state => state.auth.accessToken !== null)
   const isAdmin = useAppSelector(state => state.auth.isAdmin)
+  const [isLoading, setIsLoading] = React.useState(true)
   const { toast } = useToast()
   const router = useRouter()
 
-  if (!isAuthenticated || !isAdmin) {
-    toast({
-      title: 'Unauthorized',
-      description: 'You are not authorized to view this page',
-      variant: 'destructive'
-    })
-    router.replace('/')
-  }
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin) {
+      toast({
+        title: 'Unauthorized',
+        description: 'You are not authorized to view this page',
+        variant: 'destructive'
+      })
+      setTimeout(() => {
+        router.replace('/')
+      }, 1000)
+    }
+  }, [])
 
   const IMAGE = '/images/sidebar/item.svg'
   const axiosInstance = useAxiosAuth()
@@ -43,6 +48,7 @@ const AdminDashboardPage = () => {
           ? statsResponse.data.totalTeam - statsResponse.data.totalVerifiedTeam
           : -1
       setOverallStats({ unverified, registered })
+      setIsLoading(false)
     })()
   }, [])
 

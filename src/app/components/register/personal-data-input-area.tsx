@@ -154,7 +154,10 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
           // If we get the link, do a PUT request to S3
           const upload = await axiosInstance.put({
             url: getLink.data.presignedUrl,
-            body: values.identityCard[0]
+            body: values.identityCard[0],
+            headers: {
+              'Content-Type': values.identityCard[0].type
+            }
           })
 
           if (upload.status === 200) {
