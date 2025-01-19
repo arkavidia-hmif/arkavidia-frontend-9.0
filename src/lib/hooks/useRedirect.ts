@@ -17,7 +17,7 @@ const useLoginRedirect = () => {
         description: 'You need to be logged in to access this page',
         variant: 'destructive'
       })
-      router.push('/login') // Change this to the actual login page path
+      router.push('/') // Change this to the actual login page path
     }
   }, [])
 }

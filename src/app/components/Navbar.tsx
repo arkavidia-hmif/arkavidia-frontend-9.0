@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Button } from './Button'
 import Image from 'next/image'
 import { LogOut, Menu } from 'lucide-react'
@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../contexts/AuthContext'
 import { useAppSelector } from '~/redux/store'
 import { toast } from '~/hooks/use-toast'
+import { MouseEventHandler } from 'react'
 
 type NavItem = {
   name: string
@@ -22,7 +23,9 @@ type NavItem = {
 
 function Navbar() {
   const isAuthenticated = useAppSelector(state => state.auth.accessToken !== null)
+  const hasFilledInfo = useAppSelector(state => state.auth.hasFilledInfo)
   const isAdmin = useAppSelector(state => state.auth.isAdmin)
+  const router = useRouter()
   const { logout } = useAuth()
   const LOGGED_IN = isAuthenticated // ! hardcode untuk testing
   const pathname = usePathname()
@@ -39,6 +42,26 @@ function Navbar() {
       description: 'You have been logged out',
       variant: 'info'
     })
+  }
+
+  const checkHasFilledInfo = () => {
+    if (!hasFilledInfo) {
+      toast({
+        title: 'Please fill in your information',
+        description:
+          'You need to fill in your information before you can access the dashboard',
+        variant: 'info'
+      })
+      setTimeout(() => {
+        router.push('/register/personal-data')
+      }, 500)
+    } else {
+      if (isAdmin) {
+        setTimeout(() => router.push('/dashboard/admin'), 500)
+      } else {
+        setTimeout(() => router.push('/dashboard'), 500)
+      }
+    }
   }
 
   return (
@@ -80,9 +103,9 @@ function Navbar() {
               <>
                 <DropdownMenuItem
                   className={`cursor-pointer ${pathname === '/dashboard' ? 'bg-white text-purple-700' : ''}`}>
-                  <Link href="/dashboard" className="w-full">
+                  <div className="w-full" onClick={() => checkHasFilledInfo()}>
                     Dashboard
-                  </Link>
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleLogout}
@@ -133,11 +156,9 @@ function Navbar() {
                 <DropdownMenuItem
                   className="cursor-pointer focus:bg-purple-600 focus:text-white"
                   asChild>
-                  <Link
-                    href={isAdmin ? '/dashboard/admin' : '/dashboard'}
-                    className="w-full">
+                  <div className="w-full" onClick={() => checkHasFilledInfo()}>
                     Dashboard
-                  </Link>
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer text-red-500 focus:bg-purple-600 focus:text-red-400"

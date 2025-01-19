@@ -112,7 +112,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
         description: 'You have been logged out',
         variant: 'success'
       })
-      router.replace('/login')
+      router.replace('/')
     }, 1000)
   }
 
@@ -177,8 +177,8 @@ function Sidebar({ announcement = false }: SidebarProps) {
                         height={20}
                         className="lg:h-6 lg:w-6"
                       />
-                      <span className="truncate text-sm font-medium text-white lg:text-base">
-                        {USERNAME}
+                      <span className="truncate text-ellipsis text-sm font-medium text-white lg:text-base">
+                        {USERNAME.length > 10 ? `${USERNAME.slice(0, 10)}...` : USERNAME}
                       </span>
                       <ChevronUp
                         className={`m-1 ml-auto h-4 w-4 text-white transition-transform duration-300 ease-in-out lg:h-5 lg:w-5 ${

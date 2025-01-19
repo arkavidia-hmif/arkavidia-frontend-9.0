@@ -14,6 +14,7 @@ import { useToast } from '~/hooks/use-toast'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { MenuItem } from '~/app/components/Dropdown'
 import Loading from '~/app/components/Loading'
+import { useAppSelector } from '~/redux/store'
 
 const DummyPersonalInfoData: ProfileInformationDefaultValue = {
   name: 'Ahdmad Jone Done',
@@ -82,6 +83,7 @@ const DummyDropdownOptions: ProfileInformationDropdownOptions = {
 }
 
 const ProfilePage = () => {
+  const username = useAppSelector(state => state.auth.username)
   const axiosAuth = useAxiosAuth()
   const { toast } = useToast()
   const [userData, setUserData] = useState<GetUserResponse>()
@@ -121,7 +123,7 @@ const ProfilePage = () => {
         <div className="mb-8">
           <ProfileHero
             title="Profile"
-            name={userData?.fullName ?? ''}
+            name={username}
             email={userData?.email ?? ''}
             isResetProfile={false}
           />
