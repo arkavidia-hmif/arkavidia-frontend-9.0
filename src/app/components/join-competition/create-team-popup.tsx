@@ -10,27 +10,20 @@ import {
   DialogDescription,
   DialogClose,
   DialogTrigger
-} from './../ui/dialog'
-import { Button } from './../Button'
-import { Input } from './../ui/input'
-import { Label } from './../ui/label'
+} from '../ui/dialog'
+import { Button } from '../Button'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
 import { cn } from '~/lib/utils'
-
-type CompetitionType = 'cp' | 'ctf'
-
-const competitionAbbr: Record<CompetitionType, string> = {
-  cp: 'Competitive Programming',
-  ctf: 'Capture The Flag'
-}
 
 interface SuccessDialogProps {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
-  competitionType: CompetitionType
   teamCode: string
+  competitionLink: string
 }
 
-const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCode }) => {
+const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCode, competitionLink }) => {
   const [isCopied, setIsCopied] = useState(false)
 
   const copyToClipboard = useCallback(() => {
@@ -76,7 +69,7 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCo
         </div>
         <div className="mt-4 flex justify-end">
           <DialogClose asChild>
-            <Button size="xl" className="w-full" onClick={() => setIsOpen(false)}>
+            <Button size="xl" className="w-full" onClick={() => window.location.href = competitionLink}>
               Go to Dashboard
             </Button>
           </DialogClose>
@@ -86,8 +79,9 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCo
   )
 }
 
-export const CreateTeamPopup: React.FC<{ competitionType: CompetitionType }> = ({
-  competitionType
+export const CreateTeamPopup: React.FC<{ competitionName: string; competitionLink: string }> = ({
+  competitionName,
+  competitionLink
 }) => {
   const [teamName, setTeamName] = useState('')
   const [error, setError] = useState('')
@@ -129,7 +123,7 @@ export const CreateTeamPopup: React.FC<{ competitionType: CompetitionType }> = (
             <div className="grow-1 flex flex-col md:gap-12">
               <DialogHeader className="flex flex-col gap-4">
                 <DialogTitle className="text-2xl md:text-5xl font-bold">
-                  Create Team for {competitionAbbr[competitionType]}
+                  Create Team for {competitionName}
                 </DialogTitle>
                 <DialogDescription className="text-base md:text-xl">
                   Once you create a team name you can invite others
@@ -166,7 +160,7 @@ export const CreateTeamPopup: React.FC<{ competitionType: CompetitionType }> = (
       <SuccessDialog
         isOpen={isSuccess}
         setIsOpen={setIsSuccess}
-        competitionType={competitionType}
+        competitionLink={competitionLink}
         teamCode={generatedTeamCode}
       />
     </>
