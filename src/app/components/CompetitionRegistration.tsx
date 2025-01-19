@@ -41,10 +41,12 @@ export const competitionAbbr: Record<CompetitionType, string> = {
 
 export default function CompetitionRegistration({
   competitionAbbreviation,
-  competitionID
+  competitionID,
+  disabled
 }: {
   competitionAbbreviation: string
   competitionID: string
+  disabled: boolean
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const [competitionType, setCompetitionType] = useState<CompetitionType>('Default')
@@ -101,7 +103,8 @@ export default function CompetitionRegistration({
       <DialogTrigger asChild>
         <Button
           size="sm"
-          onClick={() => handleOpenDialog()}
+          onClick={() => {disabled ? handleOpenDialog() : () => {}}}
+          disabled={disabled}
           className="">
             <div className='flex gap-2 lg:gap-5 lg:text-base lg:w-[200px] items-center justify-center'>
             <p>Register Now </p>

@@ -66,6 +66,15 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   const [currentOrClosestEvent, setCurrentOrClosestEvent] =
     useState<TimelineEventProps | null>(null)
   const [timeLeft, setTimeLeft] = useState<number>(0) // Time left in milliseconds
+  const [isRegistrationActive, setIsRegistrationActive] = useState<boolean>(false)
+
+  const registrationKeywords = [
+    "Register",
+    "Registration",
+    "Pendaftaran",
+    "Daftar",
+    "Registrasi",
+  ]
 
   useEffect(() => {
     const now = new Date()
@@ -80,7 +89,6 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
       return startTime > now.getTime() || endTime > now.getTime()
     })
 
-    // Check for current event
     const currentEvent = props.registrationDeadline.find(event => {
       const startTime = event.timeStart
         ? new Date(event.timeStart).getTime()
@@ -101,11 +109,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               now.getTime()
             : 0
       )
-      return
-    }
-
-    // Find the closest future event
-    if (futureEvents.length > 0) {
+    } else if (futureEvents.length > 0) {
       const closestFutureEvent = futureEvents.sort((a, b) => {
         const timeA = a.timeStart
           ? new Date(a.timeStart).getTime()
@@ -122,12 +126,30 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
       setCurrentOrClosestEvent(closestFutureEvent)
       setTimeLeft(remainingTime)
-      return
+    } else {
+      setCurrentOrClosestEvent(null)
+      setTimeLeft(0)
     }
 
-    // If all events are in the past or none exist
-    setCurrentOrClosestEvent(null)
-    setTimeLeft(0)
+    // Check for registration event
+    const isRegistrationOngoing = props.registrationDeadline.some(event => {
+      const titleIncludesRegistrationKeyword = registrationKeywords.some(keyword =>
+        event.title.toLowerCase().includes(keyword.toLowerCase())
+      )
+
+      if (!titleIncludesRegistrationKeyword) return false
+
+      const startTime = event.timeStart
+        ? new Date(event.timeStart).getTime()
+        : Number.MIN_SAFE_INTEGER
+      const endTime = event.timeEnd
+        ? new Date(event.timeEnd).getTime()
+        : Number.MAX_SAFE_INTEGER
+
+      return now.getTime() >= startTime && now.getTime() <= endTime
+    })
+
+    setIsRegistrationActive(isRegistrationOngoing)
   }, [props.registrationDeadline])
 
   useEffect(() => {
@@ -256,6 +278,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
             <CompetitionRegistration
               competitionID={props.competitionCode}
               competitionAbbreviation={props.competitionAbbr}
+              disabled={!isRegistrationActive}
             />
           </div>
         </section>
