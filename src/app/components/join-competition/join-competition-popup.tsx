@@ -118,6 +118,7 @@ export const JoinTeamPopup: React.FC<{ competitionID: string, competitionType: C
     }
 
     if (resp.error) {
+      // @ts-expect-error - error doesn't exists on response definition
       setError(resp.error.error);
       return;
     }

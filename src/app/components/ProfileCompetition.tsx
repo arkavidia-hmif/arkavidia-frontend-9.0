@@ -71,7 +71,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
               team: activeTeamData?.name || '',
               teamId: activeTeamData?.id || '',
               joinCode: activeTeamData?.joinCode || '',
-              isVerified: activeTeamData?.isVerified || false
+              isVerified: activeTeamData?.document?.every(doc => doc.isVerified) || false
             })
           }
         }
@@ -101,7 +101,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
           team: activeTeamData?.name || '',
           teamId: activeTeamData?.id || '',
           joinCode: activeTeamData?.joinCode || '',
-          isVerified: activeTeamData?.isVerified || false
+          isVerified: activeTeamData?.document?.every(doc => doc.isVerified) || false
         })
         setTimeout(() => setIsLoading(false), 500)
       } catch (error) {
