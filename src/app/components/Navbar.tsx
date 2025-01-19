@@ -30,7 +30,6 @@ function Navbar() {
   const LOGGED_IN = isAuthenticated // ! hardcode untuk testing
   const pathname = usePathname()
   const NAV_ITEMS: NavItem[] = [
-    { name: 'About Us', link: '/aboutus' },
     { name: 'Event', link: '/event' },
     { name: 'Competition', link: '/competition' }
   ]
@@ -65,7 +64,7 @@ function Navbar() {
   }
 
   return (
-    <nav className="fixed z-[100] mt-3 w-full bg-transparent px-4 py-3 lg:px-12">
+    <nav className="fixed z-[100] w-full bg-transparent px-4 pb-1 pt-6 backdrop-blur-lg lg:px-12">
       <div className="flex flex-row items-center justify-between">
         <Link href="/" className="flex flex-row items-center justify-center gap-2 px-4">
           <Image
@@ -88,7 +87,7 @@ function Navbar() {
           <DropdownMenuTrigger className="rounded-md data-[state=open]:bg-purple-700 md:hidden">
             <Menu size={24} className="m-3" color="white" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="mr-2 min-w-[167px] gap-4 rounded-lg border-none bg-purple-700 px-3 py-5 font-teachers text-base font-bold text-white">
+          <DropdownMenuContent className="z-10 mr-2 mt-3 min-w-[167px] gap-4 rounded-lg border-none bg-purple-700 px-3 py-5 font-teachers text-base font-bold text-white">
             {NAV_ITEMS.map((item, index) => (
               <DropdownMenuItem
                 key={index}
@@ -127,14 +126,14 @@ function Navbar() {
         </DropdownMenu>
 
         {/* Desktop menu */}
-        <ul className="hidden items-center justify-center space-x-8 text-white md:flex  ">
+        <ul className="hidden items-center justify-center space-x-8 text-white md:flex">
           {NAV_ITEMS.map((item, index) => (
             <li key={index}>
               <Link
                 href={item.link}
-                className={`px-6 py-2 font-teachers text-base font-bold ${
+                className={`h-full px-6 py-2 font-teachers text-base font-bold ${
                   pathname === item.link
-                    ? 'rounded-full bg-purple-500'
+                    ? 'rounded-xl bg-purple-300'
                     : 'hover:rounded-lg hover:bg-black/20 hover:py-4'
                 }`}>
                 {item.name}
@@ -152,7 +151,7 @@ function Navbar() {
                   className="cursor-pointer rounded-full"
                 />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="mr-2 mt-2 min-w-[155px] gap-12 rounded-lg border-none bg-purple-700 px-3 py-4 font-teachers text-base font-bold text-white">
+              <DropdownMenuContent className="z-20 mr-3 mt-3 min-w-[155px] gap-12 rounded-lg border-none bg-purple-700 px-3 py-4 font-teachers text-base font-bold text-white">
                 <DropdownMenuItem
                   className="cursor-pointer focus:bg-purple-600 focus:text-white"
                   asChild>
