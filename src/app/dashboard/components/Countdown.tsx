@@ -4,7 +4,7 @@ import ComponentBox from './ComponentBox'
 
 interface CountdownProps {
   eventName?: string
-  eventDate?: Date | null
+  eventDate?: Date
 }
 
 interface TimeLeft {
@@ -53,10 +53,10 @@ function calculateTimeLeft(endDate?: Date): TimeLeft {
 function CountdownPart({ type, number }: { type: string; number: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-y-2">
-      <p className="bg-gradient-to-r from-[#CE6AFF] to-[#FF71A0] bg-clip-text font-belanosima text-[56px] xl:text-[64px] text-transparent">
+      <p className="bg-gradient-to-r from-[#CE6AFF] to-[#FF71A0] bg-clip-text font-belanosima text-[56px] text-transparent xl:text-[64px]">
         {number}
       </p>
-      <p className="calendarDateTypes font-teachers text-[20px] xl:text-[24px] font-bold">
+      <p className="calendarDateTypes font-teachers text-[20px] font-bold xl:text-[24px]">
         {type.toUpperCase()}
       </p>
     </div>
@@ -64,13 +64,15 @@ function CountdownPart({ type, number }: { type: string; number: string }) {
 }
 
 function Countdown({ eventName, eventDate }: CountdownProps) {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => calculateTimeLeft(eventDate))
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(
+    eventDate ? calculateTimeLeft(eventDate) : null
+  )
 
   useEffect(() => {
     if (!eventDate) return
 
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft(eventDate))
+      setTimeLeft(eventDate ? calculateTimeLeft(eventDate) : null)
     }, 1000)
 
     return () => clearInterval(timer)
@@ -84,19 +86,32 @@ function Countdown({ eventName, eventDate }: CountdownProps) {
     <ComponentBox title="Countdown" morespace={true}>
       <div className="w-full px-2">
         <div className="flex w-full justify-between font-dmsans text-[20px]">
-          <p className="text-[14px] font-normal xl:text-base">{eventName ? eventName : ''}</p>
-          <p className="text-[14px] font-normal xl:text-base">{eventDate ? getDateText(eventDate) : ''}</p>
+          <p className="text-[14px] font-normal xl:text-base">
+            {eventName ?? 'Belum ada event'}
+          </p>
+          <p className="text-[14px] font-bold xl:text-base">
+            {eventDate ? getDateText(eventDate) : '-'}
+          </p>
         </div>
         <div className="grid grid-cols-1 pb-4">
           <div className="grid grid-cols-3 gap-x-2 text-center">
-            <CountdownPart type="days" number={getDisplayNumber(timeLeft.days)} />
+            <CountdownPart type="days" number={getDisplayNumber(timeLeft?.days ?? -1)} />
             <p className="font-belanosima text-[48px] xl:text-[64px]">:</p>
-            <CountdownPart type="hours" number={getDisplayNumber(timeLeft.hours)} />
+            <CountdownPart
+              type="hours"
+              number={getDisplayNumber(timeLeft?.hours ?? -1)}
+            />
           </div>
           <div className="grid grid-cols-3 gap-x-2 text-center">
-            <CountdownPart type="minutes" number={getDisplayNumber(timeLeft.minutes)} />
+            <CountdownPart
+              type="minutes"
+              number={getDisplayNumber(timeLeft?.minutes ?? -1)}
+            />
             <p className="font-belanosima text-[48px] xl:text-[64px]">:</p>
-            <CountdownPart type="seconds" number={getDisplayNumber(timeLeft.seconds)} />
+            <CountdownPart
+              type="seconds"
+              number={getDisplayNumber(timeLeft.seconds ?? -1)}
+            />
           </div>
         </div>
       </div>

@@ -6,17 +6,15 @@ import Image from 'next/image'
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   useLoginRedirect()
   return (
-    <section className="relative h-[100vh] min-h-screen w-full overflow-auto bg-gradient-to-b from-[#1f0246] to-[#2e046a] md:min-h-screen">
-      <Image
-        src="/images/profile/reset-password/bg.png"
-        alt="Background"
-        className="fixed left-0 top-0 h-full w-full object-cover"
-        width={1920}
-        height={1080}
-      />
+    <section className="relative h-full w-full">
       <Sidebar />
-
-      <div className="px-5 pb-5 pt-32 xl:pl-[248px] xl:pt-[34px] xl:pr-[38px] ">{children}</div>
+      <div className="px-8 py-20 lg:py-6 lg:pl-[250px]">{children}</div>
+      <Image
+        src="/images/competition/bg.png"
+        alt="Background image"
+        fill
+        className="absolute z-[-10] h-full min-h-screen w-full bg-gradient-to-r from-[#1F0246] to-[#2E046A] object-cover"
+      />
     </section>
   )
 }

@@ -16,7 +16,10 @@ export const ContentTabBar = ({ selected, setSelected }: Props) => {
           setSelected={setSelected}
           title={'Profile Information'}
         />
-        <Menu Selected={selected} setSelected={setSelected} title={'Social Media'} />
+        <Menu 
+          Selected={selected} 
+          setSelected={setSelected} 
+          title={'Social Media'} />
       </div>
       <span className="absolute bottom-0 h-1 w-full rounded-full bg-white"></span>
     </div>

@@ -10,7 +10,7 @@ interface SubmissionItem {
 function Submisi({ submissions }: { submissions?: SubmissionItem[] }) {
   return (
     <ComponentBox title="Submisi" center={false}>
-      {submissions?.length === 0 ? (
+      {!submissions?.length ? (
         <div className="mb-2 mt-2 text-white/60">Belum ada Submisi</div>
       ) : (
         <div className="flex w-[100%] flex-col gap-3">

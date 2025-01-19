@@ -1,12 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import { InputArea } from '../../components/login/input-area'
+import { InputArea } from '~/app/components/login/input-area'
 import { useRouter } from 'next/navigation'
 import { useAppSelector } from '~/redux/store'
 import { useEffect } from 'react'
 import { useToast } from '~/hooks/use-toast'
-import { useLoginRedirect } from '~/lib/hooks/useRedirect'
 
 const LoginPage = () => {
   const router = useRouter()

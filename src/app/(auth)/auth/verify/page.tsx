@@ -2,7 +2,6 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect } from 'react'
-import { set } from 'react-hook-form'
 import { basicVerifyAccount } from '~/api/generated'
 import Loading from '~/app/components/Loading'
 import { axiosInstance } from '~/lib/axios'

@@ -21,7 +21,7 @@ interface EventDate {
   information: string
 }
 
-const Calendar: React.FC = ({ events }: { events?: EventDate[] }) => {
+const Calendar = ({ eventDate }: { eventDate?: EventDate[] }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [currentDate, setCurrentDate] = useState(new Date())
   const [days, setDays] = useState<Date[]>()
@@ -85,8 +85,11 @@ const Calendar: React.FC = ({ events }: { events?: EventDate[] }) => {
             day={day}
             currentDate={currentDate}
             isEventDate={
-              events ?
-              events.some(event => event.date.toDateString() === day.toDateString()) : false
+              eventDate
+                ? eventDate.some(
+                    event => event.date.toDateString() === day.toDateString()
+                  )
+                : false
             }
           />
         ))}
