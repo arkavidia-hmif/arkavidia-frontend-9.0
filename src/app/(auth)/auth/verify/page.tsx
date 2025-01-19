@@ -58,9 +58,9 @@ function VerifyEmailPage() {
     if (!userId || !token) {
       setStatus('error')
       setIsProcessing(false)
-      setMessage('Invalid verification link. Redirecting to login page...')
+      setMessage('Invalid verification link. Redirecting...')
       setTimeout(() => {
-        router.replace('/login')
+        router.replace('/')
       }, 1500)
       return
     }

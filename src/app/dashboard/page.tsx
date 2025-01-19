@@ -179,9 +179,7 @@ function UserDashboard() {
           setUserTeams(competitions)
           setCurrentTeam(competitions[0])
           setCurrentCompetition(options[0])
-          setTimeout(() => {
-            setIsLoading(false)
-          }, 600)
+
           // console.log('currentTeam: ' + currentTeam.name)
           // @ts-ignore
           // router.push(`/dashboard/${chosenCompetition.competition.title.toLowerCase()}`)
@@ -189,6 +187,9 @@ function UserDashboard() {
           setHasCompetitions(false)
         }
       }
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 1000)
     }
 
     fetchTeams()
@@ -336,13 +337,15 @@ function UserDashboard() {
     return (
       <>
         {!hasCompetitions ? (
-          <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-y-3">
-            <div className="text-center font-belanosima text-[20px]">
-              No competitions joined yet!
+          <div className="relative h-screen w-full">
+            <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-y-3">
+              <div className="text-center font-belanosima text-[20px]">
+                No competitions joined yet!
+              </div>
+              <Link href="/">
+                <Button>Find a competition to join</Button>
+              </Link>
             </div>
-            <Link href="/">
-              <Button>Find a competition to join</Button>
-            </Link>
           </div>
         ) : (
           <div className="relative flex h-full w-full flex-col">

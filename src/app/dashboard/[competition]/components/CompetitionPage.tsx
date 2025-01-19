@@ -64,7 +64,12 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     const fetchSubmissionRequirements = async () => {
       try {
         if (!isLoggedIn) {
-          router.push('/login')
+          toast({
+            title: 'Not Logged In',
+            description: 'You need to be logged in to access this page',
+            variant: 'destructive'
+          })
+          router.push('/')
           return
         }
 
