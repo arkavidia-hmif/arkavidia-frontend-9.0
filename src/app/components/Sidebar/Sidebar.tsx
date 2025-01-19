@@ -56,7 +56,12 @@ function Sidebar({ announcement = false }: SidebarProps) {
       }
 
       if (req.data) {
-        setSidebarLinks([]) // Clear the sidebar links
+        setSidebarLinks([
+          {
+            name: 'Dashboard',
+            link: '/dashboard'
+          }
+        ]) //
         const competitionList = JSON.parse(JSON.stringify(req.data)) as GetTeamsResponse
 
         if (competitionList.length > 0) {
@@ -64,11 +69,9 @@ function Sidebar({ announcement = false }: SidebarProps) {
             setSidebarLinks(prev => [
               ...prev,
               {
-                // @ts-ignore
                 name: expandCompetitionName(competition.competition!.title),
                 link: getSidebarURL({
                   isAdmin,
-                  // @ts-ignore
                   competitionName: competition.competition!.title
                 })
               }
