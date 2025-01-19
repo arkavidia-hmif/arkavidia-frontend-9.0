@@ -21,6 +21,7 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
 import { useRouter } from 'next/navigation'
 import ProfileCompetition from '~/app/components/ProfileCompetition'
+import TeamInformationContent from '~/app/components/competition/TeamInformationContent'
 import Dropdown, { MenuItem } from '~/app/components/Dropdown'
 import { toast, useToast } from '~/hooks/use-toast'
 
@@ -230,8 +231,12 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
   }
 
   const contents = [
-    <div>Team Information Content</div>,
-    <div></div>,
+    // Team Information Content
+    <TeamInformationContent />,
+
+    // Announcements Content
+    <div>Announcements Content</div>,
+
     // Task List Content
     <div className="font-dmsans">
       {selectedTask ? (
