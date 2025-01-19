@@ -274,7 +274,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
                   }
                   return {
                     name: member.user?.fullName || 'No Name',
-                    verified: member.document.isVerified,
+                    verified: member.document.isVerified || false,
                     title: member.role || 'Member',
                     id: member.userId || 'null'
                   }

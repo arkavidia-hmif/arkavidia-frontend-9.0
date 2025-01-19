@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Select,
   SelectContent,
@@ -10,44 +10,62 @@ import {
 interface MonthNYearSelectProps {
   type: 'month' | 'year'
   onChange?: (value: string) => void
-  initialDate?: Date
+  initialDate?: Date,
+  limit: {
+    month_upper: number,
+    month_under : number,
+    year : number,
+  }
 }
 
-function MonthNYearSelect({ ...props }: MonthNYearSelectProps) {
-  const initialDate = props.initialDate || new Date()
+function MonthNYearSelect(props: MonthNYearSelectProps) {
+  const [selectedValue, setSelectedValue] = useState<string | undefined>()
+
+  // Update selected value when initialDate changes
+  useEffect(() => {
+    if (props.initialDate) {
+      const value =
+        props.type === 'month'
+          ? (props.initialDate.getMonth() + 1).toString() // Convert 0-based month to 1-based
+          : props.initialDate.getFullYear().toString()
+      setSelectedValue(value)
+    }
+  }, [props.initialDate, props.type])
+
+  // Handle value change
+  const handleValueChange = (value: string) => {
+    setSelectedValue(value)
+    if (props.onChange) {
+      props.onChange(value)
+    }
+  }
+
   return (
     <div className="flex gap-x-2">
-      <Select>
-        <SelectTrigger className="gap-x-2 h-6 rounded-lg border-white text-[13px]">
+      <Select onValueChange={handleValueChange} value={selectedValue}>
+        <SelectTrigger className="h-6 gap-x-2 rounded-lg border-white text-[13px]">
           <SelectValue
             className="text-[10px]"
             placeholder={
               props.type === 'month'
-                ? initialDate.toLocaleString('id-ID', { month: 'long' })
-                : initialDate.getFullYear()
+                ? props.initialDate?.toLocaleString('id-ID', { month: 'long' })
+                : props.initialDate?.getFullYear().toString()
             }></SelectValue>
         </SelectTrigger>
         <SelectContent className="text-[10px]">
-          {props.type === 'month' && (
-            <>
-              <SelectItem value="1">Januari</SelectItem>
-              <SelectItem value="2">Februari</SelectItem>
-              <SelectItem value="3">Maret</SelectItem>
-              <SelectItem value="4">April</SelectItem>
-              <SelectItem value="5">Mei</SelectItem>
-              <SelectItem value="6">Juni</SelectItem>
-              <SelectItem value="7">Juli</SelectItem>
-              <SelectItem value="8">Agustus</SelectItem>
-              <SelectItem value="9">September</SelectItem>
-              <SelectItem value="10">Oktober</SelectItem>
-              <SelectItem value="11">November</SelectItem>
-              <SelectItem value="12">Desember</SelectItem>
-            </>
-          )}
+          {props.type === 'month' &&
+            Array.from({ length: props.limit.month_upper - props.limit.month_under }, (_, i = props.limit.month_under) => (
+              <SelectItem key={i} value={(i + 1).toString()}>
+                {new Date(0, i).toLocaleString('id-ID', { month: 'long' })}
+              </SelectItem>
+            ))}
           {props.type === 'year' && (
-            <>
-              <SelectItem value="2025">2025</SelectItem>
-            </>
+            <SelectItem
+              disabled={true}
+              key={new Date().getFullYear()}
+              value={new Date().getFullYear().toString()}>
+              {new Date().getFullYear()}
+            </SelectItem>
           )}
         </SelectContent>
       </Select>
