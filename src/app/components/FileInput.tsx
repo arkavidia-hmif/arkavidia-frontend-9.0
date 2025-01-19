@@ -29,7 +29,8 @@ export type uploadedFileState = {
 type ComponentProps = {
     onUpload?: (e: uploadedFileState | null ) => void,
     className?: string,
-    displaySucces?: boolean
+    displaySucces?: boolean,
+    supportedFormats: string[]
 }
 
 function fileExt(filename: string) {
@@ -55,7 +56,7 @@ function uploadedStatus(success?: boolean) {
 }
 
 
-export default function FileInput({onUpload, className, displaySucces}: ComponentProps) {
+export default function FileInput({onUpload, className, displaySucces, supportedFormats}: ComponentProps) {
     const [file, setFile] = useState<File | null>(null);
     const [progress, setProgress] = useState(0)
     const [uploaded, setUploaded] = useState(false);
@@ -69,6 +70,19 @@ export default function FileInput({onUpload, className, displaySucces}: Componen
                 description: "Only single file allowed",
                 variant: "destructive"
             })
+            return;
+        }
+
+        const file = acceptedFiles[0];
+        const fileExt = file.name.split(".").pop()?.toLowerCase(); // Get file extension
+
+        // Check if the file extension is supported
+        if (!fileExt || !supportedFormats.includes(fileExt)) {
+            toast({
+            title: "Unsupported File Format",
+            description: `Allowed formats: ${supportedFormats.join(", ")}`,
+            variant: "destructive",
+            });
             return;
         }
 
@@ -247,7 +261,7 @@ export default function FileInput({onUpload, className, displaySucces}: Componen
                         }
                     </h1>
                     <div className="text-neutral-450">
-                        <p>Supported formats: JPEG, PNG, PDF, DOCX</p>
+                        <p>Supported formats: {`${supportedFormats.join(", ")}`}</p>
                         <p>Maximum file size 20 MB</p>
                     </div>
                 </div>

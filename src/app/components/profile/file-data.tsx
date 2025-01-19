@@ -82,7 +82,8 @@ return (
             }}>
             <FileInput 
             onUpload={handleUpload} 
-            className='mt-3 w-full' 
+            className='mt-3 w-full'
+            supportedFormats={['jpeg', 'png', 'jpg']} 
             />
         </div>
     </div>
