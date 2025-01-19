@@ -190,19 +190,21 @@ function Sidebar({ announcement = false }: SidebarProps) {
                   <DropdownMenuContent
                     align="center"
                     className="m-auto ml-1 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-[0_0_12px] shadow-lilac-200">
-                    <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
-                      <Image
-                        src="/images/sidebar/landing-page.svg"
-                        alt={'Landing Pace Icon'}
-                        width={16}
-                        height={18}
-                        className="mr-2 h-4 w-4"
-                      />
-                      <Link href="/">Landing Page</Link>
-                    </DropdownMenuItem>
+                    <Link href="/" className="cursor-pointer">
+                      <DropdownMenuItem className="rounded-lg text-white focus:text-white/80">
+                        <Image
+                          src="/images/sidebar/landing-page.svg"
+                          alt={'Landing Pace Icon'}
+                          width={16}
+                          height={18}
+                          className="mr-2 h-4 w-4"
+                        />
+                        Landing Page
+                      </DropdownMenuItem>
+                    </Link>
                     {!isAdmin && (
-                      <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
-                        <Link href="/dashboard/profile" className="flex gap-x-2">
+                      <Link href="/dashboard/profile" className="cursor-pointer">
+                        <DropdownMenuItem className="flex gap-x-2 rounded-lg text-white focus:text-white/80">
                           <Image
                             src="/images/sidebar/face.svg"
                             alt={'Landing Pace Icon'}
@@ -211,8 +213,8 @@ function Sidebar({ announcement = false }: SidebarProps) {
                             className="mr-2 h-4 w-4"
                           />
                           <p>Profile</p>
-                        </Link>
-                      </DropdownMenuItem>
+                        </DropdownMenuItem>
+                      </Link>
                     )}
                     <DropdownMenuItem
                       onClick={handleLogout}
