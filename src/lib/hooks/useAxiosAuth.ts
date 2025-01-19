@@ -2,17 +2,16 @@
 
 import { authAxiosInstance } from '../axios'
 import { useEffect } from 'react'
-import { useRefreshToken } from './useRefreshToken'
-import { useAuth } from '~/app/contexts/AuthContext'
+import { useAppSelector } from '~/redux/store'
 
 const useAxiosAuth = () => {
-  const { logout } = useAuth()
-  const refreshToken = useRefreshToken()
+  const accessToken = useAppSelector(state => state.auth.accessToken)
 
   useEffect(() => {
     const requestInterceptor = authAxiosInstance.instance.interceptors.request.use(
       async c => {
         // Success
+        c.headers['Authorization'] = `Bearer ${accessToken}`
         return c
       },
       err => Promise.reject(err) // Error
@@ -21,16 +20,6 @@ const useAxiosAuth = () => {
     const responseInterceptor = authAxiosInstance.instance.interceptors.response.use(
       res => res, // Success
       async err => {
-        // Error
-        const prevReq = err.config
-        // If the request was made and the server responded with a 401
-        if (err.response.status === 401 && prevReq && !prevReq._sent) {
-          prevReq._sent = true
-          await refreshToken()
-          return authAxiosInstance.instance(prevReq)
-        }
-
-        logout()
         return Promise.reject(err)
       }
     )
@@ -39,7 +28,7 @@ const useAxiosAuth = () => {
       authAxiosInstance.instance.interceptors.request.eject(requestInterceptor)
       authAxiosInstance.instance.interceptors.response.eject(responseInterceptor)
     }
-  }, [refreshToken])
+  }, [accessToken])
 
   return authAxiosInstance
 }

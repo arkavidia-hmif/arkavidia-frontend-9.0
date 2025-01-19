@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import Image from 'next/image'
 
@@ -13,7 +14,7 @@ function Loading({
     size = size + 1
   }
 
-  const defaultSize = 400
+  const defaultSize = 360
   const maxSmallSize = 32
   const usedSize = size
     ? isSmallVariant
@@ -35,9 +36,9 @@ function Loading({
   const cursorVertical = (usedSize - radius) / 2
   const imageSize = 0.4 * usedSize
 
-  const path = `M ${usedSize / 2} ${cursorVertical} a ${arcRadius} ${arcRadius} 0 0 1 0 ${radius} a ${arcRadius} ${arcRadius} 0 0 1 0 -${radius}}`
+  const path = `M ${usedSize / 2} ${cursorVertical} a ${arcRadius} ${arcRadius} 0 0 1 0 ${radius} a ${arcRadius} ${arcRadius} 0 0 1 0 -${radius}`
   return (
-    <div className="relative flex items-center justify-center gap-x-3">
+    <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 scale-[80%] items-center justify-center gap-x-3">
       <svg
         viewBox={viewBox}
         className="gradientLoader animate-spin rounded-full"
@@ -54,6 +55,7 @@ function Loading({
             alt="Loading icon"
             width={imageSize}
             height={imageSize}
+            quality={30}
           />
           <p className="mt-2 font-teachers text-2xl font-bold text-white">Loading....</p>
         </div>

@@ -80,7 +80,9 @@ function DashboardPage() {
           {/* Header */}
           <div>
             {/* Title */}
-            <p className="mb-4 font-belanosima text-[24px] xl:text-[48px]">Hi, {username}!</p>
+            <p className="mb-4 font-belanosima text-[24px] xl:text-[48px]">
+              Hi, {username}!
+            </p>
 
             {/* Team Information */}
             <div className="flex flex-col gap-[18px] text-white xl:flex-row xl:justify-between">
@@ -89,7 +91,7 @@ function DashboardPage() {
                 <div className="flex items-center">
                   <span className="w-[84px] font-dmsans text-xs xl:text-base">Team</span>
                   <span className="w-4">:</span>
-                  <span className="max-w-[200px] break-words font-teachers text-[14px] xl:text-base font-bold">
+                  <span className="max-w-[200px] break-words font-teachers text-[14px] font-bold xl:text-base">
                     {team}
                   </span>
                 </div>
@@ -139,7 +141,7 @@ function DashboardPage() {
 
           {/* Submisi */}
           <div className="hidden xl:block">
-            <Submisi submissions={submissions}  />
+            <Submisi submissions={submissions} />
           </div>
         </section>
 
