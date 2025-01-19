@@ -8,6 +8,8 @@ import { Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import Link from 'next/link'
 import { randomInt } from 'crypto'
+import { Button } from '../Button'
+import { useRouter } from 'next/navigation'
 
 interface CardCompetitionProps {
   title: string
@@ -30,7 +32,7 @@ const competitions = [
       'Capture The Flag merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
     preview: '/images/competition/ctf-preview.png',
     carousel: '/images/competition/ctf-logo.png',
-    link: '/competition/ctf'
+    link: '/competition/capture-the-flag'
   },
   {
     title: 'Competitive Programming',
@@ -38,7 +40,7 @@ const competitions = [
       'Competitive Programming merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
     preview: '/images/competition/cp-preview.png',
     carousel: '/images/competition/cp-logo.png',
-    link: '/competition/cp'
+    link: '/competition/competitive-programming'
   },
   {
     title: 'Datavidia',
@@ -84,7 +86,7 @@ const CardCompetition = ({ title, logo, isActive }: CardCompetitionProps) => {
   const glowCardStyle = isActive
     ? {
         boxShadow:
-          title === 'Hackvidia'  || title === 'Capture The Flag'
+          title === 'Hackvidia' || title === 'Capture The Flag'
             ? '0 0 10px 5px rgba(72, 230, 255, 0.6), 0 0 10px rgba(72, 230, 255, 0.6)'
             : title === 'UXvidia'
               ? '0 0 15px rgba(186, 85, 211, 0.6), 0 0 25px rgba(186, 85, 211, 0.6)'
@@ -131,6 +133,7 @@ const CardCompetition = ({ title, logo, isActive }: CardCompetitionProps) => {
 }
 
 const CompetitionCarousel = () => {
+  const router = useRouter()
   const [activeIndex, setActiveIndex] = useState(
     Math.floor(Math.random() * competitions.length)
   )
@@ -156,14 +159,16 @@ const CompetitionCarousel = () => {
             <p className="text-justify font-dmsans text-xs leading-5 text-lilac-100 md:text-[14px] md:leading-6 lg:text-[16px]">
               {competitions[activeIndex].description}
             </p>
-            <Link href={competitions[activeIndex].link} className="hover:cursor-pointer">
-              <div className="flex w-full items-center rounded-sm bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] px-3 py-2">
+            <Button className="z-50 hover:cursor-pointer hover:opacity-75">
+              <Link
+                href={competitions[activeIndex].link}
+                className="flex w-full items-center rounded-sm bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] px-3 py-2">
                 <p className="grow text-center font-dmsans text-xs md:text-base">
                   Go To Page
                 </p>
                 <FaArrowRight className="ml-2 justify-self-end text-xs md:text-base" />
-              </div>
-            </Link>
+              </Link>
+            </Button>
           </div>
           <div className="col-span-2 mt-6 flex w-full justify-center px-4 md:mt-14 lg:px-0 lg:pl-24">
             <div className="w-full max-w-3xl">
