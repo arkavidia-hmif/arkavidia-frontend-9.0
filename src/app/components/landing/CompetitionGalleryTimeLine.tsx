@@ -7,10 +7,7 @@ export const CompetitionGaleryTimeline = () => {
       title: 'Academya'
     },
     {
-      title: 'Arkavidia Talks'
-    },
-    {
-      title: 'ITFest'
+      title: 'ArkavX'
     },
     {
       title: 'Gala Dinner'
