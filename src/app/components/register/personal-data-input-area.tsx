@@ -17,7 +17,7 @@ import { useToast } from '../../../hooks/use-toast'
 import Dropdown, { MenuItem } from '../Dropdown'
 import { Checkbox } from '../Checkbox'
 import CustomDatePicker from '../date-picker/CustomDatePicker'
-import { getPresignedLink, self, updateUser, uploadUserIdCard } from '~/api/generated'
+import { getPresignedLink, self, updateUser, updateUserDocument } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { axiosInstance } from '~/lib/axios'
 import { useRouter } from 'next/navigation'
@@ -47,7 +47,7 @@ const registerPersonalDataSchema = z.object({
       message: 'Nomor telepon minimal memiliki 8 digit'
     }),
   identityCard: z
-    .array(z.instanceof(File))
+    .instanceof(FileList)
     .refine(val => val.length > 0, { message: 'Kartu identitas wajib diunggah' }),
   lineid: z.string().optional(),
   instagram: z.string().optional(),
@@ -111,7 +111,6 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
           description: 'Gagal mengirimkan data',
           variant: 'destructive'
         })
-        return
       }
 
       if (getSelf.data) {
@@ -126,13 +125,13 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
             filename: `${userId}-identity-card.${fileExt}`
           }
         })
+
         if (getLink.error) {
           toast({
             title: 'Error',
             description: 'Gagal melakukan upload data',
             variant: 'destructive'
           })
-          return
         }
 
         if (getLink.data) {
@@ -144,11 +143,21 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
 
           if (upload.status === 200) {
             // If the upload is successful, save the data to the backend
-            const uploadIDCardURL = await uploadUserIdCard({
-              client: axiosAuth,
-              body: {
-                userIdCardUrl: getLink.data.mediaUrl
+            let body
+            // KTM
+            if (values.education !== 'sma') {
+              body = {
+                kartuMediaId: getLink.data.mediaId
               }
+            } else {
+              // Kartu Pelajar
+              body = {
+                nisnMediaId: getLink.data.mediaId
+              }
+            }
+            const uploadIDCardURL = await updateUserDocument({
+              client: axiosAuth,
+              body: body
             })
 
             if (uploadIDCardURL.error) {
@@ -157,7 +166,6 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                 description: 'Gagal melakukan upload data',
                 variant: 'destructive'
               })
-              return
             }
 
             if (uploadIDCardURL.data) {
@@ -183,11 +191,9 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                   description: 'Gagal melakukan pembaruan data',
                   variant: 'destructive'
                 })
-                return
               }
 
               if (updateProfile.data) {
-                appDispatch(setFilledInfo(true))
                 toast({
                   title: 'Success',
                   description: 'Data berhasil disimpan',
@@ -205,7 +211,6 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
               description: 'Gagal melakukan upload data',
               variant: 'destructive'
             })
-            return
           }
         }
       }
@@ -223,6 +228,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
    */
   function handleFormErrors(errors: typeof form.formState.errors) {
     Object.values(errors).forEach(error => {
+      console.log(errors)
       if (error?.message) {
         toast({
           title: 'Validation Error',
@@ -360,7 +366,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                     className="cursor-pointer gap-x-1 border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 file:cursor-pointer file:rounded-md file:border file:bg-purple-800 file:text-xs placeholder:text-purple-500 max-md:text-xs"
                     placeholder=""
                     {...fileRef}
-                    onChange={e => field.onChange(e.target?.files?.[0] ?? undefined)}
+                    onChange={e => field.onChange(e.target?.files ?? undefined)}
                   />
                 </FormControl>
               </FormItem>
