@@ -235,10 +235,10 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           <div className="flex flex-row items-center justify-center gap-2 sm:gap-6 md:gap-10">
             {/* Timer Blocks */}
             {[
-              { value: days, label: 'Days' },
-              { value: hours, label: 'Hours' },
-              { value: minutes, label: 'Minutes' },
-              { value: seconds, label: 'Seconds' }
+              { value: days, label: 'Hari' },
+              { value: hours, label: 'Jam' },
+              { value: minutes, label: 'Menit' },
+              { value: seconds, label: 'Detik' }
             ].map(unit => (
               <div key={unit.label} className="flex flex-col items-center gap-2">
                 <div className="flex flex-row gap-1 sm:gap-2 md:gap-3">
@@ -344,11 +344,11 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           <section
             className="flex w-full items-center justify-center px-4 sm:px-8"
             id="competition-contact">
-            <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:items-center sm:justify-around sm:gap-12 md:gap-28">
+            <div className="flex flex-col items-center justify-center gap-6 md:flex-row md:items-center md:justify-around md:gap-12">
               <div className="text-nowrap text-center font-dmsans text-base font-bold sm:text-lg">
                 Contact Person
               </div>
-              <div className="flex w-full flex-col flex-wrap gap-4 sm:flex-row sm:gap-2">
+              <div className="flex w-full flex-col flex-wrap gap-4 md:flex-row sm:gap-2">
                 {props.contactPerson?.map(contact => (
                   <Button
                     variant="outline"
