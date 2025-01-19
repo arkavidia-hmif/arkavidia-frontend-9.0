@@ -3,38 +3,17 @@
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { self } from '~/api/generated'
+import { getUser, self } from '~/api/generated'
 import SocialMediaInput from './social-media-input'
 
 export interface SocialMediaDefaultValue {
-  line: string | null
-  discord: string | null
-  instagram: string | null
+  line: string | null | undefined
+  discord: string | null | undefined
+  instagram: string | null | undefined
 }
 
-export const SocialMediaContent = () => {
-  const [currentValue, setCurrentValue] = useState<SocialMediaDefaultValue>({
-    line: null,
-    discord: null,
-    instagram: null
-  })
-  const axiosAuth = useAxiosAuth()
-
-  useEffect(() => {
-    const fetchSelf = async () => {
-      const res = await self({ client: axiosAuth })
-
-      if (res.data) {
-        setCurrentValue({
-          line: res.data.idLine,
-          discord: res.data.idDiscord,
-          instagram: res.data.idInstagram
-        })
-      }
-    }
-
-    fetchSelf()
-  }, [])
+export const SocialMediaContent = ({ current }: { current: SocialMediaDefaultValue }) => {
+  const [currentValue, setCurrentValue] = useState<SocialMediaDefaultValue>(current)
 
   return (
     <div className="flex flex-col justify-between gap-8 rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-6 py-8 shadow-lg md:flex-row md:gap-36">

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useCallback } from 'react'
-import { ArrowLeft, Copy, Check } from 'lucide-react'
+import { ArrowLeft, Copy, Check, ArrowRight } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,10 @@ import { Button } from '../Button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { cn } from '~/lib/utils'
+import { postCreateTeam } from '~/api/generated'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { useToast } from '~/hooks/use-toast'
+import { competitionAbbr, CompetitionType } from '~/app/components/CompetitionRegistration'
 
 interface SuccessDialogProps {
   isOpen: boolean
@@ -79,17 +83,18 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCo
   )
 }
 
-export const CreateTeamPopup: React.FC<{ competitionName: string; competitionLink: string }> = ({
-  competitionName,
-  competitionLink
+export const CreateTeamPopup: React.FC<{ competitionID: string, competitionType: CompetitionType }> = ({
+  competitionID, competitionType
 }) => {
+  const { toast } = useToast();
+  const axiosAuth = useAxiosAuth();
   const [teamName, setTeamName] = useState('')
   const [error, setError] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [generatedTeamCode, setGeneratedTeamCode] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
@@ -97,7 +102,24 @@ export const CreateTeamPopup: React.FC<{ competitionName: string; competitionLin
       setError('Team name is required!')
     } else {
       // Generate a random team code (in a real app, this would be done on the server)
-      const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase()
+      const resp = await postCreateTeam({
+        client: axiosAuth,
+        body: {
+          competitionId: competitionID,
+          name: teamName
+        }
+      });
+
+      if (resp.error) {
+        setError(resp.error.error);
+        return;
+      }
+      toast({
+        title: 'Team created successfully',
+        variant: 'success',
+        duration: 3000
+      })
+      const randomCode = resp.data.joinCode;
       setGeneratedTeamCode(randomCode)
       setIsSuccess(true)
       setIsOpen(false)
@@ -108,14 +130,19 @@ export const CreateTeamPopup: React.FC<{ competitionName: string; competitionLin
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button size="sm" onClick={() => setIsOpen(true)}>
-            Create Team
+        <Button size="sm" onClick={() => setIsOpen(true)} className="flex gap-[2rem] items-center justify-center w-[250px]">
+            <div>
+                <p className='text-xl'>
+                    Create Team
+                </p>
+            </div>
+            <ArrowRight strokeWidth={4} size={4} className='mt-[2px]'/>
           </Button>
         </DialogTrigger>
-        <DialogContent className="flex max-w-5xl items-center md:justify-center gap-4 bg-[url('/images/join-competition/bg.png')] bg-cover bg-center bg-no-repeat py-16 font-teachers">
-          <div className="flex w-full flex-row justify-center md:gap-4">
+        <DialogContent className="flex max-w-5xl px-[3rem] items-center md:justify-center gap-4 bg-[url('/images/join-competition/bg.png')] bg-cover bg-center bg-no-repeat py-[3rem] font-teachers">
+          <div className="flex w-full flex-col justify-center md:gap-4">
             <div className="grow-0">
-              <DialogClose className="rounded-sm p-2 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
                 <ArrowLeft className="h-auto w-5 md:w-8" />
                 <span className="sr-only">Go back</span>
               </DialogClose>
@@ -123,7 +150,7 @@ export const CreateTeamPopup: React.FC<{ competitionName: string; competitionLin
             <div className="grow-1 flex flex-col md:gap-12">
               <DialogHeader className="flex flex-col gap-4">
                 <DialogTitle className="text-2xl md:text-5xl font-bold">
-                  Create Team for {competitionName}
+                  Create Team for {competitionType}
                 </DialogTitle>
                 <DialogDescription className="text-base md:text-xl">
                   Once you create a team name you can invite others
@@ -160,7 +187,7 @@ export const CreateTeamPopup: React.FC<{ competitionName: string; competitionLin
       <SuccessDialog
         isOpen={isSuccess}
         setIsOpen={setIsSuccess}
-        competitionLink={competitionLink}
+        competitionLink={''}
         teamCode={generatedTeamCode}
       />
     </>

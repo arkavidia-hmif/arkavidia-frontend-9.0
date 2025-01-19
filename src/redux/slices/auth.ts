@@ -32,6 +32,8 @@ const authSlice = createSlice({
       state.accessToken = null
       state.isAdmin = false
       state.isLoggedIn = false
+      state.hasFilledInfo = false
+      state.username = ''
     },
     setAdmin(state) {
       state.isAdmin = true

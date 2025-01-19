@@ -8,7 +8,6 @@ export type contentType = string
 interface TabProps {
   contentType: contentType[]
   content: React.ReactNode[]
-
 }
 
 export const Tab = ({ contentType, content }: TabProps) => {
@@ -72,7 +71,7 @@ export const Tab = ({ contentType, content }: TabProps) => {
       </div>
 
       {/* Render Selected Content */}
-      <div className="mt-2">{selectedContent}</div>
+      <div className="mt-4">{selectedContent}</div>
     </>
   )
 }
