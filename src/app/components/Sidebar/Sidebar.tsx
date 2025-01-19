@@ -56,7 +56,12 @@ function Sidebar({ announcement = false }: SidebarProps) {
       }
 
       if (req.data) {
-        setSidebarLinks([]) // Clear the sidebar links
+        setSidebarLinks([
+          {
+            name: 'Dashboard',
+            link: '/dashboard'
+          }
+        ]) //
         const competitionList = JSON.parse(JSON.stringify(req.data)) as GetTeamsResponse
 
         if (competitionList.length > 0) {
@@ -64,11 +69,9 @@ function Sidebar({ announcement = false }: SidebarProps) {
             setSidebarLinks(prev => [
               ...prev,
               {
-                // @ts-ignore
                 name: expandCompetitionName(competition.competition!.title),
                 link: getSidebarURL({
                   isAdmin,
-                  // @ts-ignore
                   competitionName: competition.competition!.title
                 })
               }
@@ -109,7 +112,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
         description: 'You have been logged out',
         variant: 'success'
       })
-      router.replace('/login')
+      router.replace('/')
     }, 1000)
   }
 
@@ -174,8 +177,8 @@ function Sidebar({ announcement = false }: SidebarProps) {
                         height={20}
                         className="lg:h-6 lg:w-6"
                       />
-                      <span className="truncate text-sm font-medium text-white lg:text-base">
-                        {USERNAME}
+                      <span className="truncate text-ellipsis text-sm font-medium text-white lg:text-base">
+                        {USERNAME.length > 10 ? `${USERNAME.slice(0, 10)}...` : USERNAME}
                       </span>
                       <ChevronUp
                         className={`m-1 ml-auto h-4 w-4 text-white transition-transform duration-300 ease-in-out lg:h-5 lg:w-5 ${
@@ -187,27 +190,31 @@ function Sidebar({ announcement = false }: SidebarProps) {
                   <DropdownMenuContent
                     align="center"
                     className="m-auto ml-1 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-[0_0_12px] shadow-lilac-200">
-                    <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
-                      <Image
-                        src="/images/sidebar/landing-page.svg"
-                        alt={'Landing Pace Icon'}
-                        width={16}
-                        height={18}
-                        className="mr-2 h-4 w-4"
-                      />
-                      <Link href="/">Landing Page</Link>
-                    </DropdownMenuItem>
-                    {!isAdmin && (
-                      <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
+                    <Link href="/" className="cursor-pointer">
+                      <DropdownMenuItem className="rounded-lg text-white focus:text-white/80">
                         <Image
-                          src="/images/sidebar/face.svg"
+                          src="/images/sidebar/landing-page.svg"
                           alt={'Landing Pace Icon'}
                           width={16}
-                          height={16}
+                          height={18}
                           className="mr-2 h-4 w-4"
                         />
-                        <Link href="/dashboard/profile">Profile</Link>
+                        Landing Page
                       </DropdownMenuItem>
+                    </Link>
+                    {!isAdmin && (
+                      <Link href="/dashboard/profile" className="cursor-pointer">
+                        <DropdownMenuItem className="flex gap-x-2 rounded-lg text-white focus:text-white/80">
+                          <Image
+                            src="/images/sidebar/face.svg"
+                            alt={'Landing Pace Icon'}
+                            width={16}
+                            height={16}
+                            className="mr-2 h-4 w-4"
+                          />
+                          <p>Profile</p>
+                        </DropdownMenuItem>
+                      </Link>
                     )}
                     <DropdownMenuItem
                       onClick={handleLogout}

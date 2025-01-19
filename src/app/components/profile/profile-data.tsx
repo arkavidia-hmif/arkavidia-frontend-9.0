@@ -7,6 +7,10 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import Dropdown, { MenuItem } from '../Dropdown'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { getEducation, getFormattedBirthDate } from '~/lib/utils'
+import { toast, useToast } from '~/hooks/use-toast'
+import { useAppDispatch } from '~/redux/store'
+import { setUsername } from '~/redux/slices/auth'
 interface ProfileDataProps {
   title: string
   value: string
@@ -120,6 +124,7 @@ interface InputProfileDataProps {
 
 export const InputProfileData = (props: InputProfileDataProps) => {
   const axiosAuth = useAxiosAuth()
+  const appDispatch = useAppDispatch()
   const [value, setValue] = useState<string>(props.default_value)
   const [tempValue, setTempValue] = useState<string>(props.default_value)
 
@@ -128,7 +133,8 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       const noSpace = props.title.toLowerCase().replace(' ', '_')
       const fieldMap: Record<string, string> = {
         name: 'fullName',
-        phone_number: 'phoneNumber'
+        phone_number: 'phoneNumber',
+        instance: 'instance'
       }
 
       const fieldName = fieldMap[noSpace]
@@ -137,10 +143,34 @@ export const InputProfileData = (props: InputProfileDataProps) => {
         client: axiosAuth,
         body: { [fieldName]: tempValue }
       })
+
+      if (response.error) {
+        toast({
+          title: 'Failed to update',
+          description: 'Something went wrong',
+          variant: 'destructive'
+        })
+      }
+
+      if (response.data) {
+        toast({
+          title: 'Success',
+          description: 'Update berhasil',
+          variant: 'success'
+        })
+        if (fieldName === 'fullName') {
+          appDispatch(setUsername(tempValue))
+        }
+        setValue(tempValue)
+      }
       // console.log('API Response:', response)
       setValue(tempValue)
     } catch (error) {
-      console.error('Failed to update input:', error)
+      toast({
+        title: 'Failed to update',
+        description: 'Something went wrong',
+        variant: 'destructive'
+      })
     }
   }
 
@@ -183,20 +213,33 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
 
   async function onSaveInput() {
     try {
-      console.log('title', props.title)
       const noSpace = props.title.toLowerCase().replace(/ /g, '_')
-      console.log(noSpace)
       const fieldMap: Record<string, string> = {
-        instance: 'instance',
-        education: 'education',
-        how_do_you_know_about_arkavidia: 'entrySource'
+        education: 'education'
       }
       const fieldName = fieldMap[noSpace]
-      console.log(tempValue.option)
       const response = await updateUser({
         client: axiosAuth,
-        body: { [fieldName]: tempValue.option }
+        body: {
+          [fieldName]:
+            fieldName === 'education' ? getEducation(tempValue.option) : tempValue.option
+        }
       })
+      if (response.error) {
+        toast({
+          title: 'Failed to update education',
+          description: 'Something went wrong',
+          variant: 'destructive'
+        })
+      }
+
+      if (response.data) {
+        toast({
+          title: 'Success',
+          description: 'Update successful',
+          variant: 'success'
+        })
+      }
       // console.log(response)
       setValue(tempValue)
     } catch (error) {
@@ -230,29 +273,49 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
 
 interface DatePickerProfileDataProps {
   title: string
-  default_value: Date
+  default_value: string
   logoSrc?: React.ReactNode
 }
 
 export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
+  const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
-  const [selectedDate, setSelectedDate] = useState<Date>(props.default_value)
-  const [tempDate, setTempDate] = useState<Date>(props.default_value)
+  const [selectedDate, setSelectedDate] = useState<string>(props.default_value)
+  const [tempDate, setTempDate] = useState<Date>(new Date(props.default_value))
 
   async function onSaveDate() {
     try {
-      await updateUser({
+      const update = await updateUser({
         client: axiosAuth,
-        body: { birthDate: tempDate.toISOString().split('T')[0] }
+        body: { birthDate: getFormattedBirthDate(tempDate) }
       })
-      setSelectedDate(tempDate)
+      if (update.error) {
+        toast({
+          title: 'Failed to update birth date',
+          description: 'Something went wrong',
+          variant: 'destructive'
+        })
+      }
+
+      if (update.data) {
+        setSelectedDate(getFormattedBirthDate(tempDate))
+        toast({
+          title: 'Success',
+          description: 'Update successful',
+          variant: 'success'
+        })
+      }
     } catch (error) {
-      console.error('Failed to update date:', error)
+      toast({
+        title: 'Failed to update birth date',
+        description: 'Something went wrong',
+        variant: 'destructive'
+      })
     }
   }
 
   function onCancelDate() {
-    setTempDate(selectedDate)
+    setTempDate(new Date(selectedDate))
   }
 
   const formatDate = (date: Date) => date.toISOString().split('T')[0]
@@ -261,14 +324,18 @@ export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
     <ProfileData
       handleCancel={onCancelDate}
       title={props.title}
-      value={selectedDate.toDateString()}
+      value={
+        isNaN(tempDate.getTime())
+          ? 'No date'
+          : tempDate.toLocaleString('id-ID', { dateStyle: 'medium' })
+      }
       handleSave={onSaveDate}>
       <div className="flex items-center">
         {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
         <input
           aria-label="Date"
           type="date"
-          value={formatDate(tempDate)}
+          value={getFormattedBirthDate(tempDate)}
           onChange={e => setTempDate(new Date(e.target.value))}
           className="w-full rounded-md border border-purple-400 bg-lilac-100 p-2 py-3 pr-40 text-purple-400"
         />

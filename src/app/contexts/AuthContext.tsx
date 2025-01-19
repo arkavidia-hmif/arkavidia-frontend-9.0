@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { client, self, User } from '~/api/generated'
+import { client, getUser, self, User } from '~/api/generated'
 import { createAxiosAuthInstance } from '~/lib/axios'
 import { basicLogin as login, logout as reqLogout } from '~/api/generated'
 import { authAxiosInstance, axiosInstance } from '~/lib/axios'
@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     appDispatch(userLogout())
     appDispatch(setNotAdmin())
-    localStorage.clear()
+    window.localStorage.clear()
   }
 
   const getSelf = async () => {
@@ -56,19 +56,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (selfReq.data) {
-        const hasFilledInfo = selfReq.data.isRegistrationComplete
         const isAdmin = selfReq.data.role === 'admin'
-        const username = selfReq.data.fullName
-        if (hasFilledInfo) {
-          appDispatch(setFilledInfo(true))
-        }
+        const userReq = await getUser({ client: authAxios })
+        if (userReq.data) {
+          const hasFilledInfo = userReq.data.isRegistrationComplete
+          const username = userReq.data.fullName
+          appDispatch(setFilledInfo(hasFilledInfo))
 
-        if (username) {
-          appDispatch(setUsername(username))
-        }
+          if (username) {
+            appDispatch(setUsername(username))
+          }
 
-        if (isAdmin) {
-          appDispatch(setAdmin())
+          if (isAdmin) {
+            appDispatch(setAdmin())
+          }
         }
       }
     }
@@ -100,10 +101,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (req.data) {
       appDispatch(userLogin(req.data.accessToken))
-      res.ok = true
-      setTimeout(() => {
-        router.replace('/')
-      }, 500)
+      const selfReq = await self({
+        client: createAxiosAuthInstance(req.data.accessToken)
+      })
+      if (selfReq.data) {
+        const hasFilledInfo = selfReq.data.isRegistrationComplete
+        const isAdmin = selfReq.data.role === 'admin'
+        const username = selfReq.data.fullName
+        if (hasFilledInfo) {
+          appDispatch(setFilledInfo(true))
+        }
+
+        if (username) {
+          appDispatch(setUsername(username))
+        }
+
+        if (isAdmin) {
+          appDispatch(setAdmin())
+        }
+        res.ok = true
+        setTimeout(() => {
+          if (!hasFilledInfo) {
+            router.replace('/register/personal-data')
+          } else {
+            router.replace('/')
+          }
+        }, 500)
+      }
     }
 
     return res

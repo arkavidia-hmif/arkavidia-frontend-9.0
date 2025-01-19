@@ -17,14 +17,17 @@ import { useToast } from '../../../hooks/use-toast'
 import Dropdown, { MenuItem } from '../Dropdown'
 import { Checkbox } from '../Checkbox'
 import CustomDatePicker from '../date-picker/CustomDatePicker'
-import { getPresignedLink, self, updateUser } from '~/api/generated'
+import { getPresignedLink, self, updateUser, updateUserDocument } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { axiosInstance } from '~/lib/axios'
 import { useRouter } from 'next/navigation'
 import { getEducation, getFormattedBirthDate } from '~/lib/utils'
 import { setFilledInfo } from '~/redux/slices/auth'
-import { useAppDispatch } from '~/redux/store'
+import { useAppDispatch, useAppSelector } from '~/redux/store'
 import useCheckFillInfo from '~/lib/hooks/useCheckFillInfo'
+import { useState } from 'react'
+import { FaArrowRight } from 'react-icons/fa'
+import Link from 'next/link'
 
 interface PersonalDataProps {
   educationOptions: MenuItem[]
@@ -49,6 +52,7 @@ const registerPersonalDataSchema = z.object({
   identityCard: z
     .instanceof(FileList)
     .refine(val => val.length > 0, { message: 'Kartu identitas wajib diunggah' }),
+  nisn: z.string().optional(),
   lineid: z.string().optional(),
   instagram: z.string().optional(),
   discord: z.string().optional(),
@@ -58,11 +62,25 @@ const registerPersonalDataSchema = z.object({
 })
 
 export const PersonalDataForm = (props: PersonalDataProps) => {
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
   const hasFinishedRegis = useCheckFillInfo()
+  const [isSMAPicked, setIsSMAPicked] = useState(false)
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
   const router = useRouter()
   const appDispatch = useAppDispatch()
+
+  if (!isLoggedIn) {
+    toast({
+      title: 'Tidak terotorisasi',
+      description: 'Anda harus login untuk mengakses halaman ini',
+      variant: 'destructive'
+    })
+    setTimeout(() => {
+      router.push('/')
+    }, 1000)
+    return null
+  }
 
   if (hasFinishedRegis) {
     setTimeout(() => {
@@ -121,10 +139,11 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
         const getLink = await getPresignedLink({
           client: axiosAuth,
           query: {
-            bucket: 'competition-registration',
+            bucket: 'kartu-identitas',
             filename: `${userId}-identity-card.${fileExt}`
           }
         })
+
         if (getLink.error) {
           toast({
             title: 'Error',
@@ -134,7 +153,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
         }
 
         if (getLink.data) {
-          // If we get the link, do a PUT rqeuest to S3
+          // If we get the link, do a PUT request to S3
           const upload = await axiosInstance.put({
             url: getLink.data.presignedUrl,
             body: values.identityCard[0]
@@ -142,42 +161,68 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
 
           if (upload.status === 200) {
             // If the upload is successful, save the data to the backend
-            // Logic to save new user profile data
-            const updateProfile = await updateUser({
-              client: axiosAuth,
-              body: {
-                fullName: values.fullname,
-                birthDate: getFormattedBirthDate(values.birthdate),
-                education: getEducation(values.education),
-                instance: values.institution,
-                phoneNumber: values.phonenumber,
-                idLine: values.lineid,
-                idInstagram: values.instagram,
-                idDiscord: values.discord,
-                consent: values.formacceptance
+            let body
+            // KTM
+            if (values.education !== 'sma') {
+              body = {
+                kartuMediaId: getLink.data.mediaId
               }
+            } else {
+              // Kartu Pelajar
+              body = {
+                nisnMediaId: getLink.data.mediaId
+              }
+            }
+            const uploadIDCardURL = await updateUserDocument({
+              client: axiosAuth,
+              body: body
             })
-            if (updateProfile.error) {
+
+            if (uploadIDCardURL.error) {
               toast({
                 title: 'Error',
-                description: 'Gagal melakukan pembaruan data',
+                description: 'Gagal melakukan upload data',
                 variant: 'destructive'
               })
             }
 
-            if (updateProfile.data) {
-              appDispatch(setFilledInfo(true))
-            }
-            // TODO: Add logic to save S3 data to backend database here
-            toast({
-              title: 'Success',
-              description: 'Data berhasil disimpan',
-              variant: 'success'
-            })
+            if (uploadIDCardURL.data) {
+              // Logic to save new user profile data
+              const updateProfile = await updateUser({
+                client: axiosAuth,
+                body: {
+                  fullName: values.fullname,
+                  birthDate: getFormattedBirthDate(values.birthdate),
+                  education: getEducation(values.education),
+                  instance: values.institution,
+                  phoneNumber: values.phonenumber,
+                  idLine: values.lineid,
+                  idInstagram: values.instagram,
+                  idDiscord: values.discord,
+                  consent: values.formacceptance
+                }
+              })
 
-            setTimeout(() => {
-              router.replace('/')
-            }, 1000)
+              if (updateProfile.error) {
+                toast({
+                  title: 'Error',
+                  description: 'Gagal melakukan pembaruan data',
+                  variant: 'destructive'
+                })
+              }
+
+              if (updateProfile.data) {
+                toast({
+                  title: 'Success',
+                  description: 'Data berhasil disimpan',
+                  variant: 'success',
+                  duration: 5000
+                })
+                setTimeout(() => {
+                  router.replace('/')
+                }, 1000)
+              }
+            }
           } else {
             toast({
               title: 'Error',
@@ -213,13 +258,28 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
   }
 
   const fileRef = form.register('identityCard')
+  function handleEducationChange(item: MenuItem | null) {
+    if (item) {
+      if (getEducation(item.option) === 'sma') {
+        setIsSMAPicked(true)
+      } else {
+        setIsSMAPicked(false)
+      }
+      form.setValue('nisn', undefined)
+    }
+  }
 
   return (
     //TODO : Replace padding and gap into design system pad and gap
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}
-        className="my-6 mr-4 flex flex-col gap-12 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[60px] max-md:px-[36px] max-md:py-[40px] lg:px-[72px] lg:py-[80px]">
+        className="my-6 mr-4 flex flex-col gap-6 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[40px] max-md:px-[36px] max-md:py-[30px] lg:px-[72px] lg:py-[60px]">
+        <Link href="/" className="flex w-full justify-end">
+          <p className="flex items-center gap-x-2 text-lg text-lilac-300 hover:text-lilac-200">
+            Isi Nanti <FaArrowRight size={16} />
+          </p>
+        </Link>
         <h1 className="w-full text-center font-teachers text-3xl font-bold text-lilac-200">
           Lengkapi Data Dirimu!
         </h1>
@@ -272,7 +332,10 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                         option => option.option === field.value
                       ) || null
                     }
-                    onChange={item => field.onChange(item?.option ?? null)}
+                    onChange={item => {
+                      field.onChange(item?.option ?? null)
+                      handleEducationChange(item ?? null)
+                    }}
                     placeholder="Pilih jenjang pendidikan anda"
                     data={props.educationOptions}
                     label={''}
@@ -283,6 +346,25 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
               </FormItem>
             )}
           />
+          {isSMAPicked && (
+            <FormField
+              control={form.control}
+              name="nisn"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">
+                    NISN <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
+                      placeholder="Masukkan NISN Anda"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}></FormField>
+          )}
           <FormField
             control={form.control}
             name="institution"
@@ -338,7 +420,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                     className="cursor-pointer gap-x-1 border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 file:cursor-pointer file:rounded-md file:border file:bg-purple-800 file:text-xs placeholder:text-purple-500 max-md:text-xs"
                     placeholder=""
                     {...fileRef}
-                    onChange={e => field.onChange(e.target?.files?.[0] ?? undefined)}
+                    onChange={e => field.onChange(e.target?.files ?? undefined)}
                   />
                 </FormControl>
               </FormItem>
@@ -421,7 +503,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
           className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs'
           type="submit"
           variant={'ghost'}>
-          Register
+          Simpan Data
         </Button>
       </form>
     </Form>
