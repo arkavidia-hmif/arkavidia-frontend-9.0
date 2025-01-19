@@ -25,6 +25,7 @@ import { getEducation, getFormattedBirthDate } from '~/lib/utils'
 import { setFilledInfo } from '~/redux/slices/auth'
 import { useAppDispatch } from '~/redux/store'
 import useCheckFillInfo from '~/lib/hooks/useCheckFillInfo'
+import { useState } from 'react'
 
 interface PersonalDataProps {
   educationOptions: MenuItem[]
@@ -49,6 +50,7 @@ const registerPersonalDataSchema = z.object({
   identityCard: z
     .instanceof(FileList)
     .refine(val => val.length > 0, { message: 'Kartu identitas wajib diunggah' }),
+  nisn: z.string().optional(),
   lineid: z.string().optional(),
   instagram: z.string().optional(),
   discord: z.string().optional(),
@@ -59,6 +61,7 @@ const registerPersonalDataSchema = z.object({
 
 export const PersonalDataForm = (props: PersonalDataProps) => {
   const hasFinishedRegis = useCheckFillInfo()
+  const [isSMAPicked, setIsSMAPicked] = useState(false)
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
   const router = useRouter()
@@ -228,7 +231,6 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
    */
   function handleFormErrors(errors: typeof form.formState.errors) {
     Object.values(errors).forEach(error => {
-      console.log(errors)
       if (error?.message) {
         toast({
           title: 'Validation Error',
@@ -241,6 +243,16 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
   }
 
   const fileRef = form.register('identityCard')
+  function handleEducationChange(item: MenuItem | null) {
+    if (item) {
+      if (getEducation(item.option) === 'sma') {
+        setIsSMAPicked(true)
+      } else {
+        setIsSMAPicked(false)
+      }
+      form.setValue('nisn', undefined)
+    }
+  }
 
   return (
     //TODO : Replace padding and gap into design system pad and gap
@@ -300,7 +312,10 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                         option => option.option === field.value
                       ) || null
                     }
-                    onChange={item => field.onChange(item?.option ?? null)}
+                    onChange={item => {
+                      field.onChange(item?.option ?? null)
+                      handleEducationChange(item ?? null)
+                    }}
                     placeholder="Pilih jenjang pendidikan anda"
                     data={props.educationOptions}
                     label={''}
@@ -311,6 +326,23 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
               </FormItem>
             )}
           />
+          {isSMAPicked && (
+            <FormField
+              control={form.control}
+              name="nisn"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">NISN</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
+                      placeholder="Masukkan NISN Anda"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}></FormField>
+          )}
           <FormField
             control={form.control}
             name="institution"
