@@ -1,10 +1,7 @@
 "use client"
 
-import { ChangeEvent, useState, useCallback } from "react"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
+import { useState, useCallback } from "react"
 import {useDropzone} from 'react-dropzone'
-import axios from "axios";
 import Image from "next/image";
 import { X } from "lucide-react";
 import ProgressBar from "./ProgressBar";
@@ -13,12 +10,6 @@ import { useToast } from "~/hooks/use-toast"
 import { getPresignedLink, self } from "~/api/generated"
 import useAxiosAuth from "~/lib/hooks/useAxiosAuth"
 import { axiosInstance } from "~/lib/axios"
-
-type MediaResponse = {
-    presignedUrl: string,
-    mediaUrl: string,
-    expiresIn: number
-}
 
 export type uploadedFileState = {
     mediaID: string,
@@ -160,6 +151,9 @@ export default function FileInput({onUpload, className, displaySucces, supported
                 setUploaded(false);
                 const upload = await axiosInstance.put({
                     url: getLink.data.presignedUrl,
+                    headers: {
+                        "Content-Type": selectedFile.type
+                    },
                     body: selectedFile,
                     onUploadProgress: (progressEvent) => {
                         if(progressEvent.total) {
@@ -169,6 +163,7 @@ export default function FileInput({onUpload, className, displaySucces, supported
                     }
                 })
                 
+
                 if (upload.status === 200) {
                     onUpload && onUpload({
                         mediaID: getLink.data.mediaId,

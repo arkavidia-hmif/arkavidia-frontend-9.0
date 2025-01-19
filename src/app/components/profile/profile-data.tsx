@@ -166,7 +166,7 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       }
       // console.log('API Response:', response)
       setValue(tempValue)
-    } catch (error) {
+    } catch {
       toast({
         title: 'Failed to update',
         description: 'Something went wrong',
