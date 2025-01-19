@@ -43,8 +43,6 @@ export const ResetPasswordForm = () => {
     }
   })
 
-  console.log(token)
-
   const [showPassword, setShowPassword] = useState(false)
 
   const togglePasswordVisibility = () => {

@@ -199,7 +199,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
       const file = event.dataTransfer.files[0]
       setSelectedFile(file)
-      console.log('Dropped file:', file)
+      // console.log('Dropped file:', file)
     }
   }
 
@@ -207,7 +207,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0]
       setSelectedFile(file)
-      console.log('Selected file:', file)
+      // console.log('Selected file:', file)
     }
   }
 

@@ -55,8 +55,6 @@ export const FormForgetPassword = () => {
       }
     })
 
-    console.log(res)
-
     // If success, open modal
     if (res.status === 200) {
       setIsSuccessModalOpen(true)
