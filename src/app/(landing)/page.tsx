@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { CompetitionSwiper } from '../components/landing/CompetitionSwiper'
+import GalleryCarousel from '../components/landing/GalleryCarousel'
 
 const competitions = [
   {
@@ -81,6 +82,9 @@ const MainLandingCompetitionPage = () => {
       </div>
       <div className="col-span-3 mt-6 flex h-fit w-full items-center justify-center px-10 md:mt-14">
         <CompetitionSwiper competitions={competitions} />
+      </div>
+      <div className='mt-12'>
+        <GalleryCarousel />
       </div>
 
       <Image
