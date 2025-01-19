@@ -9,48 +9,75 @@ import {
   getCompetitionTimelineWithCompetitionId,
   GetCompetitionTimelineWithCompetitionIdResponse
 } from '~/api/generated'
-import { CompetitionLandingPage } from '~/app/components/competition/LandingPage'
+import { CompetitionLandingPage, ContactPersonProps } from '~/app/components/competition/LandingPage'
 import { useRouter } from 'next/navigation'
 import { TimelineEventProps } from '~/app/components/Timeline'
+import Loading from '~/app/components/Loading'
 
 type CompetitionMap = {
   [key: string]: {
     title: string
     abbr: string
     logoPath: string
+    contactPerson?: ContactPersonProps[]
   }
 }
 
+// DEFINITION
 const COMPETITIONMAP: CompetitionMap = {
   'competitive-programming': {
     title: 'Competitive Programming',
     abbr: 'CP',
-    logoPath: '/images/competition/cp-logo.svg'
+    logoPath: '/images/competition/cp-logo.svg',
+    contactPerson: [
+      {name: 'Farhan', contact: 'farhannr28', type: 'line'},
+      {name: 'Kristo', contact: 'kristoanugrah', type: 'line'},
+    ],
   },
   arkalogica: {
     title: 'Arkalogica',
     abbr: 'Arkalogica',
-    logoPath: '/images/competition/arkalogica-logo.svg'
+    logoPath: '/images/competition/arkalogica-logo.svg',
+    contactPerson: [
+      {name: 'Nuel', contact: 'imanuelgirsang', type: 'line'},
+      {name: 'Adril', contact: 'manurungadril', type: 'line'},
+    ],
   },
   uxvidia: {
     title: 'UXVidia',
     abbr: 'UXvidia',
-    logoPath: '/images/competition/uxvidia-logo.svg'
+    logoPath: '/images/competition/uxvidia-logo.svg',
+    contactPerson: [
+      {name: 'Nuel', contact: 'imanuelgirsang', type: 'line'},
+      {name: 'Adril', contact: 'manurungadril', type: 'line'},
+    ],
   },
   'capture-the-flag': {
     title: 'Capture The Flag',
     abbr: 'CTF',
-    logoPath: '/images/competition/ctf-logo.svg'
+    logoPath: '/images/competition/ctf-logo.svg',
+    contactPerson: [
+      {name: 'Dava', contact: 'dovodedomo', type: 'discord'},
+      {name: 'Saad', contact: 'saadabha', type: 'line'},
+    ],
   },
   hackvidia: {
     title: 'Hackvidia',
     abbr: 'Hackvidia',
-    logoPath: '/images/competition/hackvidia-logo.svg'
+    logoPath: '/images/competition/hackvidia-logo.svg',
+    contactPerson: [
+      {name: 'Syakira', contact: 'syakiraafldz', type: 'line'},
+      {name: 'Edbert', contact: 'yenyenhui', type: 'line'},
+    ],
   },
   datavidia: {
     title: 'Datavidia',
     abbr: 'Datavidia',
-    logoPath: '/images/competition/datavidia-logo.svg'
+    logoPath: '/images/competition/datavidia-logo.svg',
+    contactPerson: [
+      {name: 'Fathur', contact: 'fathurwithyou', type: 'line'},
+      {name: 'Maul', contact: 'maull04', type: 'line'},
+    ],
   }
 }
 
@@ -75,6 +102,7 @@ function CompetitionLanding({ params }: { params: Promise<{ competition: string 
     title: string
     abbr: string
     logoPath: string
+    contactPerson?: ContactPersonProps[]
   }>({ title: '', abbr: '', logoPath: '' })
   const [competitionTimeline, setCompetitionTimeline] = useState<TimelineEventProps[]>([
     { title: '', timeEnd: new Date() }
@@ -104,7 +132,7 @@ function CompetitionLanding({ params }: { params: Promise<{ competition: string 
         }
 
         if (!competitions) {
-          setError('No competitions data received from the API')
+          router.push('/404')
           return
         }
 
@@ -140,11 +168,11 @@ function CompetitionLanding({ params }: { params: Promise<{ competition: string 
   }, [params, axiosInstance])
 
   if (error) {
-    return <p>{error}</p>
+    router.push('/404')
   }
 
   if (!competitionData) {
-    return <p>Loading...</p>
+    return (<Loading/>)
   }
 
   return (
@@ -157,6 +185,7 @@ function CompetitionLanding({ params }: { params: Promise<{ competition: string 
       competitionLogoPath={competitionMeta.logoPath}
       registerLink=""
       handbookLink={competitionData.guidebookUrl || '#'}
+      contactPerson={competitionMeta.contactPerson}
     />
   )
 }

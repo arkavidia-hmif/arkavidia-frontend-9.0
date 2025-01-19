@@ -9,7 +9,6 @@ import { IoMdDownload } from 'react-icons/io'
 import FAQAccordion from '../FAQAccordion'
 import CompetitionRegistration from '../CompetitionRegistration'
 
-
 type WinnerPrizeProps = {
   position: string
   prize?: number | string
@@ -26,11 +25,27 @@ const options: Intl.DateTimeFormatOptions = {
   second: 'numeric'
 }
 
-type ContactPersonProps = {
+export type ContactPersonProps = {
   name: string
-  type?: 'phone' | 'email' | 'line' | 'whatsapp' | 'instagram' | string
+  type: SocialMedia
   contact?: string
-  iconPath?: string
+}
+
+export type SocialMedia =
+  | 'phone'
+  | 'email'
+  | 'line'
+  | 'whatsapp'
+  | 'discord'
+  | 'instagram'
+
+export const contactLogo: Record<SocialMedia, string> = {
+  line: '/images/profile/linelogo.svg',
+  discord: '/images/profile/discordlogo.jpg',
+  instagram: '/images/profile/iglogo.png',
+  whatsapp: '/images/profile/whatsapplogo.svg',
+  phone: '',
+  email: ''
 }
 
 type CompetitionLandingPageProps = {
@@ -53,98 +68,94 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   const [timeLeft, setTimeLeft] = useState<number>(0) // Time left in milliseconds
 
   useEffect(() => {
-    const now = new Date();
-  
-    // Separate events into past and future
-    const pastEvents = props.registrationDeadline.filter(
-      event => event.timeEnd && new Date(event.timeEnd).getTime() < now.getTime()
-    );
+    const now = new Date()
+
     const futureEvents = props.registrationDeadline.filter(event => {
       const startTime = event.timeStart
         ? new Date(event.timeStart).getTime()
-        : Number.MAX_SAFE_INTEGER;
+        : Number.MAX_SAFE_INTEGER
       const endTime = event.timeEnd
         ? new Date(event.timeEnd).getTime()
-        : Number.MAX_SAFE_INTEGER;
-      return startTime > now.getTime() || endTime > now.getTime();
-    });
-  
+        : Number.MAX_SAFE_INTEGER
+      return startTime > now.getTime() || endTime > now.getTime()
+    })
+
     // Check for current event
     const currentEvent = props.registrationDeadline.find(event => {
       const startTime = event.timeStart
         ? new Date(event.timeStart).getTime()
-        : Number.MIN_SAFE_INTEGER;
+        : Number.MIN_SAFE_INTEGER
       const endTime = event.timeEnd
         ? new Date(event.timeEnd).getTime()
-        : Number.MAX_SAFE_INTEGER;
-      return now.getTime() >= startTime && now.getTime() <= endTime;
-    });
-  
+        : Number.MAX_SAFE_INTEGER
+      return now.getTime() >= startTime && now.getTime() <= endTime
+    })
+
     if (currentEvent) {
-      setCurrentOrClosestEvent(currentEvent);
+      setCurrentOrClosestEvent(currentEvent)
       setTimeLeft(
         currentEvent.timeEnd
           ? new Date(currentEvent.timeEnd).getTime() - now.getTime()
           : futureEvents.length > 0
-          ? new Date(futureEvents[0].timeStart || futureEvents[0].timeEnd!).getTime() -
-            now.getTime()
-          : 0
-      );
-      return;
+            ? new Date(futureEvents[0].timeStart || futureEvents[0].timeEnd!).getTime() -
+              now.getTime()
+            : 0
+      )
+      return
     }
-  
+
     // Find the closest future event
     if (futureEvents.length > 0) {
       const closestFutureEvent = futureEvents.sort((a, b) => {
         const timeA = a.timeStart
           ? new Date(a.timeStart).getTime()
-          : new Date(a.timeEnd!).getTime();
+          : new Date(a.timeEnd!).getTime()
         const timeB = b.timeStart
           ? new Date(b.timeStart!).getTime()
-          : new Date(b.timeEnd!).getTime();
-        return timeA - timeB;
-      })[0];
-  
+          : new Date(b.timeEnd!).getTime()
+        return timeA - timeB
+      })[0]
+
       const remainingTime = closestFutureEvent.timeStart
         ? new Date(closestFutureEvent.timeStart).getTime() - now.getTime()
-        : new Date(closestFutureEvent.timeEnd!).getTime() - now.getTime();
-  
-      setCurrentOrClosestEvent(closestFutureEvent);
-      setTimeLeft(remainingTime);
-      return;
+        : new Date(closestFutureEvent.timeEnd!).getTime() - now.getTime()
+
+      setCurrentOrClosestEvent(closestFutureEvent)
+      setTimeLeft(remainingTime)
+      return
     }
-  
+
     // If all events are in the past or none exist
-    setCurrentOrClosestEvent(null);
-    setTimeLeft(0);
-  }, [props.registrationDeadline]);
-  
+    setCurrentOrClosestEvent(null)
+    setTimeLeft(0)
+  }, [props.registrationDeadline])
+
   useEffect(() => {
     // Timer to update timeLeft every second
     const interval = setInterval(() => {
       if (currentOrClosestEvent && timeLeft > 0) {
-        setTimeLeft(prev => (prev > 1000 ? prev - 1000 : 0)); // Decrease by 1 second
+        setTimeLeft(prev => (prev > 1000 ? prev - 1000 : 0)) // Decrease by 1 second
       } else if (timeLeft === 0) {
-        setCurrentOrClosestEvent(null); // Mark as closed when timeLeft reaches 0
+        setCurrentOrClosestEvent(null) // Mark as closed when timeLeft reaches 0
       }
-    }, 1000);
-  
-    return () => clearInterval(interval);
-  }, [currentOrClosestEvent, timeLeft]);
-  
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [currentOrClosestEvent, timeLeft])
+
   const formatTimeUnits = (ms: number) => {
     if (ms <= 0) {
-      return { days: 0, hours: 0, minutes: 0, seconds: 0 }; // Set all to 0 if no time is left
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 } // Set all to 0 if no time is left
     }
-  
-    const seconds = Math.floor(ms / 1000) % 60;
-    const minutes = Math.floor(ms / (1000 * 60)) % 60;
-    const hours = Math.floor(ms / (1000 * 60 * 60)) % 24;
-    const days = Math.floor(ms / (1000 * 60 * 60 * 24));
-    return { days, hours, minutes, seconds };
-  };
-  
-  const { days, hours, minutes, seconds } = formatTimeUnits(timeLeft);
+
+    const seconds = Math.floor(ms / 1000) % 60
+    const minutes = Math.floor(ms / (1000 * 60)) % 60
+    const hours = Math.floor(ms / (1000 * 60 * 60)) % 24
+    const days = Math.floor(ms / (1000 * 60 * 60 * 24))
+    return { days, hours, minutes, seconds }
+  }
+
+  const { days, hours, minutes, seconds } = formatTimeUnits(timeLeft)
 
   return (
     <div className="min-h-screen min-w-full bg-[url('/images/competition/landing-page.jpg')] bg-cover bg-no-repeat">
@@ -157,9 +168,9 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           <div className="flex flex-col gap-4 md:flex-row md:gap-8">
             <div className="flex w-full items-center justify-center md:w-1/3">
               <Image
-                width={600}
-                height={600}
-                src={props.competitionLogoPath || '/arkavidiaLogo.svg'}
+                width={700}
+                height={700}
+                src={props.competitionLogoPath || '/arkavidiaText.svg'}
                 alt={props.competitionName}
               />
             </div>
@@ -170,25 +181,29 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               <p className="text-justify font-dmsans text-sm leading-6 sm:text-base md:text-lg md:leading-7">
                 {props.competitionDescription}
               </p>
-              
-              <p className="text-center text-base font-bold md:text-left md:text-lg">
-  {currentOrClosestEvent ? (
-    timeLeft > 0 ? (
-      `${currentOrClosestEvent.title}: ${
-        currentOrClosestEvent.timeEnd
-          ? new Date(currentOrClosestEvent.timeEnd).toLocaleDateString('id-ID', options)
-          : currentOrClosestEvent.timeStart
-          ? `Starts on ${new Date(currentOrClosestEvent.timeStart).toLocaleDateString('id-ID', options)}`
-          : 'Date Not Available'
-      }`
-    ) : (
-      'CLOSED'
-    )
-  ) : (
-    'CLOSED'
-  )}
-</p>
 
+              <p className="text-center text-base font-bold md:text-left md:text-lg">
+                {currentOrClosestEvent ? (
+                  timeLeft > 0 ? (
+                    `${currentOrClosestEvent.title}: ${
+                      currentOrClosestEvent.timeEnd
+                        ? new Date(currentOrClosestEvent.timeEnd).toLocaleDateString(
+                            'id-ID',
+                            options
+                          )
+                        : currentOrClosestEvent.timeStart
+                          ? `Starts on ${new Date(currentOrClosestEvent.timeStart).toLocaleDateString('id-ID', options)}`
+                          : 'Date Not Available'
+                    }`
+                  ) : (
+                    <span className="rounded-sm border-red-400 px-6 py-2 text-center">
+                      DITUTUP
+                    </span>
+                  )
+                ) : (
+                  'CLOSED'
+                )}
+              </p>
             </div>
           </div>
         </section>
@@ -226,14 +241,22 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           {/* Buttons */}
           <div className="flex flex-col justify-center gap-4 sm:flex-row sm:gap-8 md:gap-12">
             <Button variant="outline" className="w-full sm:w-auto">
-              <a href={props.handbookLink} target='_blank' rel="noopener noreferrer">
-              <div className="flex flex-row items-center justify-center gap-2">
-                <IoMdDownload className="text-[#48E6FF]" />
-                <span>Download Handbook</span>
-              </div>
+              <a
+                href={props.handbookLink === '#' ? '#' : props.handbookLink}
+                target={
+                  props.handbookLink === '#' || props.handbookLink === '' ? '' : '_blank'
+                }
+                rel="noopener noreferrer">
+                <div className="flex flex-row items-center justify-center gap-2">
+                  <IoMdDownload className="text-[#48E6FF]" />
+                  <span>Download Handbook</span>
+                </div>
               </a>
             </Button>
-            <CompetitionRegistration competitionID={props.competitionCode} competitionAbbreviation={props.competitionAbbr} />
+            <CompetitionRegistration
+              competitionID={props.competitionCode}
+              competitionAbbreviation={props.competitionAbbr}
+            />
           </div>
         </section>
 
@@ -295,20 +318,22 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
         {/* Contact Person Section */}
         {props.contactPerson && (
-          <section className="w-1/2 px-4 sm:px-8" id="competition-contact">
-            <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:justify-around sm:gap-12 md:gap-28">
-              <div className="text-center font-dmsans text-base font-bold sm:text-left sm:text-lg">
+          <section
+            className="flex w-full items-center justify-center px-4 sm:px-8"
+            id="competition-contact">
+            <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:items-center sm:justify-around sm:gap-12 md:gap-28">
+              <div className="text-nowrap text-center font-dmsans text-base font-bold sm:text-lg">
                 Contact Person
               </div>
-              <div className="flex flex-col gap-4 sm:flex-row sm:gap-2">
+              <div className="flex w-full flex-col flex-wrap gap-4 sm:flex-row sm:gap-2">
                 {props.contactPerson?.map(contact => (
                   <Button
                     variant="outline"
                     key={contact.contact}
                     className="w-full sm:w-auto">
-                    <div className="flex flex-row items-center justify-center gap-2">
+                    <div className="flex flex-row items-center justify-center gap-2 px-4">
                       <Image
-                        src={contact.iconPath || ''}
+                        src={contactLogo[contact.type] || ''}
                         alt={contact.name}
                         width={20}
                         height={20}

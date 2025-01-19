@@ -17,7 +17,7 @@ export const CompetitionGaleryTimeline = () => {
     }
   ]
   return (
-    <div className="mt-48 flex flex-col items-center justify-around gap-28 max-md:mt-24 md:flex-row">
+    <div className="mt-48 flex flex-col items-center justify-around gap-28 max-md:mt-24 md:flex-row z-50">
       <GalleryCarousel />
 
       <Timeline variant="vertical" events={TimelineData} />
