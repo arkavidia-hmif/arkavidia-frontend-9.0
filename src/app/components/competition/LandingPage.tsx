@@ -158,7 +158,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   const { days, hours, minutes, seconds } = formatTimeUnits(timeLeft)
 
   return (
-    <div className="min-h-screen min-w-full bg-purple-900">
+    <div className="min-h-screen min-w-full">
       <Navbar />
       <div className="mx-4 flex flex-col items-center gap-16 py-6 font-dmsans sm:mx-8 md:mx-12 md:gap-16 md:py-24 lg:mx-16 lg:gap-18 lg:py-24">
         {/* Competition Information Section */}
@@ -347,7 +347,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           </section>
         )}
       </div>
-      <Image src={'/images/competition/landing-page.png'} fill className='absolute top-0' alt='Landing Background'/>
+      <Image src={'/images/competition/landing-page.png'} fill className='absolute top-0 z-[-1]' alt='Landing Background'/>
     </div>
   )
 }
