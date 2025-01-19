@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { ArrowLeft, CircleCheck } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CircleCheck } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -15,13 +15,11 @@ import { Button } from './../Button'
 import { Input } from './../ui/input'
 import { Label } from './../ui/label'
 import { cn } from '~/lib/utils'
+import { joinTeamByCode } from '~/api/generated'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { useToast } from '~/hooks/use-toast'
+import { competitionAbbr, CompetitionType } from '~/app/components/CompetitionRegistration'
 
-type CompetitionType = 'cp' | 'ctf';
-
-const competitionAbbr: Record<CompetitionType, string> = {
-  'cp': "Competitive Programming",
-  'ctf': "Capture The Flag",
-}
 
 interface SuccessDialogProps {
   isOpen: boolean
@@ -53,39 +51,63 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, compet
   )
 }
 
-export const JoinCompetitionPopup: React.FC<{ competitionType: CompetitionType }> = ({ competitionType }) => {
+export const JoinCompetitionPopup: React.FC<{ competitionID: string, competitionType: CompetitionType }> = ({competitionType }) => {
+  const { toast } = useToast();
+  const axiosAuth = useAxiosAuth();
   const [teamCode, setTeamCode] = React.useState('')
   const [error, setError] = React.useState('')
   const [isSuccess, setIsSuccess] = React.useState(false)
   const [isOpen, setIsOpen] = React.useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
 
+    const resp = await joinTeamByCode({
+      client: axiosAuth,
+      body: {
+        teamCode
+      }
+    })
     // TODO implement code validation. Just for testing purposes
     if (!teamCode || teamCode === 'WRONG') {
-      setError('Wrong team code!')
-    } else {
-      setIsSuccess(true)
-      setIsOpen(false)
+      setError('Wrong team code!');
+      return;
     }
+
+    if (resp.error) {
+      setError(resp.error.error);
+      return;
+    }
+
+    toast({
+      title: 'Successfully joined team',
+      variant: 'success',
+      duration: 3000
+    })
+    setIsSuccess(true)
+    setIsOpen(false)
   }
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button size="sm" onClick={() => setIsOpen(true)}>
-            Join Competition
-          </Button>
+        <Button size="sm" onClick={() => setIsOpen(true)} className="flex gap-[2rem] items-center justify-center w-[250px]">
+          <div>
+              <p className='text-xl'>
+                  Join Competition
+              </p>
+          </div>
+          <ArrowRight strokeWidth={4} size={4} className='mt-[2px]'/>
+        </Button>
         </DialogTrigger>
         <DialogContent 
         className={cn(
-          "max-w-5xl flex gap-4 justify-center items-center font-teachers py-16",
+          "max-w-5xl flex gap-4 justify-center items-center font-teachers py-16 px-[3rem]",
           "bg-[url('/images/join-competition/bg.png')] bg-cover bg-center bg-no-repeat",
         )}>
-          <div className="flex flex-row gap-2 md:gap-4 w-full justify-center">
+          <div className="flex flex-col gap-2 md:gap-4 w-full justify-center">
             <div className='grow-0'>
               <DialogClose className="rounded-sm opacity-70 ring-offset-background p-2 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
                 <ArrowLeft className="w-6 md:w-8 h-auto" />

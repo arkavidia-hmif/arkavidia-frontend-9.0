@@ -26,8 +26,6 @@ function SocialMediaInput({
   const [tempValue, setTempValue] = useState<string>(default_value)
 
   const handleSave = async () => {
-    setValue(tempValue)
-    setTempValue(value)
     let update
     if (type === 'line') {
       update = await updateUser({ client: axiosAuth, body: { idLine: tempValue } })
@@ -46,6 +44,8 @@ function SocialMediaInput({
     }
 
     if (update && update.data) {
+      setValue(tempValue)
+      setTempValue(value)
       toast({
         title: `Success`,
         description: 'Update successful',
@@ -59,7 +59,7 @@ function SocialMediaInput({
       handleSave={handleSave}
       handleCancel={() => setTempValue(value)}
       title={title}
-      value={value}>
+      value={value.length > 0 ? value : 'Not set'}>
       <div className="flex items-center">
         {logoSrc && <div className="mr-2">{logoSrc}</div>}
         <Input

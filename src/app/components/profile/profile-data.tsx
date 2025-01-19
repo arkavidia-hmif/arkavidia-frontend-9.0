@@ -7,8 +7,10 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import Dropdown, { MenuItem } from '../Dropdown'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
-import { getFormattedBirthDate } from '~/lib/utils'
-import { useToast } from '~/hooks/use-toast'
+import { getEducation, getFormattedBirthDate } from '~/lib/utils'
+import { toast, useToast } from '~/hooks/use-toast'
+import { useAppDispatch } from '~/redux/store'
+import { setUsername } from '~/redux/slices/auth'
 interface ProfileDataProps {
   title: string
   value: string
@@ -21,7 +23,6 @@ interface ProfileDataLayoutProps extends ProfileDataProps {
 }
 
 // Base profileData components layout
-export const ProfileData = (props: ProfileDataLayoutProps) => {
 export const ProfileData = (props: ProfileDataLayoutProps) => {
   const [isEdit, setIsEdit] = useState<boolean>(false)
 
@@ -123,6 +124,7 @@ interface InputProfileDataProps {
 
 export const InputProfileData = (props: InputProfileDataProps) => {
   const axiosAuth = useAxiosAuth()
+  const appDispatch = useAppDispatch()
   const [value, setValue] = useState<string>(props.default_value)
   const [tempValue, setTempValue] = useState<string>(props.default_value)
 
@@ -131,7 +133,8 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       const noSpace = props.title.toLowerCase().replace(' ', '_')
       const fieldMap: Record<string, string> = {
         name: 'fullName',
-        phone_number: 'phoneNumber'
+        phone_number: 'phoneNumber',
+        instance: 'instance'
       }
 
       const fieldName = fieldMap[noSpace]
@@ -140,10 +143,34 @@ export const InputProfileData = (props: InputProfileDataProps) => {
         client: axiosAuth,
         body: { [fieldName]: tempValue }
       })
+
+      if (response.error) {
+        toast({
+          title: 'Failed to update',
+          description: 'Something went wrong',
+          variant: 'destructive'
+        })
+      }
+
+      if (response.data) {
+        toast({
+          title: 'Success',
+          description: 'Update berhasil',
+          variant: 'success'
+        })
+        if (fieldName === 'fullName') {
+          appDispatch(setUsername(tempValue))
+        }
+        setValue(tempValue)
+      }
       // console.log('API Response:', response)
       setValue(tempValue)
     } catch (error) {
-      console.error('Failed to update input:', error)
+      toast({
+        title: 'Failed to update',
+        description: 'Something went wrong',
+        variant: 'destructive'
+      })
     }
   }
 
@@ -188,15 +215,31 @@ export const DropdownProfileData = (props: DropdownProfileDataProps) => {
     try {
       const noSpace = props.title.toLowerCase().replace(/ /g, '_')
       const fieldMap: Record<string, string> = {
-        instance: 'instance',
-        education: 'education',
-        how_do_you_know_about_arkavidia: 'entrySource'
+        education: 'education'
       }
       const fieldName = fieldMap[noSpace]
       const response = await updateUser({
         client: axiosAuth,
-        body: { [fieldName]: tempValue.option }
+        body: {
+          [fieldName]:
+            fieldName === 'education' ? getEducation(tempValue.option) : tempValue.option
+        }
       })
+      if (response.error) {
+        toast({
+          title: 'Failed to update education',
+          description: 'Something went wrong',
+          variant: 'destructive'
+        })
+      }
+
+      if (response.data) {
+        toast({
+          title: 'Success',
+          description: 'Update successful',
+          variant: 'success'
+        })
+      }
       // console.log(response)
       setValue(tempValue)
     } catch (error) {
@@ -263,7 +306,11 @@ export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
         })
       }
     } catch (error) {
-      console.error('Failed to update date:', error)
+      toast({
+        title: 'Failed to update birth date',
+        description: 'Something went wrong',
+        variant: 'destructive'
+      })
     }
   }
 
@@ -277,14 +324,18 @@ export const DatePickerProfileData = (props: DatePickerProfileDataProps) => {
     <ProfileData
       handleCancel={onCancelDate}
       title={props.title}
-      value={selectedDate}
+      value={
+        isNaN(tempDate.getTime())
+          ? 'No date'
+          : tempDate.toLocaleString('id-ID', { dateStyle: 'medium' })
+      }
       handleSave={onSaveDate}>
       <div className="flex items-center">
         {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
         <input
           aria-label="Date"
           type="date"
-          value={tempDate.toLocaleString('id-ID')}
+          value={getFormattedBirthDate(tempDate)}
           onChange={e => setTempDate(new Date(e.target.value))}
           className="w-full rounded-md border border-purple-400 bg-lilac-100 p-2 py-3 pr-40 text-purple-400"
         />

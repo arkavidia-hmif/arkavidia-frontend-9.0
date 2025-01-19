@@ -17,7 +17,7 @@ import { useToast } from '../../../hooks/use-toast'
 import Dropdown, { MenuItem } from '../Dropdown'
 import { Checkbox } from '../Checkbox'
 import CustomDatePicker from '../date-picker/CustomDatePicker'
-import { getPresignedLink, self, updateUser } from '~/api/generated'
+import { getPresignedLink, self, updateUser, uploadUserIdCard } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { axiosInstance } from '~/lib/axios'
 import { useRouter } from 'next/navigation'
@@ -111,6 +111,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
           description: 'Gagal mengirimkan data',
           variant: 'destructive'
         })
+        return
       }
 
       if (getSelf.data) {
@@ -121,7 +122,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
         const getLink = await getPresignedLink({
           client: axiosAuth,
           query: {
-            bucket: 'competition-registration',
+            bucket: 'kartu-identitas',
             filename: `${userId}-identity-card.${fileExt}`
           }
         })
@@ -131,10 +132,11 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
             description: 'Gagal melakukan upload data',
             variant: 'destructive'
           })
+          return
         }
 
         if (getLink.data) {
-          // If we get the link, do a PUT rqeuest to S3
+          // If we get the link, do a PUT request to S3
           const upload = await axiosInstance.put({
             url: getLink.data.presignedUrl,
             body: values.identityCard[0]
@@ -142,48 +144,68 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
 
           if (upload.status === 200) {
             // If the upload is successful, save the data to the backend
-            // Logic to save new user profile data
-            const updateProfile = await updateUser({
+            const uploadIDCardURL = await uploadUserIdCard({
               client: axiosAuth,
               body: {
-                fullName: values.fullname,
-                birthDate: getFormattedBirthDate(values.birthdate),
-                education: getEducation(values.education),
-                instance: values.institution,
-                phoneNumber: values.phonenumber,
-                idLine: values.lineid,
-                idInstagram: values.instagram,
-                idDiscord: values.discord,
-                consent: values.formacceptance
+                userIdCardUrl: getLink.data.mediaUrl
               }
             })
-            if (updateProfile.error) {
+
+            if (uploadIDCardURL.error) {
               toast({
                 title: 'Error',
-                description: 'Gagal melakukan pembaruan data',
+                description: 'Gagal melakukan upload data',
                 variant: 'destructive'
               })
+              return
             }
 
-            if (updateProfile.data) {
-              appDispatch(setFilledInfo(true))
-            }
-            // TODO: Add logic to save S3 data to backend database here
-            toast({
-              title: 'Success',
-              description: 'Data berhasil disimpan',
-              variant: 'success'
-            })
+            if (uploadIDCardURL.data) {
+              // Logic to save new user profile data
+              const updateProfile = await updateUser({
+                client: axiosAuth,
+                body: {
+                  fullName: values.fullname,
+                  birthDate: getFormattedBirthDate(values.birthdate),
+                  education: getEducation(values.education),
+                  instance: values.institution,
+                  phoneNumber: values.phonenumber,
+                  idLine: values.lineid,
+                  idInstagram: values.instagram,
+                  idDiscord: values.discord,
+                  consent: values.formacceptance
+                }
+              })
 
-            setTimeout(() => {
-              router.replace('/')
-            }, 1000)
+              if (updateProfile.error) {
+                toast({
+                  title: 'Error',
+                  description: 'Gagal melakukan pembaruan data',
+                  variant: 'destructive'
+                })
+                return
+              }
+
+              if (updateProfile.data) {
+                appDispatch(setFilledInfo(true))
+                toast({
+                  title: 'Success',
+                  description: 'Data berhasil disimpan',
+                  variant: 'success',
+                  duration: 5000
+                })
+                setTimeout(() => {
+                  router.replace('/')
+                }, 1000)
+              }
+            }
           } else {
             toast({
               title: 'Error',
               description: 'Gagal melakukan upload data',
               variant: 'destructive'
             })
+            return
           }
         }
       }

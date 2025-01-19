@@ -18,7 +18,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Get API Definition
-RUN pnpm dlx @hey-api/openapi-ts \
+RUN pnpm openapi-ts \
 -c @hey-api/client-axios \
 -i ${NEXT_PUBLIC_API_URL}/openapi.json \
 -o src/api/generated
