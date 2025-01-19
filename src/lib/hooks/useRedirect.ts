@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAppSelector } from '~/redux/store'
 import { toast, useToast } from '~/hooks/use-toast'
 
