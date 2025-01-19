@@ -2,10 +2,8 @@ import React from 'react';
 
 export type TimelineEventProps = {
   title: string;
-  description?: string;
   timeStart?: Date;
-  timeEnd: Date;
-  logoPath?: string;
+  timeEnd?: Date;
 };
 
 export type TimelineProps = {
@@ -84,7 +82,6 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
             } space-y-2`}
           >
             <h1 className="text-2xl font-bold text-purple-100">{event.title}</h1>
-            <p className="text-sm">{event.description}</p>
             <p className="text-md text-gray-400">
               {event.timeStart &&
                 event.timeStart.toLocaleDateString('id-ID', options) + ' - '}

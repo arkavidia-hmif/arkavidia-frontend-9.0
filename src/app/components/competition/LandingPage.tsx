@@ -7,7 +7,7 @@ import Timeline, { TimelineEventProps } from '../Timeline'
 import { Button } from '../Button'
 import { IoMdDownload } from 'react-icons/io'
 import FAQAccordion from '../FAQAccordion'
-import RegisterCompetitionPopup from '../join-competition/register-competition-popup'
+import CompetitionRegistration from '../CompetitionRegistration'
 
 
 type WinnerPrizeProps = {
@@ -35,6 +35,7 @@ type ContactPersonProps = {
 
 type CompetitionLandingPageProps = {
   competitionCode: string
+  competitionAbbr: string
   competitionName: string
   competitionDescription: string
   competitionLogoPath: string
@@ -52,104 +53,98 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   const [timeLeft, setTimeLeft] = useState<number>(0) // Time left in milliseconds
 
   useEffect(() => {
-    const now = new Date()
-
+    const now = new Date();
+  
     // Separate events into past and future
     const pastEvents = props.registrationDeadline.filter(
       event => event.timeEnd && new Date(event.timeEnd).getTime() < now.getTime()
-    )
+    );
     const futureEvents = props.registrationDeadline.filter(event => {
       const startTime = event.timeStart
         ? new Date(event.timeStart).getTime()
-        : Number.MAX_SAFE_INTEGER
+        : Number.MAX_SAFE_INTEGER;
       const endTime = event.timeEnd
         ? new Date(event.timeEnd).getTime()
-        : Number.MAX_SAFE_INTEGER
-      return startTime > now.getTime() || endTime > now.getTime()
-    })
-
+        : Number.MAX_SAFE_INTEGER;
+      return startTime > now.getTime() || endTime > now.getTime();
+    });
+  
     // Check for current event
     const currentEvent = props.registrationDeadline.find(event => {
       const startTime = event.timeStart
         ? new Date(event.timeStart).getTime()
-        : Number.MIN_SAFE_INTEGER
+        : Number.MIN_SAFE_INTEGER;
       const endTime = event.timeEnd
         ? new Date(event.timeEnd).getTime()
-        : Number.MAX_SAFE_INTEGER
-      return now.getTime() >= startTime && now.getTime() <= endTime
-    })
-
+        : Number.MAX_SAFE_INTEGER;
+      return now.getTime() >= startTime && now.getTime() <= endTime;
+    });
+  
     if (currentEvent) {
-      setCurrentOrClosestEvent(currentEvent)
+      setCurrentOrClosestEvent(currentEvent);
       setTimeLeft(
         currentEvent.timeEnd
           ? new Date(currentEvent.timeEnd).getTime() - now.getTime()
+          : futureEvents.length > 0
+          ? new Date(futureEvents[0].timeStart || futureEvents[0].timeEnd!).getTime() -
+            now.getTime()
           : 0
-      )
-      return
+      );
+      return;
     }
-
+  
     // Find the closest future event
     if (futureEvents.length > 0) {
       const closestFutureEvent = futureEvents.sort((a, b) => {
         const timeA = a.timeStart
           ? new Date(a.timeStart).getTime()
-          : new Date(a.timeEnd!).getTime()
+          : new Date(a.timeEnd!).getTime();
         const timeB = b.timeStart
           ? new Date(b.timeStart!).getTime()
-          : new Date(b.timeEnd!).getTime()
-        return timeA - timeB
-      })[0]
-
+          : new Date(b.timeEnd!).getTime();
+        return timeA - timeB;
+      })[0];
+  
       const remainingTime = closestFutureEvent.timeStart
         ? new Date(closestFutureEvent.timeStart).getTime() - now.getTime()
-        : new Date(closestFutureEvent.timeEnd!).getTime() - now.getTime()
-
-      setCurrentOrClosestEvent(closestFutureEvent)
-      setTimeLeft(remainingTime)
-      return
+        : new Date(closestFutureEvent.timeEnd!).getTime() - now.getTime();
+  
+      setCurrentOrClosestEvent(closestFutureEvent);
+      setTimeLeft(remainingTime);
+      return;
     }
-
-    // If all events are in the past
-    if (pastEvents.length > 0) {
-      const latestPastEvent = pastEvents.sort(
-        (a, b) => new Date(b.timeEnd!).getTime() - new Date(a.timeEnd!).getTime()
-      )[0]
-      setCurrentOrClosestEvent(latestPastEvent)
-      setTimeLeft(0)
-      return
-    }
-
-    // If no events exist
-    setCurrentOrClosestEvent(null)
-    setTimeLeft(0)
-  }, [props.registrationDeadline])
-
+  
+    // If all events are in the past or none exist
+    setCurrentOrClosestEvent(null);
+    setTimeLeft(0);
+  }, [props.registrationDeadline]);
+  
   useEffect(() => {
     // Timer to update timeLeft every second
     const interval = setInterval(() => {
       if (currentOrClosestEvent && timeLeft > 0) {
-        setTimeLeft(prev => (prev > 1000 ? prev - 1000 : 0)) // Decrease by 1 second
+        setTimeLeft(prev => (prev > 1000 ? prev - 1000 : 0)); // Decrease by 1 second
+      } else if (timeLeft === 0) {
+        setCurrentOrClosestEvent(null); // Mark as closed when timeLeft reaches 0
       }
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [currentOrClosestEvent, timeLeft])
-
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, [currentOrClosestEvent, timeLeft]);
+  
   const formatTimeUnits = (ms: number) => {
     if (ms <= 0) {
-      return { days: 0, hours: 0, minutes: 0, seconds: 0 } // Set all to 0 if no time is left
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 }; // Set all to 0 if no time is left
     }
-
-    const seconds = Math.floor(ms / 1000) % 60
-    const minutes = Math.floor(ms / (1000 * 60)) % 60
-    const hours = Math.floor(ms / (1000 * 60 * 60)) % 24
-    const days = Math.floor(ms / (1000 * 60 * 60 * 24))
-    return { days, hours, minutes, seconds }
-  }
   
-
-  const { days, hours, minutes, seconds } = formatTimeUnits(timeLeft)
+    const seconds = Math.floor(ms / 1000) % 60;
+    const minutes = Math.floor(ms / (1000 * 60)) % 60;
+    const hours = Math.floor(ms / (1000 * 60 * 60)) % 24;
+    const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+    return { days, hours, minutes, seconds };
+  };
+  
+  const { days, hours, minutes, seconds } = formatTimeUnits(timeLeft);
 
   return (
     <div className="min-h-screen min-w-full bg-[url('/images/competition/landing-page.jpg')] bg-cover bg-no-repeat">
@@ -177,14 +172,23 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               </p>
               
               <p className="text-center text-base font-bold md:text-left md:text-lg">
-                {currentOrClosestEvent
-                  ? timeLeft > 0
-                    ? `${currentOrClosestEvent.title}: ${new Date(
-                        currentOrClosestEvent.timeEnd
-                      ).toLocaleDateString('id-ID', options)}`
-                    : 'CLOSED'
-                  : 'CLOSED'}
-              </p>
+  {currentOrClosestEvent ? (
+    timeLeft > 0 ? (
+      `${currentOrClosestEvent.title}: ${
+        currentOrClosestEvent.timeEnd
+          ? new Date(currentOrClosestEvent.timeEnd).toLocaleDateString('id-ID', options)
+          : currentOrClosestEvent.timeStart
+          ? `Starts on ${new Date(currentOrClosestEvent.timeStart).toLocaleDateString('id-ID', options)}`
+          : 'Date Not Available'
+      }`
+    ) : (
+      'CLOSED'
+    )
+  ) : (
+    'CLOSED'
+  )}
+</p>
+
             </div>
           </div>
         </section>
@@ -229,7 +233,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               </div>
               </a>
             </Button>
-            <RegisterCompetitionPopup competitionName={props.competitionName} />
+            <CompetitionRegistration competitionID={props.competitionCode} competitionAbbr={props.competitionAbbr} />
           </div>
         </section>
 
