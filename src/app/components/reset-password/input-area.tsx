@@ -9,6 +9,7 @@ import { Button } from '../ui/button'
 import { useState } from 'react'
 import { MdVisibility, MdVisibilityOff } from 'react-icons/md'
 import { useToast } from '~/hooks/use-toast'
+import { useSearchParams } from 'next/navigation'
 
 const ResetPasswordSchema = z
   .object({
@@ -22,6 +23,8 @@ const ResetPasswordSchema = z
 
 export const ResetPasswordForm = () => {
   const { toast } = useToast()
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token')
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
     defaultValues: {
@@ -37,7 +40,6 @@ export const ResetPasswordForm = () => {
   }
 
   const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
-    console.log('Password reset data:', values)
     toast({
       title: 'Password Changed',
       description: 'Passwordmu sudah berhasil diganti'

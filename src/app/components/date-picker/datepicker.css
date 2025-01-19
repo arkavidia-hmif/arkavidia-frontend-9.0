@@ -1,0 +1,22 @@
+.datepicker-personal .rdp-months {
+  width: 100%;
+  flex-grow: 1;
+}
+
+.datepicker-personal .rdp-month {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  margin-bottom: 10px;
+  flex-grow: 1;
+}
+
+.datepicker-personal .rdp-root {
+  width: 100%;
+}
+
+.datepicker-personal .rdp-month_grid {
+  width: 100%;
+}

@@ -6,7 +6,25 @@ import CompetitionContext from '../../components/admin-dashboard/CompetitionCont
 import { getTeamStatistic, GetTeamStatisticResponse } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 
+import { useRouter } from 'next/navigation'
+import { useToast } from '~/hooks/use-toast'
+import { useAppSelector } from '~/redux/store'
+
 const AdminDashboardPage = () => {
+  const isAuthenticated = useAppSelector(state => state.auth.accessToken !== null)
+  const isAdmin = useAppSelector(state => state.auth.isAdmin)
+  const { toast } = useToast()
+  const router = useRouter()
+  
+  if (!isAuthenticated || !isAdmin) {
+    toast({
+      title: 'Unauthorized',
+      description: 'You are not authorized to view this page',
+      variant: 'destructive'
+    })
+    router.replace('/')
+  }
+      
   const IMAGE = '/images/sidebar/item.svg'
   const axiosInstance = useAxiosAuth()
   const [overallStats, setOverallStats] = React.useState({
