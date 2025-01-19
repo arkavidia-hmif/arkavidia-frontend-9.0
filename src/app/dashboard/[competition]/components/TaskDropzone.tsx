@@ -11,7 +11,7 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 
 interface TaskDropzoneProps {
   bucket: GetPresignedLinkData['query']['bucket']
-  onSubmitMedia: (mediaUrl: string) => Promise<void>
+  onSubmitMedia: (mediaId: string, bucket: string, type: string) => Promise<void>
 }
 
 const fileTypeAssets = {
@@ -81,13 +81,14 @@ const TaskDropzone: React.FC<TaskDropzoneProps> = ({ bucket, onSubmitMedia }) =>
         throw new Error('Failed to get presigned URL')
       }
 
-      const { presignedUrl, mediaUrl } = response.data
+      const { presignedUrl, mediaId } = response.data
 
+      // Upload to S3
       await axios.put(presignedUrl, selectedFile, {
         headers: { 'Content-Type': selectedFile.type }
       })
 
-      await onSubmitMedia(mediaUrl)
+      await onSubmitMedia(mediaId, bucket, bucket)
       setSelectedFile(null)
     } catch {
       setError('An error occurred during upload. Please try again.')
