@@ -118,11 +118,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (isAdmin) {
           appDispatch(setAdmin())
         }
+        res.ok = true
+        setTimeout(() => {
+          if (!hasFilledInfo) {
+            router.replace('/register/personal-data')
+          } else {
+            router.replace('/')
+          }
+        }, 500)
       }
-      res.ok = true
-      setTimeout(() => {
-        router.replace('/')
-      }, 500)
     }
 
     return res
