@@ -19,7 +19,7 @@ const competitions = [
       'Capture The Flag merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
     preview: '/images/competition/ctf-preview.png',
     carousel: '/images/competition/ctf-logo.png',
-    link: '/competition/ctf'
+    link: '/competition/capture-the-flag'
   },
   {
     title: 'Competitive Programming',
@@ -27,7 +27,7 @@ const competitions = [
       'Competitive Programming merupakan kompetisi yang bertujuan untuk menjadi ajang pengembangan kompetensi dan pertandingan antara talenta digital Indonesia khususnya di dunia sains data.',
     preview: '/images/competition/cp-preview.png',
     carousel: '/images/competition/cp-logo.png',
-    link: '/competition/cp'
+    link: '/competition/competitive-programming'
   },
   {
     title: 'Datavidia',
@@ -57,7 +57,7 @@ const competitions = [
 
 const MainLandingCompetitionPage = () => {
   return (
-    <div className="md:py-18 relative flex min-h-screen flex-col items-center bg-[linear-gradient(180deg,_#7138C0_-14.45%,_#0F0123_35.71%)] py-10 text-center lg:py-24">
+    <div className="md:py-18 relative flex min-h-screen flex-col items-center bg-[linear-gradient(180deg,_#2C016D_-17.56%,_#0F0123_35.71%)] py-10 text-center lg:py-24">
       <div className="relative z-10 flex w-full flex-col justify-center px-10 pt-12 md:pt-20 lg:pt-24">
         <h1 className="text-glow bg-gradient-to-b from-[#48E6FF] from-20% via-[#9274FF] to-[#C159D8] bg-clip-text font-belanosima text-[56px] font-bold leading-[70px] text-transparent md:text-[84px] md:leading-[96px] lg:text-[108px] lg:leading-[132px]">
           ARKAVIDIA 9.0
@@ -90,8 +90,9 @@ const MainLandingCompetitionPage = () => {
       <Image
         src={'/images/competition/bg-landing.png'}
         alt={'bg-competition'}
-        fill
-        className="absolute top-16 z-0 object-fill"
+        width={1900}
+        height={2080}
+        className="absolute top-0 object-contain"
       />
     </div>
   )
