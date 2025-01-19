@@ -18,7 +18,7 @@ import { cn } from '~/lib/utils'
 import { postCreateTeam } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
-import { competitionAbbr, CompetitionType } from '~/app/components/CompetitionRegistration'
+import { CompetitionType } from '~/app/components/CompetitionRegistration'
 
 interface SuccessDialogProps {
   isOpen: boolean

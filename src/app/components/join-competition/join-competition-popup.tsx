@@ -16,17 +16,16 @@ import { cn } from '~/lib/utils'
 import { joinTeamByCode } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
-import { competitionAbbr, CompetitionType } from '~/app/components/CompetitionRegistration'
+import { CompetitionType } from '~/app/components/CompetitionRegistration'
 
 
 interface SuccessDialogProps {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
   competitionType: string
-  competitionLink: string
 }
 
-const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, competitionType, competitionLink }) => {
+const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, competitionType }) => {
   const teamName = 'Tim Sukses' // Dummy, replace it dynamically if needed
 
   return (
@@ -71,9 +70,9 @@ export const JoinTeam: React.FC<{ competitionID: string, competitionType: Compet
         teamCode
       }
     })
-    // TODO implement code validation. Just for testing purposes
-    if (!teamCode || teamCode === 'WRONG') {
-      setError('Wrong team code!');
+
+    if (!teamCode) {
+      setError('Please provide team code');
       return;
     }
 
