@@ -237,10 +237,10 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
   const contents = [
     // Team Information Content
-    <TeamInformationContent />,
+    <TeamInformationContent compeName={compeName} />,
 
     // Announcements Content
-    <div>Announcements Content</div>,
+    <div></div>,
 
     // Task List Content
     <div className="font-dmsans">

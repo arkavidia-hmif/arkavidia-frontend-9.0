@@ -230,7 +230,7 @@ export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
   )
 }
 
-const TeamInformationContent = () => {
+const TeamInformationContent = ({ compeName }: { compeName: string }) => {
   const [teamName, setTeamName] = useState<string>('')
   const [teamId, setTeamId] = useState<string>('')
   const [currentUserId, setCurrentUserId] = useState<string>('')
@@ -252,30 +252,34 @@ const TeamInformationContent = () => {
         const teams = teamsResponse.data
 
         if (Array.isArray(teams) && teams.length > 0) {
-          const selectedTeam = teams[0]
-          setTeamName(selectedTeam.name)
-          setTeamId(selectedTeam.id)
+          const selectedTeam = teams.find(
+            team => team.competition!.title.toLowerCase() === compeName.toLowerCase()
+          )
+          if (selectedTeam) {
+            setTeamName(selectedTeam.name)
+            setTeamId(selectedTeam.id)
 
-          const membersResponse = await getTeamMember({
-            client: authAxios,
-            path: { teamId: selectedTeam.id }
-          })
+            const membersResponse = await getTeamMember({
+              client: authAxios,
+              path: { teamId: selectedTeam.id }
+            })
 
-          const transformedMembers = Array.isArray(membersResponse.data)
-            ? membersResponse.data.map(member => {
-                if (member.userId === userId) {
-                  setUserRole(member.role)
-                }
-                return {
-                  name: member.user?.fullName || 'No Name',
-                  verified: member.isVerified,
-                  title: member.role || 'Member',
-                  id: member.userId || 'null'
-                }
-              })
-            : []
+            const transformedMembers = Array.isArray(membersResponse.data)
+              ? membersResponse.data.map(member => {
+                  if (member.userId === userId) {
+                    setUserRole(member.role)
+                  }
+                  return {
+                    name: member.user?.fullName || 'No Name',
+                    verified: member.isVerified,
+                    title: member.role || 'Member',
+                    id: member.userId || 'null'
+                  }
+                })
+              : []
 
-          setMembers(transformedMembers)
+            setMembers(transformedMembers)
+          }
         } else {
           console.warn('No teams found for the user.')
         }
@@ -284,7 +288,7 @@ const TeamInformationContent = () => {
       } finally {
         setTimeout(() => {
           setLoading(false)
-        }, 300)
+        }, 500)
       }
     }
 
