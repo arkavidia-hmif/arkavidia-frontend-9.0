@@ -1,7 +1,7 @@
 'use client';
 
 import { CreateTeamPopup } from "./join-competition/create-team-popup";
-import { JoinTeam } from "./join-competition/join-competition-popup";
+import { JoinTeamPopup } from "./join-competition/join-competition-popup";
 import {
     Dialog,
     DialogContent,
@@ -27,13 +27,13 @@ export const competitionAbbr: Record<CompetitionType, string> = {
     Default: 'Competition Name'
   }
 
-export default function CompetitionRegistration({ competitionAbbr, competitionID }: { competitionAbbr: string, competitionID: string }) {
+export default function CompetitionRegistration({ competitionAbbreviation, competitionID }: { competitionAbbreviation: string, competitionID: string }) {
     const [isOpen, setIsOpen] = useState(false)
     const [competitionType, setCompetitionType] = useState<CompetitionType>('Default');
     
     
     useEffect(() => {
-        setCompetitionType(competitionAbbr as CompetitionType)
+        setCompetitionType(competitionAbbreviation as CompetitionType)
       },[])
     
 
@@ -59,11 +59,10 @@ export default function CompetitionRegistration({ competitionAbbr, competitionID
             <div className="grow-1 flex flex-col md:gap-12">
                 <DialogHeader className="flex flex-col gap-4">
                     <DialogTitle className="text-2xl md:text-5xl font-bold">
-                    Competition Name Registration
+                    {competitionAbbr[competitionType]} Registration
                     </DialogTitle>
                     <DialogDescription className="text-base md:text-xl">
                     Build your team or join forces with others
-                    {competitionID}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex justify-around">
@@ -73,7 +72,7 @@ export default function CompetitionRegistration({ competitionAbbr, competitionID
                     </div>
                     <div className="flex flex-col gap-4 items-center">
                         <UserSearch strokeWidth={2.5} size={120}/>
-                        <JoinTeam competitionID={competitionID} competitionType={competitionType} />
+                        <JoinTeamPopup competitionID={competitionID} competitionType={competitionType} />
                     </div>
                 </div>
             </div>

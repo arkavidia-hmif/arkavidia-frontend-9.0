@@ -141,9 +141,6 @@ function CompetitionLanding({ params }: { params: Promise<{ competition: string 
     return <p>Loading...</p>;
   }
 
-  // console.log("Timeline", timeline)
-  // console.log("Fetch", competitionTimeline)
-
   return (
     <CompetitionLandingPage 
     competitionCode={competitionData.id}

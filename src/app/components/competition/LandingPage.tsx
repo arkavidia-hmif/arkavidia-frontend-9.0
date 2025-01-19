@@ -233,7 +233,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               </div>
               </a>
             </Button>
-            <CompetitionRegistration competitionID={props.competitionCode} competitionAbbr={props.competitionAbbr} />
+            <CompetitionRegistration competitionID={props.competitionCode} competitionAbbreviation={props.competitionAbbr} />
           </div>
         </section>
 
