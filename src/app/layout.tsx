@@ -34,7 +34,8 @@ const DM_SansFont = DM_Sans({
 
 export const metadata: Metadata = {
   title: 'Arkavidia 9.0',
-  description: 'Arkavidia 9.0 Website'
+  description: 'Arkavidia 9.0 Website',
+  icons: [{ rel: 'icon', url: '/arkavidiaLogo.svg' }]
 }
 
 export default function RootLayout({
