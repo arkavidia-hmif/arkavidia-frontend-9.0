@@ -1,6 +1,9 @@
 'use client'
 import React, { useEffect } from 'react'
 import FrameTugas from './FrameTugas'
+import { getCompetitionStatistic, GetCompetitionStatisticResponse } from '~/api/generated'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { useToast } from '~/hooks/use-toast'
 
 interface FrameSubmissionsProps {
   compe_id?: string
@@ -8,27 +11,36 @@ interface FrameSubmissionsProps {
 }
 
 const FrameSubmissions = ({ compe_id, totalTeam }: FrameSubmissionsProps) => {
-  const date = new Date()
+  const axiosInstance = useAxiosAuth()
+  const { toast } = useToast()
 
-  const COMPETITION_SUBMISSIONS = [
-    {
-      title: 'Tugas 1',
-      deadline: '12/12/2021 00:00 WIB',
-      submitted: 9122,
-      total: 12731
-    },
-    {
-      title: 'Tugas 2',
-      deadline: date,
-      submitted: 11,
-      total: 40
-    },
-    { title: 'Tugas 3', deadline: '12/12/2021 00:00 WIB', submitted: 0, total: totalTeam }
-  ]
+  const [competitionSubmissions, setCompetitionSubmissions] = React.useState<
+    GetCompetitionStatisticResponse[]
+  >([])
 
   useEffect(() => {
-    // fetchCompetitionSubmission(compe_id)
-  }, [])
+    async function fetchCompetitionSubmission() {
+      // fetch competition submission
+      try {
+        const res = await getCompetitionStatistic({
+          client: axiosInstance
+        })
+
+        if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {
+          throw new Error('Competition not found')
+        }
+
+        setCompetitionSubmissions(res.data)
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: (error as Error).message,
+          variant: 'warning'
+        })
+      }
+    }
+    if (compe_id) fetchCompetitionSubmission()
+  }, [compe_id, axiosInstance, totalTeam])
 
   return (
     <div
@@ -48,15 +60,19 @@ const FrameSubmissions = ({ compe_id, totalTeam }: FrameSubmissionsProps) => {
 
         {/* List Tugas */}
         <div className="mt-4 flex flex-col gap-4">
-          {COMPETITION_SUBMISSIONS.map((item, index) => (
-            <FrameTugas
-              key={index}
-              title={item.title}
-              deadline={item.deadline.toLocaleString()}
-              submitted={item.submitted}
-              total={item.total}
-            />
-          ))}
+          {competitionSubmissions
+            .filter(item => item.competitionId === compe_id)
+            .map((item, _index) =>
+              item.submissions.map((submission, _subidx) => (
+                <FrameTugas
+                  key={submission.typeId}
+                  title={submission.typeName}
+                  deadline={submission.deadline}
+                  submitted={submission.submitedTeams}
+                  total={totalTeam}
+                />
+              ))
+            )}
         </div>
       </div>
     </div>

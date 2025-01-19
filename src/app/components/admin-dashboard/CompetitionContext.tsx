@@ -14,7 +14,9 @@ import { useToast } from '~/hooks/use-toast'
 const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
   const axiosInstance = useAxiosAuth()
   const { toast } = useToast()
+  const [isLoading, setIsLoading] = React.useState(true)
   const [CompNumber, setCompNumber] = React.useState({ unverified: 0, registered: 0 })
+
   const DROPDOWN_DATA: MenuItem[] = [
     { id: 2, option: 'CP' },
     { id: 3, option: 'CTF' },
@@ -25,16 +27,15 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
     { id: 8, option: 'ArkavX' },
     { id: 9, option: 'Academya' }
   ]
+
   const [selectedCompetition, setSelectedCompetition] = React.useState<MenuItem | null>(
     DROPDOWN_DATA[0]
   )
-  const [selectedCompetitionId, setSelectedCompetitionId] = React.useState<
-    string | undefined
-  >(undefined)
+  const [selectedCompetitionId, setSelectedCompetitionId] = React.useState<string>('')
 
   useEffect(() => {
-    async function fetchCompetitionSubmission(option: string | undefined) {
-      if (option === undefined) return
+    async function fetchCompetitionSubmission(option: string) {
+      setIsLoading(true)
       try {
         const res = await getCompetitionIdByName({
           client: axiosInstance,
@@ -63,11 +64,15 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
           variant: 'warning'
         })
         setCompNumber({ unverified: 0, registered: 0 })
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    fetchCompetitionSubmission(selectedCompetition?.option)
-  }, [selectedCompetition, axiosInstance, result])
+    if (selectedCompetition?.option) {
+      fetchCompetitionSubmission(selectedCompetition.option)
+    }
+  }, [selectedCompetition, axiosInstance, result, toast])
 
   return (
     <>
@@ -83,6 +88,7 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
           />
         </div>
       </div>
+
       {/* Competition Participants */}
       <div className="my-4 flex flex-col items-center justify-between gap-4 md:my-8 md:flex-row md:gap-10">
         <FrameInfo
@@ -96,11 +102,14 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
           imgSrc={'/images/admin-dashboard/unverified-acc.svg'}
         />
       </div>
+
       {/* Submissions */}
-      <FrameSubmissions
-        compe_id={selectedCompetitionId}
-        totalTeam={CompNumber.registered}
-      />
+      {!isLoading && selectedCompetitionId && (
+        <FrameSubmissions
+          compe_id={selectedCompetitionId}
+          totalTeam={CompNumber.registered}
+        />
+      )}
     </>
   )
 }
