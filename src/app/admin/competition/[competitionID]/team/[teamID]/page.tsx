@@ -4,12 +4,12 @@ import { Tab } from "~/app/components/Tab";
 import TeamInfo from "~/app/components/team-lists/detail/TeamInfo";
 import Submission from "~/app/components/team-lists/detail/Submission";
 import { useEffect, useState } from "react";
-import { getCompetitionSubmissionTeam, getTeamDetail, GetTeamDetailResponse } from "~/api/generated";
+import { getCompetitionNameById, getCompetitionSubmissionTeam, getTeamDetail, GetTeamDetailResponse } from "~/api/generated";
 import useAxiosAuth from "~/lib/hooks/useAxiosAuth";
 import { useParams, useRouter } from "next/navigation";
 import Hero from "~/app/components/team-lists/detail/Hero";
 
-type Competition = 'cp' | 'ctf' | 'hackvidia' | 'uxvidia' | 'datavidia';
+type Competition = 'CP' | 'CTF' | 'Hackvidia' | 'UXvidia' | 'Datavidia';
 
 const URL_PLACEHOLDER = 'https://picsum.photos/200/300'
 
@@ -46,11 +46,7 @@ const submission_placeholder = [
     }
 ]
 
-function isCompetition(value: string | null): value is Competition {
-    // TODO: Uncomment this when the competition ID is finalized
-    // return ['cp', 'ctf', 'hackvidia', 'uxvidia', 'datavidia'].includes(value as Competition);
-    return true;
-}
+
 
 function TeamDetails() {
     const router = useRouter();
@@ -59,15 +55,34 @@ function TeamDetails() {
     const [teamData, setTeamData] = useState<GetTeamDetailResponse>();
     const axiosAuth = useAxiosAuth();
 
+    async function validateCompetition(value: string | null): Promise<boolean> {
+        if (!value) {
+            return false;
+        }
+        const resp = await getCompetitionNameById({
+            client: axiosAuth,
+            path: {
+                competitionId: value 
+            }
+        });
+
+        if (resp.error || !resp.data) {
+            return false;
+        }
+        setCompetition(resp.data.title as Competition);
+
+        // TODO: Uncomment this when the competition ID is finalized
+        return ['CP', 'CTF', 'Hackvidia', 'UXvidia', 'Datavidia'].includes(value as Competition);
+    }
+
+
     useEffect(() => {
         const competitionParam = params.competitionID as string;
 
-        if (!competitionParam || !isCompetition(competitionParam)) {
+        if (!competitionParam || !validateCompetition(competitionParam)) {
             router.push('/404');
             return;
         }
-
-        setCompetition(competitionParam);
 
         let isMounted = true;
 
@@ -127,10 +142,10 @@ function TeamDetails() {
                 teamName={teamData.name}
                 teamID={'#'+teamData.joinCode}
                 teamStatus={teamData.isVerified? 'Verified' : 'Unverified'}
-                teamStage={} 
+                teamStage={teamData.competitionStage} 
             />
             {competition && (
-                competition === 'uxvidia' || competition === 'datavidia' ? (
+                competition === 'UXvidia' || competition === 'Datavidia' ? (
                     <Tab 
                         contentType={['Team Information', 'Submission']} 
                         content={[
