@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { ElementType, useEffect, useRef, useState } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -10,11 +10,22 @@ import {
 import { Button } from '../../../components/ui/button'
 import { Tab } from '../../../components/Tab'
 import { ChevronLeft, CloudUpload } from 'lucide-react'
+import {
+  getCompetitionSubmissionRequirement,
+  GetCompetitionSubmissionRequirementResponse,
+  getTeams,
+  GetTeamsResponse,
+  Team
+} from '~/api/generated'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { useAppSelector } from '~/redux/store'
+import { useRouter } from 'next/navigation'
 import ProfileCompetition from '~/app/components/ProfileCompetition'
+import Dropdown, { MenuItem } from '~/app/components/Dropdown'
 
 // Task interface
 interface Task {
-  id: number
+  id: string
   title: string
   description: string
   status: 'notopened' | 'ongoing' | 'complete'
@@ -22,65 +33,7 @@ interface Task {
 }
 
 // Verif interface
-interface Verif {
-  id: number
-  title: string
-  description: string
-  status: 'notopened' | 'ongoing' | 'complete'
-  dueDate: Date
-}
-
-// Dummy data for tasks
-const tasks: Task[] = [
-  {
-    id: 1,
-    title: 'Student ID Card',
-    description:
-      '"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim  veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea  commodo consequat. Duis aute irure dolor in reprehenderit in voluptate  velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint  occaecat cupidatat non proident, sunt in culpa qui officia deserunt  mollit anim id est laborum."',
-    status: 'notopened',
-    dueDate: new Date('2025-12-29')
-  },
-  {
-    id: 2,
-    title: 'Proposal Paper',
-    description: 'Write and submit the project proposal for the competition.',
-    status: 'ongoing',
-    dueDate: new Date('2025-12-20')
-  },
-  {
-    id: 3,
-    title: 'Data Requirements',
-    description: 'Prepare and finalize the presentation slides for submission.',
-    status: 'complete',
-    dueDate: new Date('2025-12-11')
-  },
-  {
-    id: 4,
-    title: 'Past Due Date',
-    description: 'Prepare and finalize the presentation slides for submission.',
-    status: 'ongoing',
-    dueDate: new Date('2024-12-11')
-  }
-]
-
-// Dummy data for tasks
-const verifs: Verif[] = [
-  {
-    id: 1,
-    title: 'Personal Verification',
-    description:
-      '"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim  veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea  commodo consequat. Duis aute irure dolor in reprehenderit in voluptate  velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint  occaecat cupidatat non proident, sunt in culpa qui officia deserunt  mollit anim id est laborum."',
-    status: 'notopened',
-    dueDate: new Date('2025-12-29')
-  },
-  {
-    id: 2,
-    title: 'Team Verification',
-    description: 'Write and submit the project proposal for the competition.',
-    status: 'ongoing',
-    dueDate: new Date('2025-12-20')
-  }
-]
+interface Verif extends Task {}
 
 const formatDate = (date: Date): string => {
   return new Intl.DateTimeFormat('id-ID', {
@@ -93,6 +46,108 @@ const formatDate = (date: Date): string => {
 const CompetitionPage = ({ compeName }: { compeName: string }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [selectedVerif, setSelectedVerif] = useState<Verif | null>(null)
+
+  const axiosInstance = useAxiosAuth()
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
+  const router = useRouter()
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [verifications, setVerificatons] = useState<Verif[]>([])
+
+  const hasFetched = useRef(false)
+  // Call the requirement api
+  useEffect(() => {
+    if (hasFetched.current) return
+    hasFetched.current = true
+    const fetchSubmissionRequirements = async () => {
+      try {
+        if (!isLoggedIn) {
+          router.push('/login')
+          return
+        }
+
+        const teamsResponse = await getTeams({ client: axiosInstance })
+        if (teamsResponse.data && teamsResponse.data.length > 0) {
+          let teamData: GetTeamsResponse = []
+
+          teamsResponse.data.forEach(team => {
+            if (team.competition?.title.toLowerCase() === compeName.toLowerCase()) {
+              teamData.push(team)
+            }
+          })
+
+          // Handle case where no matching team is found
+          if (!teamData || teamData.length <= 0) {
+            console.log('No matching team found for competition name:', compeName)
+            router.push('/')
+            return
+          }
+          const teamId = teamData[0].id // Get Current user ID
+
+          const requirementsResponse = await getCompetitionSubmissionRequirement({
+            client: axiosInstance,
+            path: { teamId }
+          })
+
+          const newTasks: Task[] = []
+          const newVerifications: Verif[] = []
+
+          requirementsResponse.data?.forEach(data => {
+            const item = {
+              id: data.requirement.typeId,
+              title: data.requirement.typeName,
+              description: data.requirement.description,
+              dueDate: new Date(data.requirement.deadline ?? ''),
+              status: getStatusTask(data) ?? 'notopened'
+            }
+
+            if (data.requirement.stage === 'verification') {
+              if (!verifications.some(v => v.id === item.id)) {
+                newVerifications.push(item as Verif)
+              }
+            } else {
+              if (!tasks.some(t => t.id === item.id)) {
+                newTasks.push(item as Task)
+              }
+            }
+          })
+
+          console.log(newVerifications)
+          setVerificatons(prev => [
+            ...prev.filter(v => !newVerifications.some(nv => nv.id === v.id)),
+            ...newVerifications
+          ])
+
+          setTasks(prev => [
+            ...prev.filter(t => !newTasks.some(nt => nt.id === t.id)),
+            ...newTasks
+          ])
+        } else {
+          console.warn('No teams found.')
+          router.push('/')
+        }
+      } catch (error) {
+        console.error('Error fetching submission requirements:', error)
+      }
+    }
+
+    fetchSubmissionRequirements()
+  }, [])
+
+  const getStatusTask = (
+    data: GetCompetitionSubmissionRequirementResponse extends (infer ElementType)[]
+      ? ElementType
+      : never
+  ) => {
+    const isDeadline = Date.now() > new Date(data.requirement.deadline ?? '').getTime()
+    if (data.media == null && !isDeadline) {
+      return 'notopened'
+    } else if (data.media != null && !isDeadline) {
+      return 'ongoing'
+    } else if (data.media != null && isDeadline) {
+      return 'complete'
+    }
+    return 'notopened'
+  }
 
   const getTriggerColor = (item: Task | Verif): string => {
     const today = new Date()
@@ -151,6 +206,21 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     event.preventDefault()
   }
   const contentTypes = ['Team Information', 'Announcements', 'Task List', 'Verification']
+
+  const getMenuDataFromContentTypes = () => {
+    const menuItems: MenuItem[] = []
+
+    contentTypes.forEach((content, index) =>
+      menuItems.push({
+        id: index,
+        option: content,
+        iconRight: false,
+        iconLeft: false
+      })
+    )
+    return menuItems
+  }
+
   const contents = [
     <div>Team Information Content</div>,
     <div>Announcements Content</div>,
@@ -225,7 +295,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
       ) : (
         // Task List
         <Accordion type="single" collapsible>
-          {tasks.map(task => (
+          {tasks?.map(task => (
             <AccordionItem key={task.id} value={`task-${task.id}`}>
               <AccordionTrigger
                 accType="framed"
@@ -331,7 +401,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
       ) : (
         // Task List
         <Accordion type="single" collapsible>
-          {verifs.map(verif => (
+          {verifications?.map(verif => (
             <AccordionItem key={verif.id} value={`task-${verif.id}`}>
               <AccordionTrigger
                 accType="framed"

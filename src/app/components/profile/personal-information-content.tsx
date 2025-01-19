@@ -20,49 +20,63 @@ export interface ProfileInformationDropdownOptions {
   howDoYouKnowArkavOptions: MenuItem[]
 }
 
+export interface PersonalInfoProps {
+  name: string
+  birthdate: string
+  education: string
+  instance: string
+  phoneNumber: string
+  educationOptions: Array<'SMA/MA/SMK' | 'S1' | 'S2'>
+}
+
 interface Props
   extends ProfileInformationDefaultValue,
     ProfileInformationDropdownOptions {}
 
-export const PersonalInformationContent = (Props: Props) => {
+export const PersonalInformationContent = (props: PersonalInfoProps) => {
   const ErrorMenuItem: MenuItem = {
     id: -1,
-    option: 'Error'
+    option: 'No data'
   }
+
+  const educationOptions = props.educationOptions.map(
+    (option: string, index: number) => ({
+      id: index,
+      option
+    })
+  )
+  console.log(educationOptions[0])
+  console.log(props.education)
+  const currentEducation = educationOptions.find(
+    options => options.option.toLowerCase() === props.education.toLowerCase()
+  )
+
   return (
     <div className="flex flex-col justify-between gap-8 rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-10 pb-72 pt-20 shadow-lg md:flex-row md:gap-36">
       <div className="flex w-full flex-col gap-8">
         <InputProfileData
           title={'Name'}
-          default_value={Props.name ?? ''}
+          default_value={props.name}
           placehodler={'Placeholder'}
         />
 
-        <DatePickerProfileData
-          title={'Birthdate'}
-          default_value={Props.birthdate ?? new Date()}
-        />
+        <DatePickerProfileData title={'Birthdate'} default_value={props.birthdate} />
         <DropdownProfileData
           title={'Education'}
-          selectedOption={Props.education ?? ErrorMenuItem}
-          dropdownData={Props.educationOptions}
+          selectedOption={currentEducation ?? ErrorMenuItem}
+          dropdownData={educationOptions}
         />
       </div>
       <div className="flex w-full flex-col gap-8">
-        <DropdownProfileData
-          title={'Instance'}
-          selectedOption={Props.instance ?? ErrorMenuItem}
-          dropdownData={Props.instanceOptions}
+        <InputProfileData
+          title={'Name'}
+          default_value={props.instance}
+          placehodler={'Placeholder'}
         />
         <InputProfileData
           title={'Phone Number'}
-          default_value={Props.phoneNumber ?? ''}
+          default_value={props.phoneNumber}
           placehodler={'Placeholder'}
-        />
-        <DropdownProfileData
-          title={'How do you know about Arkavidia'}
-          selectedOption={Props.howDoYouKnowArkavidia ?? ErrorMenuItem}
-          dropdownData={Props.howDoYouKnowArkavOptions}
         />
       </div>
     </div>

@@ -47,7 +47,7 @@ const registerPersonalDataSchema = z.object({
       message: 'Nomor telepon minimal memiliki 8 digit'
     }),
   identityCard: z
-    .instanceof(FileList)
+    .array(z.instanceof(File))
     .refine(val => val.length > 0, { message: 'Kartu identitas wajib diunggah' }),
   lineid: z.string().optional(),
   instagram: z.string().optional(),
@@ -121,7 +121,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
         const getLink = await getPresignedLink({
           client: axiosAuth,
           query: {
-            bucket: 'competition-registration',
+            bucket: 'kartu-identitas',
             filename: `${userId}-identity-card.${fileExt}`
           }
         })

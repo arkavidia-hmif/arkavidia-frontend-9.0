@@ -199,14 +199,16 @@ function Sidebar({ announcement = false }: SidebarProps) {
                     </DropdownMenuItem>
                     {!isAdmin && (
                       <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
-                        <Image
-                          src="/images/sidebar/face.svg"
-                          alt={'Landing Pace Icon'}
-                          width={16}
-                          height={16}
-                          className="mr-2 h-4 w-4"
-                        />
-                        <Link href="/dashboard/profile">Profile</Link>
+                        <Link href="/dashboard/profile" className="flex gap-x-2">
+                          <Image
+                            src="/images/sidebar/face.svg"
+                            alt={'Landing Pace Icon'}
+                            width={16}
+                            height={16}
+                            className="mr-2 h-4 w-4"
+                          />
+                          <p>Profile</p>
+                        </Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem
@@ -224,10 +226,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
       </div>
 
       {isSidebarOpen && (
-        <div
-          className="pointer-events-auto fixed inset-0 z-40 bg-black opacity-50 transition-opacity duration-300"
-          onClick={() => setIsSidebarOpen(false)}
-        />
+        <div className="pointer-events-auto fixed inset-0 z-40 bg-black opacity-50 transition-opacity duration-300" />
       )}
     </>
   )
