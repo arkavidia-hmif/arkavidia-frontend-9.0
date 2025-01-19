@@ -2,9 +2,9 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect } from 'react'
-import { basicVerifyAccount } from '~/api/generated'
+import { basicVerifyAccount, getUser } from '~/api/generated'
 import Loading from '~/app/components/Loading'
-import { axiosInstance } from '~/lib/axios'
+import { axiosInstance, createAxiosAuthInstance } from '~/lib/axios'
 import { userLogin } from '~/redux/slices/auth'
 import { useAppDispatch } from '~/redux/store'
 
@@ -45,12 +45,11 @@ function VerifyEmailPage() {
       }
       if (res.data) {
         const accessToken = res.data.accessToken
-        appDispatch(userLogin(accessToken))
         setIsProcessing(false)
         setStatus('success')
         setMessage('Email verified successfully')
         setTimeout(() => {
-          router.replace('/')
+          router.replace('/login')
         }, 2000)
       }
     }

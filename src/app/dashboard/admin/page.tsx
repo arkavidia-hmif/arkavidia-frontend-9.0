@@ -3,19 +3,19 @@
 import React, { useEffect } from 'react'
 import FrameInfo from '../../components/admin-dashboard/FrameInfo'
 import CompetitionContext from '../../components/admin-dashboard/CompetitionContext'
-import { getTeamStatistic, GetTeamStatisticResponse } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 
 import { useRouter } from 'next/navigation'
 import { useToast } from '~/hooks/use-toast'
 import { useAppSelector } from '~/redux/store'
+import { getTeamStatistic, GetTeamStatisticResponse } from '~/api/generated'
 
 const AdminDashboardPage = () => {
   const isAuthenticated = useAppSelector(state => state.auth.accessToken !== null)
   const isAdmin = useAppSelector(state => state.auth.isAdmin)
   const { toast } = useToast()
   const router = useRouter()
-  
+
   if (!isAuthenticated || !isAdmin) {
     toast({
       title: 'Unauthorized',
@@ -24,7 +24,7 @@ const AdminDashboardPage = () => {
     })
     router.replace('/')
   }
-      
+
   const IMAGE = '/images/sidebar/item.svg'
   const axiosInstance = useAxiosAuth()
   const [overallStats, setOverallStats] = React.useState({

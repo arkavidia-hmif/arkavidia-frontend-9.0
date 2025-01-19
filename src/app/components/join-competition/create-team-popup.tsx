@@ -22,6 +22,10 @@ import {
   competitionAbbr,
   CompetitionType
 } from '~/app/components/CompetitionRegistration'
+import { useAppSelector } from '~/redux/store'
+import { useRouter } from 'next/navigation'
+import { getTeams, getUser } from '~/api/generated'
+
 
 interface SuccessDialogProps {
   isOpen: boolean
@@ -97,9 +101,47 @@ export const CreateTeamPopup: React.FC<{
   const [isOpen, setIsOpen] = useState(false)
   const [generatedTeamCode, setGeneratedTeamCode] = useState('')
 
+  // Check if user already logged in
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
+  const router = useRouter()
+  const axiosInstance = useAxiosAuth()
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    // Check if user logged in
+    if (!isLoggedIn) {
+      toast({
+        variant: 'warning',
+        title: 'Anda belum masuk. Silahkan masuk terlebih dahulu'
+      })
+      // Redirect to login if not authenticated
+      router.push('/login')
+      return
+    }
+    
+    // Check if user already filling their data
+    const userResponse = await getUser({client: axiosInstance})
+    const user = userResponse.data
+    
+    if (!user?.isRegistrationComplete) {
+      toast({
+        variant: 'warning',
+        title: 'Anda belum menyelesaikan pendaftaran. Mohon selesaikan proses pendaftaran dahulu'
+      })
+      router.push('/register/personal-data')
+    }
+
+    // Check if user already join a team
+    const teamJoined = (await getTeams({client: axiosInstance})).data
+    if (teamJoined && teamJoined.length > 0) {
+      toast({
+        title: 'Anda sudah mendaftar ke perlombaan ini',
+        variant: 'info'
+      })
+      router.push('/dashboard')
+    }
 
     if (!teamName) {
       setError('Team name is required!')
