@@ -73,7 +73,7 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
     if (selectedCompetition?.option) {
       fetchCompetitionSubmission(selectedCompetition.option)
     }
-  }, [selectedCompetition, axiosInstance, result, toast])
+  }, [selectedCompetition, result])
 
   return (
     <>
