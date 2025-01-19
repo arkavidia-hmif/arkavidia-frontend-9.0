@@ -21,7 +21,7 @@ export function getFormattedBirthDate(date: Date) {
   const month = date.getMonth() + 1
   const day = date.getDate()
 
-  return `${year}-${month}-${day}`
+  return `${year}-${month.toString().padStart(2, '0')}-${day}`
 }
 
 export function getEducation(education: string) {

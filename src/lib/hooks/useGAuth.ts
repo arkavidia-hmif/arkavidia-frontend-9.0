@@ -2,8 +2,8 @@
 
 import { useGoogleLogin } from '@react-oauth/google'
 import { useRouter } from 'next/navigation'
-import { googleLoginAccessToken } from '~/api/generated'
-import { axiosInstance } from '../axios'
+import { getUser, googleLoginAccessToken } from '~/api/generated'
+import { axiosInstance, createAxiosAuthInstance } from '../axios'
 import { useAppDispatch } from '~/redux/store'
 import { userLogin } from '~/redux/slices/auth'
 import { useToast } from '~/hooks/use-toast'
@@ -24,16 +24,31 @@ export default function useGAuth() {
       })
 
       if (res.data) {
-        appDispatch(userLogin(res.data.accessToken))
-        toast({
-          title: 'Login Success',
-          description: 'Successfully logged in',
-          variant: 'success'
-        })
+        const client = createAxiosAuthInstance(res.data.accessToken)
+        const userData = await getUser({ client: client })
+        if (!userData.data) {
+          toast({
+            title: 'Login gagal',
+            description: 'Gagal mengambil data user',
+            variant: 'destructive'
+          })
+        } else {
+          appDispatch(userLogin(res.data.accessToken))
+          const hasFilledInfo = userData.data.isRegistrationComplete
+          toast({
+            title: 'Login Success',
+            description: 'Successfully logged in',
+            variant: 'success'
+          })
 
-        setTimeout(() => {
-          router.replace('/')
-        }, 500)
+          setTimeout(() => {
+            if (!hasFilledInfo) {
+              router.replace('/register/personal-data')
+            } else {
+              router.replace('/')
+            }
+          }, 1000)
+        }
       }
     }
   })

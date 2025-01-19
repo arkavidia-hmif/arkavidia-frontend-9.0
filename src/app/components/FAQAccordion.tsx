@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Accordion,
   AccordionItem,
@@ -12,28 +12,23 @@ interface FAQAccordionProps {
 }
 
 function FAQAccordion({ items }: FAQAccordionProps) {
-  const [openItem, setOpenItem] = useState<string | null>(null)
-
-  const handleToggle = (item: string) => {
-    setOpenItem(prev => (prev === item ? null : item))
-  }
 
   return (
-    <div className="flex items-center justify-center">
-      <Accordion type="single" collapsible className="w-[50%]">
+    <div className="flex items-center justify-center w-full max-w-3xl mx-auto">
+      <Accordion type="single" collapsible className="w-full">
         {items.map((item, index) => {
           const value = `item-${index + 1}`
-          const isOpen = openItem === value
 
           return (
-            <AccordionItem key={value} value={value}>
-              <AccordionTrigger
-                isOpen={isOpen}
-                onClick={() => handleToggle(value)}
-                accType="faq">
+            <AccordionItem key={value} value={value} className="border-b border-gray-200">
+              <AccordionTrigger accType='faq'
+                className={`flex justify-between items-center p-4 w-full text-left text-lg font-medium`}
+              >
                 {item.question}
               </AccordionTrigger>
-              <AccordionContent>{item.answer}</AccordionContent>
+              <AccordionContent className="p-4 pt-0">
+                {item.answer}
+              </AccordionContent>
             </AccordionItem>
           )
         })}
@@ -43,13 +38,3 @@ function FAQAccordion({ items }: FAQAccordionProps) {
 }
 
 export default FAQAccordion
-
-// how to use
-// const faqItems = [
-//   { question: "What is React?", answer: "React is a JavaScript library for building user interfaces." },
-//   { question: "What is JSX?", answer: "JSX is a syntax extension for JavaScript, used with React to describe what the UI should look like." },
-//   { question: "What is a component?", answer: "A component is a reusable piece of UI in React." },
-//   { question: "What is state?", answer: "State is a way to manage changing data in a component." },
-// ];
-
-// <FAQAccordion items={faqItems} />

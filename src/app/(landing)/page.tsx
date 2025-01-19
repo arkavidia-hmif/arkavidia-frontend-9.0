@@ -10,13 +10,15 @@ const MainLandingCompetitionPage = () => {
             COMPETITION
           </h1>
           <p className="px-8 text-justify font-dmsans text-[16px] leading-5 tracking-wider text-lilac-100 md:text-[20px] md:leading-6 lg:mt-10 lg:px-0 lg:leading-7">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla pulvinar, massa
-            eleifend bibendum consectetur, nulla ligula hendrerit sapien, et aliquam orci
-            ex vitae odio. Vestibulum ligula nunc, bibendum aliquam orci sed, tempor
-            varius turpis. Praesent interdum lacus lectus, a aliquet lectus tempus sit
-            amet. Fusce cursus tempus euismod. Praesent nec risus a tellus pellentesque
-            aliquet nec vel nulla. Curabitur non elit elementum dolor pellentesque gravida
-            eget eu purus.
+            Kompetisi merupakan salah satu main event pada Arkavidia 9.0 yang
+            diselenggarakan untuk menguji kemampuan peserta dalam memecahkan persoalan
+            yang ada pada berbagai bidang teknologi informasi. Dengan adanya kompetisi
+            ini, diharapkan peserta pada khususnya dan masyarakat pada umumnya dapat
+            melatih kemampuan pemecahan masalah yang ada untuk sebagai bentuk persiapan
+            dalam memecahkan masalah-masalah yang ditemukan di dunia nyata. Terdapat enam
+            kompetisi yang diselenggarakan dalam Arkavidia 9.0, yakni{' '}
+            <b>Competitive Programming</b>, <b>Capture The Flag</b>, <b>Hackvidia</b>,{' '}
+            <b>UXvidia</b>, <b>Datavidia</b>, dan <b>Arkalogica</b>.
           </p>
         </div>
       </div>
