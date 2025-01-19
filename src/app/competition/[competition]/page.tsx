@@ -6,6 +6,7 @@ import { CompetitionTimeline, getCompetitionIdByName, getCompetitionTimelineWith
 import { CompetitionLandingPage } from '~/app/components/competition/LandingPage';
 import { useRouter } from "next/navigation";
 import { TimelineEventProps } from '~/app/components/Timeline';
+import Loading from '~/app/components/Loading';
 
 // Define the expected API competitionResponse type
 type Competition = {
@@ -138,7 +139,7 @@ function CompetitionLanding({ params }: { params: Promise<{ competition: string 
   }
 
   if (!competitionData) {
-    return <p>Loading...</p>;
+    return (<Loading/>)
   }
 
   return (
