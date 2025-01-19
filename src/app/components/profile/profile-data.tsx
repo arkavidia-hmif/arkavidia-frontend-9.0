@@ -134,7 +134,8 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       const fieldMap: Record<string, string> = {
         name: 'fullName',
         phone_number: 'phoneNumber',
-        instance: 'instance'
+        instance: 'instance',
+        nisn: 'nisn'
       }
 
       const fieldName = fieldMap[noSpace]

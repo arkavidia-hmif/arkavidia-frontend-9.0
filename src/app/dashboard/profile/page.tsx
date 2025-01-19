@@ -89,6 +89,8 @@ const ProfilePage = () => {
   const [userData, setUserData] = useState<GetUserResponse>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
+  const identityCard = userData?.document?.find((doc) => doc.type === 'kartu-identitas')?.media
+
   useEffect(() => {
     const getSelf = async () => {
       setIsLoading(true)
@@ -137,6 +139,8 @@ const ProfilePage = () => {
               instance={userData?.instance ?? ''}
               phoneNumber={userData?.phoneNumber ?? ''}
               educationOptions={dropdownEducationOptions}
+              identityCard={identityCard}
+              nisn={userData?.nisn}
             />
           }
           socialMedia={
