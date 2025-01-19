@@ -9,7 +9,7 @@ import {
 import { ProfileLayout } from '../../components/profile/profile-content-layout'
 import ProfileHero from '../../components/ProfileHero'
 import { useEffect, useState } from 'react'
-import { self, SelfResponse } from '~/api/generated'
+import { getUser, GetUserResponse, self, SelfResponse } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { MenuItem } from '~/app/components/Dropdown'
@@ -84,13 +84,13 @@ const DummyDropdownOptions: ProfileInformationDropdownOptions = {
 const ProfilePage = () => {
   const axiosAuth = useAxiosAuth()
   const { toast } = useToast()
-  const [userData, setUserData] = useState<SelfResponse>()
+  const [userData, setUserData] = useState<GetUserResponse>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const getSelf = async () => {
       setIsLoading(true)
-      const res = await self({ client: axiosAuth })
+      const res = await getUser({ client: axiosAuth })
       if (res.error) {
         toast({
           title: 'Error',
@@ -121,8 +121,8 @@ const ProfilePage = () => {
         <div className="mb-8">
           <ProfileHero
             title="Profile"
-            name="Ahmad John Doe"
-            email="example@example.com"
+            name={userData?.fullName ?? ''}
+            email={userData?.email ?? ''}
             isResetProfile={false}
           />
         </div>
@@ -137,7 +137,15 @@ const ProfilePage = () => {
               educationOptions={dropdownEducationOptions}
             />
           }
-          socialMedia={<SocialMediaContent />}
+          socialMedia={
+            <SocialMediaContent
+              current={{
+                line: userData?.idLine,
+                discord: userData?.idDiscord,
+                instagram: userData?.idInstagram
+              }}
+            />
+          }
         />
       </div>
     )

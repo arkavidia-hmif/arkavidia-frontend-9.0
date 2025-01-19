@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     appDispatch(userLogout())
     appDispatch(setNotAdmin())
-    localStorage.clear()
+    window.localStorage.clear()
   }
 
   const getSelf = async () => {
@@ -99,6 +99,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (req.data) {
       appDispatch(userLogin(req.data.accessToken))
+      const selfReq = await self({
+        client: createAxiosAuthInstance(req.data.accessToken)
+      })
+      if (selfReq.data) {
+        const hasFilledInfo = selfReq.data.isRegistrationComplete
+        const isAdmin = selfReq.data.role === 'admin'
+        const username = selfReq.data.fullName
+        if (hasFilledInfo) {
+          appDispatch(setFilledInfo(true))
+        }
+
+        if (username) {
+          appDispatch(setUsername(username))
+        }
+
+        if (isAdmin) {
+          appDispatch(setAdmin())
+        }
+      }
       res.ok = true
       setTimeout(() => {
         router.replace('/')

@@ -50,7 +50,7 @@ export const PersonalInformationContent = (props: PersonalInfoProps) => {
   )
 
   return (
-    <div className="flex flex-col justify-between gap-8 rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-10 pb-72 pt-20 shadow-lg md:flex-row md:gap-36">
+    <div className="mt-4 flex flex-col justify-between gap-8 rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-10 py-10 shadow-lg md:flex-row md:gap-36">
       <div className="flex w-full flex-col gap-8">
         <InputProfileData
           title={'Name'}
@@ -67,7 +67,7 @@ export const PersonalInformationContent = (props: PersonalInfoProps) => {
       </div>
       <div className="flex w-full flex-col gap-8">
         <InputProfileData
-          title={'Name'}
+          title={'Instance'}
           default_value={props.instance}
           placehodler={'Placeholder'}
         />
