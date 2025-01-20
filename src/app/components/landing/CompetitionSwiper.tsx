@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { StandingPreview } from './StandingPreview'
 import { useRef } from 'react'
 import { Swiper as SwiperType } from 'swiper/types'
+import { ArrowSign } from './ArrowSign'
 interface CompetitionsCarouselProps {
   competitions: CompetitionBrief[]
 }
@@ -26,9 +27,6 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
   const randomIdx = Math.floor(Math.random() * competitions.length)
   const [activeIndex, setActiveIndex] = useState(randomIdx)
 
-  const leftButtonRef = useRef<HTMLButtonElement>(null)
-  const rightButtonRef = useRef<HTMLButtonElement>(null)
-
   function getTitle(index: number) {
     return competitions.at(index)?.title
   }
@@ -41,51 +39,18 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
   }
 
   function nextSlide() {
-    handleGlowAnimation(rightButtonRef)
     swiperRef.current?.slideNext(400)
     setActiveIndex(swiperRef.current?.realIndex ?? randomIdx)
   }
   function prevSlide() {
-    handleGlowAnimation(leftButtonRef)
     swiperRef.current?.slidePrev(400),
       setActiveIndex(swiperRef.current?.realIndex ?? randomIdx)
   }
 
-  const handleGlowAnimation = (buttonRef: React.RefObject<HTMLButtonElement>) => {
-    if (buttonRef.current) {
-      // Add the glow effect
-
-      buttonRef.current.style.scale = '1.5'
-      // Remove the glow effect after 200 milliseconds
-      setTimeout(() => {
-        if (buttonRef.current) {
-          buttonRef.current.style.scale = '1'
-        }
-      }, 400)
-    }
-  }
-
   const swiperRef = useRef<SwiperType | null>(null)
   return (
-    <>
-      <button
-        ref={leftButtonRef}
-        onClick={prevSlide}
-        style={{
-          position: 'absolute',
-
-          zIndex: 10,
-          fontSize: '2.25rem', // text-4xl
-          color: 'rgba(255, 255, 255, 0.7)', // text-white text-opacity-70
-          transition: 'transform 0.2s, opacity 0.2s, scale 0.3s',
-
-          textShadow: '0 0 8px rgba(255, 255, 255, 0.8)' // Glow effect
-        }}
-        className="left-0 flex h-full items-center rounded-md bg-transparent px-1.5 opacity-60 backdrop-blur-sm hover:opacity-100 lg:left-10">
-        <span>
-          <FaAngleLeft />
-        </span>
-      </button>
+    <div className="relative col-span-3 mt-6 flex h-fit w-full items-center justify-center md:mt-48 md:px-10">
+      <ArrowSign onClick={prevSlide} direction={'left'} />
       <div className="relative flex max-h-[800px] w-full flex-col items-center">
         <h1 className="z-10 text-center font-belanosima text-[36px] leading-[88px] text-white md:text-[48px] lg:text-[64px]">
           {getTitle(activeIndex)}
@@ -148,22 +113,7 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
         </div>
       </div>
 
-      <button
-        ref={rightButtonRef}
-        onClick={nextSlide}
-        style={{
-          position: 'absolute',
-
-          zIndex: 10,
-          fontSize: '2.25rem', // text-4xl
-          color: 'rgba(255, 255, 255, 0.7)', // text-white text-opacity-70
-          transition: 'transform 0.2s, opacity 0.2s , scale 0.3s',
-
-          textShadow: '0 0 8px rgba(255, 255, 255, 0.8)' // Glow effect
-        }}
-        className="right-0 flex h-full items-center rounded-md bg-transparent px-1.5 opacity-60 backdrop-blur-sm hover:opacity-100 lg:right-10">
-        <FaAngleRight width={20} height={20} />
-      </button>
-    </>
+      <ArrowSign onClick={nextSlide} direction={'right'} />
+    </div>
   )
 }

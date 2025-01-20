@@ -84,11 +84,9 @@ const MainLandingCompetitionPage = () => {
           bagi pelajar, civitas akademik, dan masyarakat umum seluruh Indonesia.
         </p>
       </div>
-      <div className="relative col-span-3 mt-6 flex h-fit w-full items-center justify-center md:mt-48 md:px-10">
-        
-        <CompetitionSwiper competitions={competitions} />
 
-      </div>
+      <CompetitionSwiper competitions={competitions} />
+
       <CompetitionGaleryTimeline />
 
       <Image
