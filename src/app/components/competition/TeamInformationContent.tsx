@@ -14,6 +14,7 @@ import { useToast } from '../../../hooks/use-toast'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import Loading from '../Loading'
+import { DangerDialog } from '../DangerDialog'
 
 // ProfileData Component
 const capitalizeFirstLetter = (str: string) => {
@@ -94,18 +95,24 @@ const ProfileData = ({
 
         {/* Tampilkan tombol kick hanya jika userRole === 'leader' dan userId !== currentUserId */}
         {userRole === 'leader' && currentUserId !== userId && (
-          <Button variant={'ghost'} onClick={handleKickMember} disabled={loading}>
-            {loading ? (
-              <span>Loading</span>
-            ) : (
-              <Image
-                src={'/images/profile/close.svg'}
-                alt={'Kick Button'}
-                width={24}
-                height={24}
-              />
-            )}
-          </Button>
+          <DangerDialog
+            title="Keluarkan Member"
+            message={`Apakah kamu yakin ingin mengeluarkan ${name} dari tim?`}
+            actionText="Keluarkan"
+            action={handleKickMember}>
+            <Button variant={'ghost'} disabled={loading}>
+              {loading ? (
+                <span>Loading</span>
+              ) : (
+                <Image
+                  src={'/images/profile/close.svg'}
+                  alt={'Kick Button'}
+                  width={24}
+                  height={24}
+                />
+              )}
+            </Button>
+          </DangerDialog>
         )}
       </div>
     </div>
