@@ -92,7 +92,7 @@ const transformToTimelineEvents = (
     const arr = {
       title: event.title,
       timeStart: event.startDate ? new Date(event.startDate) : undefined,
-      timeEnd: event.endDate ? new Date(event.endDate) : new Date()
+      timeEnd: event.endDate ? new Date(event.endDate) : undefined
     }
     data.push(arr)
   })

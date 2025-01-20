@@ -245,7 +245,7 @@ export const CreateTeamPopup: React.FC<{
       <SuccessDialog
         isOpen={isSuccess}
         setIsOpen={setIsSuccess}
-        competitionLink={''}
+        competitionLink={'/dashboard'}
         teamCode={generatedTeamCode}
       />
     </>
