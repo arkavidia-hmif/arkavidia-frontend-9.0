@@ -462,7 +462,10 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                 </p>
               </AccordionTrigger>
               <AccordionContent className="-mt-2 rounded-lg border border-white px-5 py-7">
-                <p className="text-base md:text-lg">{task.description}</p>
+                <p
+                  className="text-base md:text-lg"
+                  dangerouslySetInnerHTML={{ __html: task.description.replace(/\n/g, '<br />') }}
+                />
                 <div className="mt-5 flex w-full items-center gap-3 md:justify-end">
                   <p
                     className={`flex h-10 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getStatusColor(task)}`}>
