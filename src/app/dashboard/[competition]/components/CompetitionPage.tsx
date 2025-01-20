@@ -47,6 +47,7 @@ interface Task {
 
 // Verif interface
 interface Verification {
+  id: string
   isVerified: boolean
   type: 'bukti-pembayaran' | 'poster' | 'twibbon'
   status: 'unsubmitted' | 'submitted' | 'verified'
@@ -142,6 +143,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           if (teamLeader?.userId === currentUserData.data?.id) {
             if (teamVerifData?.data?.document?.length === 0) {
               teamVerification = {
+                id: 'team-0',
                 teamId: teamId,
                 type: 'bukti-pembayaran',
                 isVerified: false,
@@ -150,6 +152,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             } else {
               const isVerified = teamVerifData?.data?.document?.[0].isVerified ?? false
               teamVerification = {
+                id: 'team-0',
                 teamId: teamId,
                 type: 'bukti-pembayaran',
                 status: isVerified ? 'verified' : 'submitted',
@@ -170,7 +173,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           const currentMemberDocument = currentMemberData?.document
 
           // Check if member has submitted the required document
-          MemberDocumentRequirement.forEach((docType: string) => {
+          MemberDocumentRequirement.forEach((docType: string, index: number) => {
             // @ts-ignore
             const memberDoc = currentMemberDocument?.find(
               (doc: any) => doc.type === docType
@@ -179,6 +182,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             // If no document found, add to memberVerifications
             if (!memberDoc) {
               memberVerifications.push({
+                id: `member-${index}`,
                 userId: currentUserData.data?.id,
                 type: docType as 'poster' | 'twibbon',
                 isVerified: false,
@@ -187,6 +191,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             } else {
               const isVerified = memberDoc.isVerified ?? false
               memberVerifications.push({
+                id: `member-${index}`,
                 userId: currentUserData.data?.id,
                 type: docType as 'poster' | 'twibbon',
                 isVerified: isVerified,
@@ -464,9 +469,9 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
         </div>
       ) : (
         // Task List
-        <Accordion type="single" collapsible>
-          {verifications?.map((verif, idx) => (
-            <AccordionItem key={idx} value={`verif-${idx}`}>
+        <Accordion type="multiple" defaultValue={verifications.map(verif => verif.id)}>
+          {verifications?.map(verif => (
+            <AccordionItem key={verif.id} value={`${verif.id}`}>
               <AccordionTrigger
                 accType="framed"
                 className={`&[data-state=open]>svg]:rotate-180 mt-2 rounded-xl border border-white px-5 py-5 outline-border hover:no-underline hover:decoration-0 md:py-7 [&>svg]:size-5 [&>svg]:-rotate-90 [&>svg]:text-white md:[&>svg]:size-7 [&[data-state=open]>svg]:rotate-0 ${getVerifTriggerColor(verif.status)}`}>
