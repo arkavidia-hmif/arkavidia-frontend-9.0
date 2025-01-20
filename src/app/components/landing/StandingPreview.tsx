@@ -1,5 +1,5 @@
 import Image, { StaticImageData } from 'next/image'
-
+import StandingPod from '/public/images/competition/standing-pod.png'
 interface StandingPreviewProps {
   preview: string
   isActive?: boolean
@@ -11,10 +11,11 @@ export const StandingPreview = ({ preview, isActive = false }: StandingPreviewPr
 
   const StandingTranslateY = isActive ? 'translate-y-[-150px]' : 'translate-y-[-120px]'
 
-  const StandingWidth = isActive ? 200 : 160
-  const StandingHeight = isActive ? 100 : 200
+  const StandingWidth = isActive ? 'w-[200px]' : 'w-[140px]'
+  const MarginTop = isActive ? '' : 'translate-y-[100px]'
   return (
-    <div className="relative flex w-full flex-col items-center justify-center">
+    <div
+      className={`relative flex w-full flex-col items-center justify-center ${MarginTop}`}>
       <Image
         src={preview}
         alt="Competiton Preview"
@@ -24,11 +25,9 @@ export const StandingPreview = ({ preview, isActive = false }: StandingPreviewPr
         style={{ width: PreviewWidth }}
       />
       <Image
-        src={'/images/competition/standing-pod.png'}
+        src={StandingPod}
         alt="Standing Pod"
-        width={StandingWidth}
-        height={StandingHeight}
-        className={`${StandingTranslateY} ml-[10px] w-[${StandingWidth}] object-scale-down`}
+        className={`${StandingTranslateY} ml-[10px] ${StandingWidth} object-scale-down`}
       />
     </div>
   )

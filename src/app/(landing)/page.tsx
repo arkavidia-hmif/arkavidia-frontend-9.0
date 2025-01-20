@@ -3,6 +3,8 @@ import { CompetitionSwiper } from '../components/landing/CompetitionSwiper'
 import GalleryCarousel from '../components/landing/GalleryCarousel'
 import Timeline from '../components/Timeline'
 import { CompetitionGaleryTimeline } from '../components/landing/CompetitionGalleryTimeLine'
+import { ArrowLeftCircle } from 'lucide-react'
+import { FaAngleLeft, FaAngleRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 
 const competitions = [
   {
@@ -82,8 +84,10 @@ const MainLandingCompetitionPage = () => {
           bagi pelajar, civitas akademik, dan masyarakat umum seluruh Indonesia.
         </p>
       </div>
-      <div className="col-span-3 mt-6 flex h-fit w-full items-center justify-center pl-10 md:mt-48 md:px-10">
+      <div className="relative col-span-3 mt-6 flex h-fit w-full items-center justify-center md:mt-48 md:px-10">
+        
         <CompetitionSwiper competitions={competitions} />
+
       </div>
       <CompetitionGaleryTimeline />
 

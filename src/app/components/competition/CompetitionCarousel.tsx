@@ -204,7 +204,6 @@ const CompetitionCarousel = () => {
                     className="flex items-center hover:cursor-grab active:cursor-grabbing"
                     onClick={() => {
                       setActiveIndex(index)
-                      console.log('Slide To: ' + index)
                       swiperRef.current?.slideToLoop(index, 500)
                     }}>
                     <CardCompetition
