@@ -3,6 +3,8 @@ import { CompetitionSwiper } from '../components/landing/CompetitionSwiper'
 import GalleryCarousel from '../components/landing/GalleryCarousel'
 import Timeline from '../components/Timeline'
 import { CompetitionGaleryTimeline } from '../components/landing/CompetitionGalleryTimeLine'
+import { ArrowLeftCircle } from 'lucide-react'
+import { FaAngleLeft, FaAngleRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 
 const competitions = [
   {
@@ -73,7 +75,7 @@ const MainLandingCompetitionPage = () => {
           boxShadow:
             '0 0 -5px 5px rgba(72, 230, 255, 0.2), 0 0 10px rgba(72, 230, 255, 0.2)'
         }}>
-        <p className="lg-[32px] text-justify font-dmsans text-[20px] leading-5 tracking-wider text-lilac-100 md:text-[24px] md:leading-6 lg:leading-7">
+        <p className="lg-[24px] text-left  font-dmsans text-[16px] leading-5 tracking-wider text-lilac-100 md:text-[20px] md:leading-6 lg:leading-7">
           Arkavidia merupakan acara IT tahunan yang diadakan oleh Himpunan Mahasiswa
           Informatika ITB. Dengan tema “Adaptive Collaboration to Encounter Digital
           Disruption”, Arkavidia 9.0 diharapkan akan lebih banyak individu sadar akan hak
@@ -82,9 +84,9 @@ const MainLandingCompetitionPage = () => {
           bagi pelajar, civitas akademik, dan masyarakat umum seluruh Indonesia.
         </p>
       </div>
-      <div className="col-span-3 mt-6 flex h-fit w-full items-center justify-center pl-10 md:mt-48 md:px-10">
-        <CompetitionSwiper competitions={competitions} />
-      </div>
+
+      <CompetitionSwiper competitions={competitions} />
+
       <CompetitionGaleryTimeline />
 
       <Image

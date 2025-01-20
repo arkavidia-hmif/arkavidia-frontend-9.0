@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Image, { StaticImageData } from 'next/image'
 import { FaArrowRight } from 'react-icons/fa'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import { Swiper, SwiperRef, SwiperSlide } from 'swiper/react'
 import { Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import Link from 'next/link'
@@ -18,6 +18,7 @@ import CPLogo from '/public/images/competition/cp-logo.png'
 import DataLogo from '/public/images/competition/datavidia-logo.png'
 import HackLogo from '/public/images/competition/hackvidia-logo.png'
 import UXLogo from '/public/images/competition/uxvidia-logo.png'
+import { ArrowSign } from '../landing/ArrowSign'
 
 interface CardCompetitionProps {
   title: string
@@ -77,6 +78,7 @@ const competitions = [
 ]
 const CardCompetition = ({ title, logo, isActive }: CardCompetitionProps) => {
   let imageStyle = ''
+  const swiperRef = useRef<SwiperRef>(null)
 
   if (title === 'Hackvidia') {
     imageStyle = 'w-[64px] md:w-[120px] -top-3 md:-top-7'
@@ -141,6 +143,10 @@ const CardCompetition = ({ title, logo, isActive }: CardCompetitionProps) => {
   )
 }
 
+function prevSlide() {}
+
+function nextSlide() {}
+
 const CompetitionCarousel = () => {
   const router = useRouter()
   const swiperRef = useRef<SwiperType | null>(null)
@@ -180,7 +186,8 @@ const CompetitionCarousel = () => {
               </Link>
             </Button>
           </div>
-          <div className="col-span-2 mt-6 flex w-full justify-center px-4 md:mt-14 lg:px-0 lg:pl-24">
+          <div className="relative col-span-2 mt-6 flex w-full justify-center px-4 md:mt-14 lg:px-0">
+            <ArrowSign onClick={prevSlide} direction={'left'} />
             <div className="w-full max-w-3xl">
               <Swiper
                 modules={[Autoplay]}
@@ -204,7 +211,6 @@ const CompetitionCarousel = () => {
                     className="flex items-center hover:cursor-grab active:cursor-grabbing"
                     onClick={() => {
                       setActiveIndex(index)
-                      console.log('Slide To: ' + index)
                       swiperRef.current?.slideToLoop(index, 500)
                     }}>
                     <CardCompetition
@@ -216,6 +222,7 @@ const CompetitionCarousel = () => {
                 ))}
               </Swiper>
             </div>
+            <ArrowSign onClick={nextSlide} direction={'right'} />
           </div>
         </div>
       </div>
