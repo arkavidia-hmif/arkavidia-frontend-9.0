@@ -97,8 +97,8 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
             </h1>
             <p className="text-md text-gray-400">
               {event.timeStart &&
-                event.timeStart.toLocaleDateString('id-ID', options) + ' - '}
-              {event.timeEnd && event.timeEnd?.toLocaleDateString('id-ID', options)}
+                event.timeStart.toLocaleDateString('id-ID', options)}
+              {event.timeEnd && ' - ' + event.timeEnd?.toLocaleDateString('id-ID', options)}
               {event.timeStart || event.timeEnd ? '' : 'Coming Soon'}
             </p>
           </div>
