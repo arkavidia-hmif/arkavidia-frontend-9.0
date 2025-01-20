@@ -278,11 +278,13 @@ function UserDashboard() {
   let team_stage = ''
   let stage_deadline = null
   if (submissionRequirementData) {
-    team_stage = (getTeamStage(submissionRequirementData)?.stage || '')
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ')
-    stage_deadline = getTeamStage(submissionRequirementData)?.deadline
+    // team_stage = (getTeamStage(submissionRequirementData)?.stage || '')
+    //   .split(' ')
+    //   .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    //   .join(' ')
+    // stage_deadline = getTeamStage(submissionRequirementData)?.deadline
+    team_stage = currentTeam?.stage || 'pre-eliminary'
+    stage_deadline = new Date('2025-02-07')
   }
 
   const events = []
