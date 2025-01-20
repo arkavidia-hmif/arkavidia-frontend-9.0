@@ -21,7 +21,8 @@ type ComponentProps = {
     onUpload?: (e: uploadedFileState | null ) => void,
     className?: string,
     displaySucces?: boolean,
-    supportedFormats: string[]
+    supportedFormats: string[],
+    sizeLimit?: number;
 }
 
 function fileExt(filename: string) {
@@ -47,13 +48,14 @@ function uploadedStatus(success?: boolean) {
 }
 
 
-export default function FileInput({onUpload, className, displaySucces, supportedFormats}: ComponentProps) {
+export default function FileInput({onUpload, className, displaySucces, supportedFormats, sizeLimit = 10}: ComponentProps) {
     const [file, setFile] = useState<File | null>(null);
     const [progress, setProgress] = useState(0)
     const [uploaded, setUploaded] = useState(false);
     const [isUploadSucces, setUploadSucces] = useState<boolean>(false);
     const { toast } = useToast()
     const axiosAuth = useAxiosAuth();
+    const fileSizeLimit = sizeLimit * 1024 * 1024; // Convert MB to bytes
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         if(acceptedFiles.length > 1) {
             toast({
@@ -75,6 +77,16 @@ export default function FileInput({onUpload, className, displaySucces, supported
             variant: "destructive",
             });
             return;
+        }
+
+        const fileSize = file.size;
+        if(fileSize > fileSizeLimit) {
+        toast({
+            title: "File too large",
+            description: `Maximum file size is ${sizeLimit}MB`,
+            variant: "destructive",
+        });
+        return;
         }
 
         setFile(acceptedFiles[0])

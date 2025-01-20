@@ -34,6 +34,7 @@ interface PersonalDataProps {
 }
 
 const supportedFormats = ['jpg', 'jpeg', 'png'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB limit
 
 // Form Schema
 const registerPersonalDataSchema = z.object({
@@ -121,7 +122,17 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
         variant: "destructive",
         });
       return;
-  }
+    }
+
+    const fileSize = values.identityCard[0].size;
+    if(fileSize > MAX_FILE_SIZE) {
+      toast({
+        title: "File too large",
+        description: `Maximum file size is 10MB`,
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (isFormAccepted) {
       toast({
