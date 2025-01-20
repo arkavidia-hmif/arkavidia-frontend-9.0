@@ -1,6 +1,7 @@
+import React from 'react'
 import ComingSoon from '../components/404-coming-soon/ComingSoon'
 
-const EventPage = () => {
+function EventPage() {
   return <ComingSoon />
 }
 

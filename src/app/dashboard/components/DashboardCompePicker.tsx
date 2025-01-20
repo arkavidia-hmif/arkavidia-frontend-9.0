@@ -39,9 +39,10 @@ function DashboardCompePicker(props: DashboardCompePickerProps) {
           : [{ id: 0, option: 'No competition joined' }]
       }
       label=""
+      searchIcon={false}
       onChange={handleChange}
       value={currentCompetition}
-      className="!md:mx-auto !mx-0 !max-w-[180px] grow-0 p-1 text-xs md:!max-w-[300px] md:text-lg"
+      className="!md:mx-auto !mx-0 !max-w-[180px] grow-0 p-1 text-xs md:!max-w-[260px] md:text-lg"
     />
   )
 }

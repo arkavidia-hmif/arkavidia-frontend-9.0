@@ -393,25 +393,6 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
             />
             <FormField
               control={form.control}
-              name="phonenumber"
-              render={({ field }) => (
-                <FormItem className={`flex flex-col gap-2`}>
-                  <FormLabel className="text-lilac-200 max-md:text-xs">
-                    Nomor Handphone <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 [appearance:textfield] placeholder:text-purple-500 max-md:text-xs [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                      placeholder="Masukkan nomor Whatsapp aktif"
-                      {...field}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="identityCard"
               render={({ field }) => (
                 <FormItem className={`flex flex-col gap-2`}>
@@ -431,6 +412,26 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="phonenumber"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">
+                    Nomor Handphone <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 [appearance:textfield] placeholder:text-purple-500 max-md:text-xs [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                      placeholder="Masukkan nomor Whatsapp aktif"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="lineid"

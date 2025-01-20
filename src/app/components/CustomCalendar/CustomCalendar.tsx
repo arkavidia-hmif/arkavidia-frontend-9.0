@@ -41,15 +41,6 @@ const Calendar = ({ eventDate }: { eventDate?: EventDate[] }) => {
   const isPrevMonthDisabled = currentDate.getMonth() + 1 <= LIMIT_MONTH_UNDER
   const isNextMonthDisabled = currentDate.getMonth() + 2 >= LIMIT_MONTH_UPPER
 
-  console.log(
-    'Current Month : ' +
-      currentDate.getMonth() +
-      ' Prev: ' +
-      isPrevMonthDisabled +
-      ' Next : ' +
-      isNextMonthDisabled
-  )
-
   const handleCustomYear = (year: number) => {
     if (year === LIMIT_YEAR) {
       setCurrentDate(prevDate => setYear(prevDate, year))
@@ -127,7 +118,9 @@ const Calendar = ({ eventDate }: { eventDate?: EventDate[] }) => {
       {/* Days of the Week */}
       <div className="calendar-days grid grid-cols-7 gap-x-4 text-center font-dmsans text-[16px] font-semibold">
         {dayList.map(day => (
-          <div key={day}>{day}</div>
+          <div key={day} className="w-9">
+            {day}
+          </div>
         ))}
       </div>
 

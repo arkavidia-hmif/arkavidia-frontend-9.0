@@ -67,32 +67,36 @@ export default function CompetitionRegistration({
       router.push('/login')
       return
     }
-    
+
     // Check if user already filling their data
-    const userResponse = await getUser({client: axiosInstance})
+    const userResponse = await getUser({ client: axiosInstance })
     const user = userResponse.data
-    
+
     if (!user?.isRegistrationComplete) {
       toast({
         variant: 'warning',
-        title: 'Anda belum menyelesaikan pendaftaran. Mohon selesaikan proses pendaftaran dahulu'
+        title:
+          'Anda belum menyelesaikan pendaftaran. Mohon selesaikan proses pendaftaran dahulu'
       })
       router.push('/register/personal-data')
     }
 
     // Check if user already join a team
-    const teamJoined = (await getTeams({client: axiosInstance})).data
-    if (teamJoined && teamJoined.length > 0) {
+    const teamJoined = (await getTeams({ client: axiosInstance })).data
+    if (
+      teamJoined &&
+      teamJoined.length > 0 &&
+      teamJoined.find(team => team.competitionId === competitionID)
+    ) {
       toast({
         title: 'Anda sudah mendaftar ke perlombaan ini',
         variant: 'info'
       })
-      router.push('/dashboard')
+      setIsOpen(false)
+    } else {
+      setIsOpen(true)
     }
-
-    setIsOpen(true)
   }
-
 
   useEffect(() => {
     setCompetitionType(competitionAbbreviation as CompetitionType)
@@ -103,13 +107,15 @@ export default function CompetitionRegistration({
       <DialogTrigger asChild>
         <Button
           size="sm"
-          onClick={() => {disabled ? handleOpenDialog() : () => {}}}
+          onClick={() => {
+            !disabled ? handleOpenDialog() : () => {}
+          }}
           disabled={disabled}
           className="">
-            <div className='flex gap-2 lg:gap-5 lg:text-base lg:w-[200px] items-center justify-center'>
+          <div className="flex items-center justify-center gap-2 lg:w-[200px] lg:gap-5 lg:text-base">
             <p>Register Now </p>
             <ArrowRight />
-            </div>
+          </div>
         </Button>
       </DialogTrigger>
       <DialogContent className="flex max-w-5xl items-center gap-4 bg-[url('/images/join-competition/bg.png')] bg-cover bg-center bg-no-repeat px-[3rem] py-[3rem] font-teachers md:justify-center">

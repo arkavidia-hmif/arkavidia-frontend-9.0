@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Image from 'next/image'
 import React from 'react'
 
@@ -18,6 +19,11 @@ function ComingSoon() {
         <p className="mt-4 text-center font-dmsans text-base leading-normal tracking-normal md:text-lg lg:text-xl">
           by Arkavidia 9.0
         </p>
+        <Link
+          href="/"
+          className="mt-6 cursor-pointer text-base font-bold text-white underline md:text-[20px] lg:text-[22px]">
+          Go Home
+        </Link>
       </div>
     </div>
   )
