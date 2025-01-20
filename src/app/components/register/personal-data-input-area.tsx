@@ -33,6 +33,8 @@ interface PersonalDataProps {
   educationOptions: MenuItem[]
 }
 
+const supportedFormats = ['jpg', 'jpeg', 'png'];
+
 // Form Schema
 const registerPersonalDataSchema = z.object({
   fullname: z.string().min(1, { message: 'Nama lengkap wajib diisi' }),
@@ -111,6 +113,16 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
    */
   async function onSubmit(values: z.infer<typeof registerPersonalDataSchema>) {
     // TODO: Replace with backend logic
+    const fileExt = values.identityCard[0].name.split(".").pop()?.toLowerCase();
+    if (!fileExt || !supportedFormats.includes(fileExt)) {
+        toast({
+        title: "Unsupported File Format",
+        description: `Allowed formats: ${supportedFormats.join(", ")}`,
+        variant: "destructive",
+        });
+      return;
+  }
+
     if (isFormAccepted) {
       toast({
         title: 'Mohon ditunggu',
@@ -403,6 +415,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                   <FormControl className="flex items-center">
                     <Input
                       type="file"
+                      accept='image/*'
                       className="cursor-pointer gap-x-1 border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 file:cursor-pointer file:rounded-md file:border file:bg-purple-800 file:text-xs placeholder:text-purple-500 max-md:text-xs"
                       placeholder=""
                       {...fileRef}
