@@ -136,28 +136,33 @@ const CardCompetition = ({ title, logo, isActive }: CardCompetitionProps) => {
           alt={title}
           width={259}
           height={276}
-          className={`select-none absolute ${imageStyle}`}
+          className={`absolute select-none ${imageStyle}`}
         />
       </div>
     </div>
   )
 }
 
-function prevSlide() {}
-
-function nextSlide() {}
-
 const CompetitionCarousel = () => {
   const router = useRouter()
   const swiperRef = useRef<SwiperType | null>(null)
-  const [activeIndex, setActiveIndex] = useState(
-    Math.floor(Math.random() * competitions.length)
-  )
+  const randomIdx = Math.floor(Math.random() * competitions.length)
+  const [activeIndex, setActiveIndex] = useState(randomIdx)
+
+  function prevSlide() {
+    swiperRef.current?.slidePrev(400)
+    setActiveIndex(swiperRef.current?.realIndex ?? randomIdx)
+  }
+
+  function nextSlide() {
+    swiperRef.current?.slideNext(400)
+    setActiveIndex(swiperRef.current?.realIndex ?? randomIdx)
+  }
 
   return (
     <div>
       {/* Preview */}
-      <div className="select-none flex w-full justify-center">
+      <div className="flex w-full select-none justify-center">
         <div className="grid min-h-[250px] max-w-5xl grid-cols-2 items-center justify-center gap-2 px-8 lg:px-0">
           <div className="flex items-center justify-center">
             <Image
