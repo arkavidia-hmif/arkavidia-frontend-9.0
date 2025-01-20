@@ -5,12 +5,12 @@ interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   label?: string
   state?: 'default' | 'error' | 'success' | 'warn'
   helperText?: string
-  value: string
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  value?: string
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
 }
 
 function TextArea({
-  label = 'Label',
+  label,
   value,
   state = 'default',
   onChange,
@@ -23,9 +23,11 @@ function TextArea({
     // diatur w-full supaya ngatur lebar textarea sesuai parentnya
     <div className="flex w-full flex-col gap-1 text-left font-dmsans">
       <label>
-        <span className={`text-xl ${disabled ? 'text-neutral-200' : 'text-lilac-100'}`}>
-          {label}
-        </span>
+        {label && (
+          <span className={`text-xl ${disabled ? 'text-neutral-200' : 'text-lilac-100'}`}>
+            {label}
+          </span>
+        )}
         {required && <span className="text-red-500"> *</span>}
       </label>
       <Textarea
