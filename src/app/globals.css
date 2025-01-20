@@ -70,3 +70,86 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Scrollbar for ExpandedMenu */
+.custom-scrollbar-expanded-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar-expanded-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar-expanded-menu::-webkit-scrollbar-thumb {
+  background-color: rgba(128, 90, 213, 0.6);
+  border-radius: 4px;
+}
+
+.custom-scrollbar-expanded-menu::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(128, 90, 213, 0.8);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.gradientLoader {
+  background-image: conic-gradient(
+    from 180deg,
+    #ff71a0 0deg,
+    #d888ff 22%,
+    #4d06b0 50%,
+    #6debff 79%,
+    rgb(255 113 160 / 30%) 94%,
+    rgb(255 113 160 / 60%) 99%
+  );
+}
+
+.gradient-coming-soon {
+  background-image: linear-gradient(
+    90deg,
+    #ff71a0 0%,
+    #48e6ff 32.65%,
+    #d888ff 59.85%,
+    #946ad0 91.5%
+  );
+  background-size: 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.text-glow {
+  filter: drop-shadow(0 0 17px #7138c0);
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+  /* Inner shadow */
+}
+
+.countdownTitle {
+  text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.4);
+}
+
+.calendarDateTypes {
+  text-shadow:
+    0px 4px 4px rgba(0, 0, 0, 0.25),
+    0px 0px 10px rgba(255, 255, 255, 0.5);
+}
+
+.countdownBox {
+  box-shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.2);
+}
+
+.dashboardSeparator {
+  background: linear-gradient(90deg, #ff95b8 0%, #a555cc 51.5%, #48e6ff 100%);
+  box-shadow: 0px 0px 8px 0px rgba(245, 245, 245, 0.5);
+}
+
+.dashboardTitle {
+  text-shadow: 0px 0px 17.7px rgba(255, 255, 255, 0.5);
+}
