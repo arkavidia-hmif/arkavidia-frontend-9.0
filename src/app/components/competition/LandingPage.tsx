@@ -8,6 +8,7 @@ import { Button } from '../Button'
 import { IoMdDownload } from 'react-icons/io'
 import FAQAccordion from '../FAQAccordion'
 import CompetitionRegistration from '../CompetitionRegistration'
+import Link from 'next/link'
 
 type WinnerPrizeProps = {
   position: string
@@ -184,8 +185,8 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
         <section
           className="flex flex-col items-center justify-around gap-8 md:gap-12"
           id="competition-information">
-          <div className="flex flex-col justify-center gap-2 md:gap-0 lg:flex-row">
-            <div className="flex w-full items-center justify-center lg:w-auto">
+          <div className="flex flex-col justify-center gap-2 lg:flex-row md:gap-0">
+            <div className="select-none flex w-full items-center justify-center lg:w-auto">
               <Image
                 width={650}
                 height={650}
@@ -348,20 +349,21 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               </div>
               <div className="flex w-full flex-col flex-wrap gap-4 sm:gap-2 md:flex-row">
                 {props.contactPerson?.map(contact => (
-                  <Button
-                    variant="outline"
-                    key={contact.contact}
-                    className="w-full sm:w-auto">
-                    <div className="flex flex-row items-center justify-center gap-2 px-4">
-                      <Image
-                        src={contactLogo[contact.type] || ''}
-                        alt={contact.name}
-                        width={20}
-                        height={20}
-                      />
-                      <p>{contact.name}</p>
-                    </div>
-                  </Button>
+                  <Link key={contact.contact} href={contact.contact || '#'}>
+                    <Button
+                      variant="outline"
+                      className="w-full sm:w-auto">
+                      <div className="flex flex-row items-center justify-center gap-2 px-4">
+                        <Image
+                          src={contactLogo[contact.type] || ''}
+                          alt={contact.name}
+                          width={20}
+                          height={20}
+                        />
+                        <p>{contact.name}</p>
+                      </div>
+                    </Button>
+                  </Link>
                 ))}
               </div>
             </div>

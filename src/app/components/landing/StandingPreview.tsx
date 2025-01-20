@@ -15,7 +15,7 @@ export const StandingPreview = ({ preview, isActive = false }: StandingPreviewPr
   const MarginTop = isActive ? '' : 'translate-y-[100px]'
   return (
     <div
-      className={`relative flex w-full flex-col items-center justify-center ${MarginTop}`}>
+      className={`relative select-none flex w-full flex-col items-center justify-center ${MarginTop}`}>
       <Image
         src={preview}
         alt="Competiton Preview"
