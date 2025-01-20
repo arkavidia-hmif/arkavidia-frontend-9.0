@@ -142,7 +142,7 @@ function Navbar() {
             </li>
           ))}
           {LOGGED_IN ? (
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger>
                 <Image
                   src={'/profileLogo.svg'}

@@ -167,7 +167,10 @@ function Sidebar({ announcement = false }: SidebarProps) {
                 )}
               </div>
               <div className="mx-2 mb-4 cursor-pointer lg:mx-2.5">
-                <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+                <DropdownMenu
+                  modal={false}
+                  open={isDropdownOpen}
+                  onOpenChange={setIsDropdownOpen}>
                   <DropdownMenuTrigger
                     asChild
                     className="my-6 flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
