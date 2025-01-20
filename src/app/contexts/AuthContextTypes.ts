@@ -9,4 +9,5 @@ export interface basicLoginResponse {
 export interface AuthContextProps {
   basicLogin: (email: string, password: string) => Promise<basicLoginResponse>
   logout: () => Promise<void>
+  sessionCheck: () => Promise<void>
 }

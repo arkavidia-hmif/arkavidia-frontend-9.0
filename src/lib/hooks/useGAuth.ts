@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { getUser, googleLoginAccessToken } from '~/api/generated'
 import { axiosInstance, createAxiosAuthInstance } from '../axios'
 import { useAppDispatch } from '~/redux/store'
-import { userLogin } from '~/redux/slices/auth'
+import { setFilledInfo, userLogin } from '~/redux/slices/auth'
 import { useToast } from '~/hooks/use-toast'
 
 export default function useGAuth() {
@@ -40,6 +40,9 @@ export default function useGAuth() {
             description: 'Successfully logged in',
             variant: 'success'
           })
+          if (hasFilledInfo) {
+            appDispatch(setFilledInfo(true))
+          }
 
           setTimeout(() => {
             if (!hasFilledInfo) {
