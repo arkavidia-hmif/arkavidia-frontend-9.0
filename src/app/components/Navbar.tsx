@@ -30,7 +30,7 @@ function Navbar() {
   const LOGGED_IN = isAuthenticated // ! hardcode untuk testing
   const pathname = usePathname()
   const NAV_ITEMS: NavItem[] = [
-    { name: 'About Us', link: '/aboutus' },
+    // { name: 'About Us', link: '/aboutus' },
     { name: 'Event', link: '/event' },
     { name: 'Competition', link: '/competition' }
   ]
@@ -127,7 +127,7 @@ function Navbar() {
         </DropdownMenu>
 
         {/* Desktop menu */}
-        <ul className="hidden items-center justify-center space-x-8 text-white md:flex  ">
+        <ul className="hidden items-center justify-center space-x-8 text-white md:flex">
           {NAV_ITEMS.map((item, index) => (
             <li key={index}>
               <Link
