@@ -122,7 +122,6 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
       // Get User ID to be embedded into file name
       const getSelf = await self({ client: axiosAuth })
       if (getSelf.error) {
-        console.log(getSelf.error.error)
         toast({
           title: 'Error',
           description: 'Gagal mengirimkan data',
