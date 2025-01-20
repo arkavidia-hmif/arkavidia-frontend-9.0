@@ -7,14 +7,15 @@ import { useToast } from '~/hooks/use-toast'
 import { useParams } from 'next/navigation'
 
 interface MessageBoxProps {
+  feedback?: string
   typeId: string
 }
 
-const MessageBox = ({ typeId }: MessageBoxProps) => {
+const MessageBox = ({ typeId, feedback = '' }: MessageBoxProps) => {
   const params = useParams()
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState(feedback)
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
