@@ -49,10 +49,10 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
 
   const swiperRef = useRef<SwiperType | null>(null)
   return (
-    <div className="relative col-span-3 mt-6 flex h-fit w-full items-center justify-center md:mt-48 md:px-10">
+    <div className="relative col-span-3 mt-6 max-md:mt-16 flex h-fit w-full items-center justify-center md:mt-48 md:px-10">
       <ArrowSign onClick={prevSlide} direction={'left'} />
       <div className="relative flex max-h-[800px] w-full flex-col items-center">
-        <h1 className="z-10 text-center font-belanosima text-[36px] leading-[88px] text-white md:text-[48px] lg:text-[64px]">
+        <h1 className="z-10 text-center font-belanosima text-[36px] text-white md:text-[48px] lg:text-[64px] lg:leading-[88px] md:leading-[60px] leading-10">
           {getTitle(activeIndex)}
         </h1>
 

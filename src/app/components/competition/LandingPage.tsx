@@ -19,10 +19,7 @@ const options: Intl.DateTimeFormatOptions = {
   weekday: 'long',
   year: 'numeric',
   month: 'long',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric'
+  day: 'numeric'
 }
 
 export type ContactPersonProps = {
@@ -208,9 +205,10 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
                 {currentOrClosestEvent ? (
                   timeLeft > 0 ? (
                     `${currentOrClosestEvent.title}: ${
-                      currentOrClosestEvent.timeEnd
-                        ? new Date(currentOrClosestEvent.timeEnd).toLocaleDateString(
+                      currentOrClosestEvent.timeStart
+                        ? new Date(currentOrClosestEvent.timeStart).toLocaleDateString(
                             'id-ID',
+
                             options
                           )
                         : currentOrClosestEvent.timeStart
@@ -231,8 +229,8 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
         </section>
 
         {/* Time Left Section */}
-        <section className="flex flex-col gap-8 md:gap-12" id="registration-time">
-          <div className="flex flex-row items-center justify-center gap-2 sm:gap-6 md:gap-10">
+        <section className="flex flex-col gap-8 md:gap-12" id="registration-time ">
+          <div className="flex  flex-row items-center justify-center gap-2 sm:gap-6 md:gap-10">
             {/* Timer Blocks */}
             {[
               { value: days, label: 'Hari' },
@@ -285,7 +283,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
         {/* Timeline Section */}
         <section
-          className="flex flex-col items-center gap-8 md:gap-16"
+          className="mt-20 flex flex-col items-center gap-8 md:gap-16"
           id="competition-timeline">
           <h1 className="text-center font-belanosima text-3xl font-extrabold uppercase sm:text-4xl md:text-5xl">
             Competition Timeline
