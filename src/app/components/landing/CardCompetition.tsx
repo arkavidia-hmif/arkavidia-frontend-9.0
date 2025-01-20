@@ -31,7 +31,7 @@ export const LandingCardCompetition = ({
   const TopMarginContainer = isActive ? 'py-0' : 'translate-y-20'
   return (
     <div
-      className={`flex w-[444px] max-md:w-[320px] flex-col items-center justify-between ${isActive ? 'gap-[360px]' : 'gap-0'} ${TopMarginContainer}`}>
+      className={`select-none flex w-[444px] max-md:w-[320px] flex-col items-center justify-between ${isActive ? 'gap-[360px]' : 'gap-0'} ${TopMarginContainer}`}>
       {isActive && (
         <>
           <h1 className="z-10 text-center font-belanosima text-[36px] leading-[88px] text-white md:text-[48px] lg:text-[64px]">

@@ -134,7 +134,7 @@ const CardCompetition = ({ title, logo, isActive }: CardCompetitionProps) => {
           alt={title}
           width={259}
           height={276}
-          className={`absolute ${imageStyle}`}
+          className={`select-none absolute ${imageStyle}`}
         />
       </div>
     </div>
@@ -151,7 +151,7 @@ const CompetitionCarousel = () => {
   return (
     <div>
       {/* Preview */}
-      <div className="flex w-full justify-center">
+      <div className="select-none flex w-full justify-center">
         <div className="grid min-h-[250px] max-w-5xl grid-cols-2 items-center justify-center gap-2 px-8 lg:px-0">
           <div className="flex items-center justify-center">
             <Image
