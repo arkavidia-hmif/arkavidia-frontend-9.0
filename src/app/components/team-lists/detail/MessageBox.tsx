@@ -40,7 +40,6 @@ const MessageBox = ({ typeId, feedback = '' }: MessageBoxProps) => {
         title: 'Feedback sent',
         variant: 'success'
       })
-      setMessage('')
     } catch (error) {
       toast({
         title: 'Failed to send feedback',
