@@ -13,7 +13,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '../Input'
 import Link from 'next/link'
-import { Button } from '../Button'
+import { Button } from '../ui/button'
 import { useToast } from '../../../hooks/use-toast'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
@@ -251,7 +251,7 @@ export const EmailRegisterForm = () => {
               )}
             />
           </div>
-          <div className="flex w-full flex-col text-center font-dmsans max-lg:gap-1.5 max-md:gap-1 max-md:text-xs lg:gap-2">
+          <div className="flex w-full flex-col text-center max-lg:gap-1.5 max-md:gap-1 max-md:text-xs lg:gap-2">
             <Button
               className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] font-semibold text-white hover:opacity-85 max-md:text-xs'
               type="submit"
@@ -264,7 +264,7 @@ export const EmailRegisterForm = () => {
             </span>
 
             <Button
-              className="gradient-border relative flex rounded-lg bg-transparent py-5 text-white max-md:text-xs"
+              className="gradient-border relative flex rounded-lg bg-transparent py-5 text-white hover:bg-[#9274FF]/20 max-md:text-xs"
               style={{
                 borderImage: 'url(/images/login/gradient-border.svg) 16 / 12px stretch'
               }}
@@ -278,7 +278,7 @@ export const EmailRegisterForm = () => {
                 width={24}
                 height={24}
               />
-              <span className="ml-3 bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] bg-clip-text text-transparent">
                 Register dengan Google
               </span>
             </Button>
