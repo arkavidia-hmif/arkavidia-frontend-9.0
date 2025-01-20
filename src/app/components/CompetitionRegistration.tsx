@@ -92,10 +92,7 @@ export default function CompetitionRegistration({
         title: 'Anda sudah mendaftar ke perlombaan ini',
         variant: 'info'
       })
-
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 500)
+      setIsOpen(false)
     } else {
       setIsOpen(true)
     }
@@ -111,7 +108,7 @@ export default function CompetitionRegistration({
         <Button
           size="sm"
           onClick={() => {
-            disabled ? handleOpenDialog() : () => {}
+            !disabled ? handleOpenDialog() : () => {}
           }}
           disabled={disabled}
           className="">

@@ -126,7 +126,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
             alt="Logo Arkavidia 9.0"
             width={24}
             height={24}
-            className="ml-4"
+            className="ml-4 cursor-pointer"
           />
         </Link>
         <div
@@ -141,13 +141,15 @@ function Sidebar({ announcement = false }: SidebarProps) {
         style={{ backgroundImage: "url('/images/sidebar/bg.svg')" }}>
         <div className="absolute inset-0 flex flex-col justify-between overflow-hidden">
           <div className="relative my-2 flex h-full w-full flex-col items-center justify-start lg:my-6">
-            <Image
-              src="/images/sidebar/logo.svg"
-              alt="Logo Arkavidia 9.0"
-              width={100}
-              height={100}
-              className=""
-            />
+            <Link href="/">
+              <Image
+                src="/images/sidebar/logo.svg"
+                alt="Logo Arkavidia 9.0"
+                width={100}
+                height={100}
+                className=""
+              />
+            </Link>
             <div className="flex h-full flex-col justify-between">
               <div className="mt-4 flex w-full grow flex-col overflow-y-auto px-2 lg:mt-7 lg:px-[10px]">
                 {sidebarLinks.length ? (
@@ -191,7 +193,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
                     align="center"
                     className="m-auto ml-1 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-[0_0_12px] shadow-lilac-200">
                     <Link href="/" className="cursor-pointer">
-                      <DropdownMenuItem className="rounded-lg text-white focus:text-white/80">
+                      <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
                         <Image
                           src="/images/sidebar/landing-page.svg"
                           alt={'Landing Pace Icon'}
@@ -204,7 +206,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
                     </Link>
                     {!isAdmin && (
                       <Link href="/dashboard/profile" className="cursor-pointer">
-                        <DropdownMenuItem className="flex gap-x-2 rounded-lg text-white focus:text-white/80">
+                        <DropdownMenuItem className="flex cursor-pointer gap-x-2 rounded-lg text-white focus:text-white/80">
                           <Image
                             src="/images/sidebar/face.svg"
                             alt={'Landing Pace Icon'}

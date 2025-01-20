@@ -26,7 +26,6 @@ import { useAppSelector } from '~/redux/store'
 import { useRouter } from 'next/navigation'
 import { getTeams, getUser } from '~/api/generated'
 
-
 interface SuccessDialogProps {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
@@ -34,7 +33,12 @@ interface SuccessDialogProps {
   competitionLink: string
 }
 
-const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCode, competitionLink }) => {
+const SuccessDialog: React.FC<SuccessDialogProps> = ({
+  isOpen,
+  setIsOpen,
+  teamCode,
+  competitionLink
+}) => {
   const [isCopied, setIsCopied] = useState(false)
 
   const copyToClipboard = useCallback(() => {
@@ -79,7 +83,10 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({ isOpen, setIsOpen, teamCo
         </div>
         <div className="mt-4 flex justify-end">
           <DialogClose asChild>
-            <Button size="xl" className="w-full" onClick={() => window.location.href = competitionLink}>
+            <Button
+              size="xl"
+              className="w-full"
+              onClick={() => (window.location.href = competitionLink)}>
               Go to Dashboard
             </Button>
           </DialogClose>
@@ -120,22 +127,27 @@ export const CreateTeamPopup: React.FC<{
       router.push('/login')
       return
     }
-    
+
     // Check if user already filling their data
-    const userResponse = await getUser({client: axiosInstance})
+    const userResponse = await getUser({ client: axiosInstance })
     const user = userResponse.data
-    
+
     if (!user?.isRegistrationComplete) {
       toast({
         variant: 'warning',
-        title: 'Anda belum menyelesaikan pendaftaran. Mohon selesaikan proses pendaftaran dahulu'
+        title:
+          'Anda belum menyelesaikan pendaftaran. Mohon selesaikan proses pendaftaran dahulu'
       })
       router.push('/register/personal-data')
     }
 
     // Check if user already join a team
-    const teamJoined = (await getTeams({client: axiosInstance})).data
-    if (teamJoined && teamJoined.length > 0) {
+    const teamJoined = (await getTeams({ client: axiosInstance })).data
+    if (
+      teamJoined &&
+      teamJoined.length > 0 &&
+      teamJoined.find(team => team.competitionId === competitionID)
+    ) {
       toast({
         title: 'Anda sudah mendaftar ke perlombaan ini',
         variant: 'info'

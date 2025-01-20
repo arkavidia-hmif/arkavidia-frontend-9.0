@@ -13,7 +13,7 @@ import { Button } from '../Button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { cn } from '~/lib/utils'
-import { joinTeamByCode } from '~/api/generated'
+import { getTeamById, joinTeamByCode } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
 import { CompetitionType } from '~/app/components/CompetitionRegistration'
@@ -49,8 +49,11 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
         </DialogHeader>
         <div className="mt-4 flex justify-end">
           <DialogClose asChild>
-            <Button size="lg" className="w-full" onClick={() => setIsOpen(false)}>
-              Go Back to Dashboard
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={() => window.location.replace('/dashboard')}>
+              Go to Dashboard
             </Button>
           </DialogClose>
         </div>
@@ -62,7 +65,7 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
 export const JoinTeamPopup: React.FC<{
   competitionID: string
   competitionType: CompetitionType
-}> = ({ competitionType }) => {
+}> = ({ competitionType, competitionID }) => {
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
   const [teamCode, setTeamCode] = React.useState('')
@@ -105,12 +108,18 @@ export const JoinTeamPopup: React.FC<{
 
     // Check if user already join a team
     const teamJoined = (await getTeams({ client: axiosInstance })).data
-    if (teamJoined && teamJoined.length > 0) {
+    if (
+      teamJoined &&
+      teamJoined.length > 0 &&
+      teamJoined.find(t => t.competitionId === competitionID)
+    ) {
       toast({
         title: 'Anda sudah mendaftar ke perlombaan ini',
         variant: 'info'
       })
-      router.push('/dashboard')
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 500)
     }
 
     const resp = await joinTeamByCode({
@@ -131,13 +140,24 @@ export const JoinTeamPopup: React.FC<{
       return
     }
 
+    const getTeamInfo = await getTeamById({
+      client: axiosAuth,
+      path: {
+        // @ts-ignore
+        teamId: resp.data.teamId
+      }
+    })
+
+    if (getTeamInfo.data) {
+      setTeamName(getTeamInfo.data.name)
+    }
+
     toast({
       title: 'Successfully joined team',
       variant: 'success',
       duration: 3000
     })
 
-    setTeamName(resp.data.name)
     setIsSuccess(true)
     setIsOpen(false)
   }

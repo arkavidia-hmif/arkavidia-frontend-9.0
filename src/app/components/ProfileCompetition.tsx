@@ -155,6 +155,9 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
         description: 'You have left the team',
         variant: 'success'
       })
+      setTimeout(() => {
+        window.location.replace('/dashboard')
+      }, 500)
     } catch (error) {
       toast({
         title: 'Failed leaving team',
