@@ -8,6 +8,7 @@ import { Button } from '../Button'
 import { IoMdDownload } from 'react-icons/io'
 import FAQAccordion from '../FAQAccordion'
 import CompetitionRegistration from '../CompetitionRegistration'
+import Link from 'next/link'
 
 type WinnerPrizeProps = {
   position: string
@@ -19,10 +20,7 @@ const options: Intl.DateTimeFormatOptions = {
   weekday: 'long',
   year: 'numeric',
   month: 'long',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric'
+  day: 'numeric'
 }
 
 export type ContactPersonProps = {
@@ -69,11 +67,11 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   const [isRegistrationActive, setIsRegistrationActive] = useState<boolean>(false)
 
   const registrationKeywords = [
-    "Register",
-    "Registration",
-    "Pendaftaran",
-    "Daftar",
-    "Registrasi",
+    'Register',
+    'Registration',
+    'Pendaftaran',
+    'Daftar',
+    'Registrasi'
   ]
 
   useEffect(() => {
@@ -182,13 +180,13 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   return (
     <div className="min-h-screen min-w-full">
       <Navbar />
-      <div className="mx-4 flex flex-col items-center gap-16 py-6 font-dmsans sm:mx-8 md:mx-12 md:gap-16 md:py-24 lg:mx-16 lg:gap-18 lg:py-24">
+      <div className="lg:gap-18 mx-4 flex flex-col items-center gap-16 py-6 font-dmsans sm:mx-8 md:mx-12 md:gap-16 md:py-24 lg:mx-16 lg:py-24">
         {/* Competition Information Section */}
         <section
           className="flex flex-col items-center justify-around gap-8 md:gap-12"
           id="competition-information">
           <div className="flex flex-col justify-center gap-2 lg:flex-row md:gap-0">
-            <div className="flex w-full items-center justify-center lg:w-auto">
+            <div className="select-none flex w-full items-center justify-center lg:w-auto">
               <Image
                 width={650}
                 height={650}
@@ -196,11 +194,11 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
                 alt={props.competitionName}
               />
             </div>
-            <div className="flex w-full flex-col justify-center gap-4 text-wrap md:gap-0 lg:gap-10 lg:w-1/2">
-              <h1 className="text-bold text-center font-belanosima text-3xl uppercase sm:text-3xl lg:text-left md:text-4xl lg:text-6xl">
+            <div className="flex w-full flex-col justify-center gap-4 text-wrap md:gap-0 lg:w-1/2 lg:gap-10">
+              <h1 className="text-bold text-center font-belanosima text-3xl uppercase sm:text-3xl md:text-4xl lg:text-left lg:text-6xl">
                 {props.competitionName}
               </h1>
-              <p className="text-justify font-dmsans text-sm leading-6 md:text-base lg:text-lg md:leading-10">
+              <p className="text-justify font-dmsans text-sm leading-6 md:text-base md:leading-10 lg:text-lg">
                 {props.competitionDescription}
               </p>
 
@@ -208,9 +206,10 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
                 {currentOrClosestEvent ? (
                   timeLeft > 0 ? (
                     `${currentOrClosestEvent.title}: ${
-                      currentOrClosestEvent.timeEnd
-                        ? new Date(currentOrClosestEvent.timeEnd).toLocaleDateString(
+                      currentOrClosestEvent.timeStart
+                        ? new Date(currentOrClosestEvent.timeStart).toLocaleDateString(
                             'id-ID',
+
                             options
                           )
                         : currentOrClosestEvent.timeStart
@@ -231,8 +230,8 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
         </section>
 
         {/* Time Left Section */}
-        <section className="flex flex-col gap-8 md:gap-12" id="registration-time">
-          <div className="flex flex-row items-center justify-center gap-2 sm:gap-6 md:gap-10">
+        <section className="flex flex-col gap-8 md:gap-12" id="registration-time ">
+          <div className="flex  flex-row items-center justify-center gap-2 sm:gap-6 md:gap-10">
             {/* Timer Blocks */}
             {[
               { value: days, label: 'Hari' },
@@ -285,7 +284,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
         {/* Timeline Section */}
         <section
-          className="flex flex-col items-center gap-8 md:gap-16"
+          className="mt-20 flex flex-col items-center gap-8 md:gap-16"
           id="competition-timeline">
           <h1 className="text-center font-belanosima text-3xl font-extrabold uppercase sm:text-4xl md:text-5xl">
             Competition Timeline
@@ -348,29 +347,35 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               <div className="text-nowrap text-center font-dmsans text-base font-bold sm:text-lg">
                 Contact Person
               </div>
-              <div className="flex w-full flex-col flex-wrap gap-4 md:flex-row sm:gap-2">
+              <div className="flex w-full flex-col flex-wrap gap-4 sm:gap-2 md:flex-row">
                 {props.contactPerson?.map(contact => (
-                  <Button
-                    variant="outline"
-                    key={contact.contact}
-                    className="w-full sm:w-auto">
-                    <div className="flex flex-row items-center justify-center gap-2 px-4">
-                      <Image
-                        src={contactLogo[contact.type] || ''}
-                        alt={contact.name}
-                        width={20}
-                        height={20}
-                      />
-                      <p>{contact.name}</p>
-                    </div>
-                  </Button>
+                  <Link key={contact.contact} href={contact.contact || '#'}>
+                    <Button
+                      variant="outline"
+                      className="w-full sm:w-auto">
+                      <div className="flex flex-row items-center justify-center gap-2 px-4">
+                        <Image
+                          src={contactLogo[contact.type] || ''}
+                          alt={contact.name}
+                          width={20}
+                          height={20}
+                        />
+                        <p>{contact.name}</p>
+                      </div>
+                    </Button>
+                  </Link>
                 ))}
               </div>
             </div>
           </section>
         )}
       </div>
-      <Image src={'/images/competition/landing-page.png'} fill className='absolute top-0 z-[-1]' alt='Landing Background'/>
+      <Image
+        src={'/images/competition/landing-page.png'}
+        fill
+        className="absolute top-0 z-[-1]"
+        alt="Landing Background"
+      />
     </div>
   )
 }

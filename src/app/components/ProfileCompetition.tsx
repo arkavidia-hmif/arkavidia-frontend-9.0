@@ -7,6 +7,15 @@ import { Team, postQuitTeam, getUser, getTeams, User } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
 import { expandCompetitionName } from '~/lib/utils'
 import Loading from './Loading'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from './ui/alert-dialog'
+import { Button } from './Button'
+import { DangerDialog } from './DangerDialog'
 
 interface ProfileCompetitionProps {
   competitionName: string
@@ -222,9 +231,15 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
 
         {/* Leave Team */}
         <div className="flex flex-col justify-start md:justify-center">
-          <div onClick={leaveTeam} className="mt-3 hover:cursor-pointer md:mt-0">
-            <MdExitToApp className="text-3xl text-red-200 md:text-4xl" />
-          </div>
+          <DangerDialog
+            title="Tinggalkan Team"
+            message="Apakah anda yakin ingin meninggalkan tim?"
+            actionText="Tinggalkan"
+            action={leaveTeam}>
+            <div className="mt-3 hover:cursor-pointer md:mt-0">
+              <MdExitToApp className="text-3xl text-red-200 md:text-4xl" />
+            </div>
+          </DangerDialog>
         </div>
       </div>
     </div>
