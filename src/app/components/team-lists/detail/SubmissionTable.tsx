@@ -55,8 +55,12 @@ function SubmissionTable({
                 {doc.file_name}
               </Link>{' '}
             </TableCell>
-            <TableCell>
-              <Tag text={doc.status} variant={variantDeterminer(doc.status)} />
+            <TableCell className="text-center">
+              <Tag
+                text={doc.status}
+                variant={variantDeterminer(doc.status)}
+                className="mx-auto flex max-w-40 items-center"
+              />
             </TableCell>
           </TableRow>
         ))}
