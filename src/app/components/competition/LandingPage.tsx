@@ -188,7 +188,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           className="flex flex-col items-center justify-around gap-8 md:gap-12"
           id="competition-information">
           <div className="flex flex-col justify-center gap-2 lg:flex-row md:gap-0">
-            <div className="flex w-full items-center justify-center lg:w-auto">
+            <div className="select-none flex w-full items-center justify-center lg:w-auto">
               <Image
                 width={650}
                 height={650}
