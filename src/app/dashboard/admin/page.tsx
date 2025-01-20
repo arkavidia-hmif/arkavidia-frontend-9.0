@@ -5,23 +5,10 @@ import FrameInfo from '../../components/admin-dashboard/FrameInfo'
 import CompetitionContext from '../../components/admin-dashboard/CompetitionContext'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 
-import React, { useEffect, useState, useCallback } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { RegisteredTeamList } from '~/app/components/registered-teamlist/teamlist'
-import { getCompetitionParticipant } from '~/api/generated'
+import { useRouter } from 'next/navigation'
 import { useToast } from '~/hooks/use-toast'
-import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
 import { getTeamStatistic, GetTeamStatisticResponse } from '~/api/generated'
-import { Team } from '~/api/generated'
-
-interface Pagination {
-  currentPage: number;
-  totalItems: number;
-  totalPages: number;
-  next: string | null;
-  prev: string | null;
-}
 
 const AdminDashboardPage = () => {
   const isAuthenticated = useAppSelector(state => state.auth.accessToken !== null)
@@ -64,68 +51,6 @@ const AdminDashboardPage = () => {
       setIsLoading(false)
     })()
   }, [])
-
-  const authAxios = useAxiosAuth();
-  const searchParams = useSearchParams()
-
-  const currentPage = Number(searchParams.get('page')) || 1;
-  const limit = searchParams.get('limit') ?? "10";
-
-  const [teamData, setTeamData] = useState<Team[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({
-    currentPage: currentPage,
-    totalItems: 0,
-    totalPages: 1,
-    next: null,
-    prev: null,
-  });
-
-  const fetchTeams = async (page: number) => {
-    try {
-      const response = await getCompetitionParticipant({
-        client: authAxios,
-        path: { competitionId: 'sgq2znio' },
-        query: { page: page.toString(), limit: limit }
-      });
-
-      if (response.data) {
-        setTeamData(response.data.result ?? []);
-        setPagination(response.data.pagination ?? { currentPage: 1, totalItems: 0, totalPages: 1, next: null, prev: null });
-      } else {
-        setTeamData([]);
-        setPagination({ currentPage: 1, totalItems: 0, totalPages: 1, next: null, prev: null });
-      }
-    } catch (error) {
-      console.error('Error fetching teams:', error);
-    }
-  };
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams]
-  );
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || newPage > pagination.totalPages) return;
-
-    // Update URL with new page query parameter
-    router.push(`?${createQueryString('page', newPage.toString())}`);
-
-    fetchTeams(newPage);
-    setPagination(prev => ({
-      ...prev,
-      currentPage: newPage,
-    }));
-  };
-
-  useEffect(() => {
-    fetchTeams(currentPage);
-  }, [currentPage]);  
 
   return (
     <>
@@ -181,4 +106,4 @@ const AdminDashboardPage = () => {
   )
 }
 
-export default AdminDashboard
+export default AdminDashboardPage
