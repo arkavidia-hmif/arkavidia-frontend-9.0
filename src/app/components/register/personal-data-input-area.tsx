@@ -79,14 +79,12 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
     setTimeout(() => {
       router.push('/')
     }, 1000)
-    return null
   }
 
   if (hasFinishedRegis) {
     setTimeout(() => {
       router.push('/')
     }, 1000)
-    return null
   }
 
   const form = useForm<z.infer<typeof registerPersonalDataSchema>>({
@@ -156,7 +154,10 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
           // If we get the link, do a PUT request to S3
           const upload = await axiosInstance.put({
             url: getLink.data.presignedUrl,
-            body: values.identityCard[0]
+            body: values.identityCard[0],
+            headers: {
+              'Content-Type': values.identityCard[0].type
+            }
           })
 
           if (upload.status === 200) {
@@ -218,6 +219,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                   variant: 'success',
                   duration: 5000
                 })
+                appDispatch(setFilledInfo(true))
                 setTimeout(() => {
                   router.replace('/')
                 }, 1000)
@@ -269,243 +271,250 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
     }
   }
 
-  return (
-    //TODO : Replace padding and gap into design system pad and gap
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}
-        className="my-6 mr-4 flex flex-col gap-6 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[40px] max-md:px-[36px] max-md:py-[30px] lg:px-[72px] lg:py-[60px]">
-        <Link href="/" className="flex w-full justify-end">
-          <p className="flex items-center gap-x-2 text-lg text-lilac-300 hover:text-lilac-200">
-            Isi Nanti <FaArrowRight size={16} />
-          </p>
-        </Link>
-        <h1 className="w-full text-center font-teachers text-3xl font-bold text-lilac-200">
-          Lengkapi Data Dirimu!
-        </h1>
-        <div className="flex flex-col gap-5">
-          <FormField
-            control={form.control}
-            name="fullname"
-            render={({ field }) => (
-              <FormItem className={`flex flex-col gap-2`}>
-                <FormLabel className="text-lilac-200 max-md:text-xs">
-                  Nama Lengkap <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
-                    placeholder="Masukkan nama lengkap Anda"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="birthdate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col gap-2">
-                <FormLabel className="text-lilac-200 max-md:text-xs">
-                  Tanggal Lahir <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <CustomDatePicker onChange={date => field.onChange(date)} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="education"
-            render={({ field }) => (
-              <FormItem className={`flex flex-col gap-2`}>
-                <FormLabel className="text-lilac-200 max-md:text-xs">
-                  Pendidikan <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Dropdown
-                    value={
-                      props.educationOptions.find(
-                        option => option.option === field.value
-                      ) || null
-                    }
-                    onChange={item => {
-                      field.onChange(item?.option ?? null)
-                      handleEducationChange(item ?? null)
-                    }}
-                    placeholder="Pilih jenjang pendidikan anda"
-                    data={props.educationOptions}
-                    label={''}
-                    isRequired={true}
-                    className="mx-0 w-full max-w-none text-sm"
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          {isSMAPicked && (
+  if (hasFinishedRegis || !isLoggedIn) {
+    return null
+  } else {
+    return (
+      //TODO : Replace padding and gap into design system pad and gap
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit, handleFormErrors)}
+          className="my-6 mr-4 flex flex-col gap-6 rounded-xl bg-purple-800 max-lg:px-[60px] max-lg:py-[40px] max-md:px-[36px] max-md:py-[30px] lg:px-[72px] lg:py-[60px]">
+          <Link href="/" className="flex w-full justify-end">
+            <p className="flex items-center gap-x-2 text-lg text-lilac-300 hover:text-lilac-200">
+              Isi Nanti <FaArrowRight size={16} />
+            </p>
+          </Link>
+          <h1 className="w-full text-center font-teachers text-3xl font-bold text-lilac-200">
+            Lengkapi Data Dirimu!
+          </h1>
+          <div className="flex flex-col gap-5">
             <FormField
               control={form.control}
-              name="nisn"
+              name="fullname"
               render={({ field }) => (
                 <FormItem className={`flex flex-col gap-2`}>
                   <FormLabel className="text-lilac-200 max-md:text-xs">
-                    NISN <span className="text-red-500">*</span>
+                    Nama Lengkap <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
                       className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
-                      placeholder="Masukkan NISN Anda"
+                      placeholder="Masukkan nama lengkap Anda"
                       {...field}
                     />
                   </FormControl>
                 </FormItem>
-              )}></FormField>
-          )}
-          <FormField
-            control={form.control}
-            name="institution"
-            render={({ field }) => (
-              <FormItem className={`flex flex-col gap-2`}>
-                <FormLabel className="text-lilac-200 max-md:text-xs">
-                  Institusi <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
-                    placeholder="Masukkan institusi pendidikan Anda"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription className="font-dmsans font-normal text-lilac-200">
-                  Contoh: Institut Teknologi Bandung, SMAN 1 Bandung
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phonenumber"
-            render={({ field }) => (
-              <FormItem className={`flex flex-col gap-2`}>
-                <FormLabel className="text-lilac-200 max-md:text-xs">
-                  Nomor Handphone <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 [appearance:textfield] placeholder:text-purple-500 max-md:text-xs [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                    placeholder="Masukkan nomor Whatsapp aktif"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="identityCard"
-            render={({ field }) => (
-              <FormItem className={`flex flex-col gap-2`}>
-                <FormLabel className="text-lilac-200 max-md:text-xs">
-                  Kartu Identitas (Kartu Pelajar atau Kartu Tanda Mahasiswa){' '}
-                  <span className="text-red-500">*</span>
-                </FormLabel>
-                <FormControl className="flex items-center">
-                  <Input
-                    type="file"
-                    className="cursor-pointer gap-x-1 border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 file:cursor-pointer file:rounded-md file:border file:bg-purple-800 file:text-xs placeholder:text-purple-500 max-md:text-xs"
-                    placeholder=""
-                    {...fileRef}
-                    onChange={e => field.onChange(e.target?.files ?? undefined)}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="lineid"
-            render={({ field }) => (
-              <FormItem className={`flex flex-col gap-2`}>
-                <FormLabel className="text-lilac-200 max-md:text-xs">ID Line</FormLabel>
-                <FormControl>
-                  <Input
-                    className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
-                    placeholder="Masukkan ID Line aktif"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="instagram"
-            render={({ field }) => (
-              <FormItem className={`flex flex-col gap-2`}>
-                <FormLabel className="text-lilac-200 max-md:text-xs">Instagram</FormLabel>
-                <FormControl>
-                  <Input
-                    className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
-                    placeholder="Masukkan username Instagram"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="discord"
-            render={({ field }) => (
-              <FormItem className={`flex flex-col gap-2`}>
-                <FormLabel className="text-lilac-200 max-md:text-xs">Discord</FormLabel>
-                <FormControl>
-                  <Input
-                    className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
-                    placeholder="Masukkan username Discord"
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="birthdate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col gap-2">
+                  <FormLabel className="text-lilac-200 max-md:text-xs">
+                    Tanggal Lahir <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <CustomDatePicker onChange={date => field.onChange(date)} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="formacceptance"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <div>
-                    <Checkbox
-                      text={
-                        <span className="max-md:text-xs md:text-sm">
-                          Dengan ini, saya menyatakan dengan sesungguhnya bahwa semua data
-                          yang diberikan bersifat benar
-                        </span>
+            <FormField
+              control={form.control}
+              name="education"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">
+                    Pendidikan <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Dropdown
+                      value={
+                        props.educationOptions.find(
+                          option => option.option === field.value
+                        ) || null
                       }
-                      textclassName="text-sm"
-                      checked={field.value}
-                      onCheckedChange={checked => field.onChange(checked)}></Checkbox>
-                  </div>
-                </FormControl>
-              </FormItem>
+                      onChange={item => {
+                        field.onChange(item?.option ?? null)
+                        handleEducationChange(item ?? null)
+                      }}
+                      placeholder="Pilih jenjang pendidikan anda"
+                      data={props.educationOptions}
+                      label={''}
+                      isRequired={true}
+                      className="mx-0 w-full max-w-none text-sm"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            {isSMAPicked && (
+              <FormField
+                control={form.control}
+                name="nisn"
+                render={({ field }) => (
+                  <FormItem className={`flex flex-col gap-2`}>
+                    <FormLabel className="text-lilac-200 max-md:text-xs">
+                      NISN <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
+                        placeholder="Masukkan NISN Anda"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}></FormField>
             )}
-          />
-        </div>
+            <FormField
+              control={form.control}
+              name="institution"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">
+                    Institusi <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
+                      placeholder="Masukkan institusi pendidikan Anda"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription className="font-dmsans font-normal text-lilac-200">
+                    Contoh: Institut Teknologi Bandung, SMAN 1 Bandung
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="identityCard"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">
+                    Kartu Identitas (Kartu Pelajar atau Kartu Tanda Mahasiswa){' '}
+                    <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl className="flex items-center">
+                    <Input
+                      type="file"
+                      className="cursor-pointer gap-x-1 border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 file:cursor-pointer file:rounded-md file:border file:bg-purple-800 file:text-xs placeholder:text-purple-500 max-md:text-xs"
+                      placeholder=""
+                      {...fileRef}
+                      onChange={e => field.onChange(e.target?.files ?? undefined)}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phonenumber"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">
+                    Nomor Handphone <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 [appearance:textfield] placeholder:text-purple-500 max-md:text-xs [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                      placeholder="Masukkan nomor Whatsapp aktif"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-        <Button
-          className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs'
-          type="submit"
-          variant={'ghost'}>
-          Simpan Data
-        </Button>
-      </form>
-    </Form>
-  )
+            <FormField
+              control={form.control}
+              name="lineid"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">ID Line</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
+                      placeholder="Masukkan ID Line aktif"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="instagram"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">
+                    Instagram
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
+                      placeholder="Masukkan username Instagram"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="discord"
+              render={({ field }) => (
+                <FormItem className={`flex flex-col gap-2`}>
+                  <FormLabel className="text-lilac-200 max-md:text-xs">Discord</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 placeholder:text-purple-500 max-md:text-xs"
+                      placeholder="Masukkan username Discord"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="formacceptance"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div>
+                      <Checkbox
+                        text={
+                          <span className="max-md:text-xs md:text-sm">
+                            Dengan ini, saya menyatakan dengan sesungguhnya bahwa semua
+                            data yang diberikan bersifat benar
+                          </span>
+                        }
+                        textclassName="text-sm"
+                        checked={field.value}
+                        onCheckedChange={checked => field.onChange(checked)}></Checkbox>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <Button
+            className='p-10" bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs'
+            type="submit"
+            variant={'ghost'}>
+            Simpan Data
+          </Button>
+        </form>
+      </Form>
+    )
+  }
 }

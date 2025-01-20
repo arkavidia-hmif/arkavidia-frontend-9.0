@@ -22,7 +22,6 @@ function getToastIcon(
     info: <Info className="h-5 w-5 text-blue-200" />
   }
 
-  console.log(variant)
   if (!variant) {
     return null
   }

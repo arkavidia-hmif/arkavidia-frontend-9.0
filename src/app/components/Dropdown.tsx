@@ -24,6 +24,7 @@ export default function Dropdown({
   placeholder,
   onChange,
   value,
+  searchIcon = true,
   className
 }: {
   data: MenuItem[]
@@ -33,6 +34,7 @@ export default function Dropdown({
   placeholder?: string
   onChange?: (selectedItem: MenuItem | null) => void
   value?: MenuItem | null
+  searchIcon?: boolean
   className?: string
 }) {
   const [inputValue, setInputValue] = useState('') // For filtering only
@@ -87,7 +89,7 @@ export default function Dropdown({
         <input
           id="input-27"
           className={clsx(
-            'h-fit w-full appearance-none rounded-xl border-[1.5px] border-purple-400 bg-lilac-200 p-3 pe-12 ps-12 font-dmsans font-normal leading-6 text-inherit text-purple-500 shadow-[0_0_0_3px_rgba(113,56,192,1)] placeholder:font-dmsans placeholder:font-normal placeholder:leading-6 placeholder:text-inherit placeholder:text-purple-500 placeholder:opacity-100 focus:outline-none'
+            'h-fit w-full appearance-none truncate rounded-xl border-[1.5px] border-purple-400 bg-lilac-200 p-3 pe-12 ps-4 font-dmsans font-normal leading-6 text-inherit text-purple-500 shadow-[0_0_0_3px_rgba(113,56,192,1)] placeholder:font-dmsans placeholder:font-normal placeholder:leading-6 placeholder:text-inherit placeholder:text-purple-500 placeholder:opacity-100 focus:outline-none'
           )}
           placeholder={selectedItem ? selectedItem.option : (placeholder ?? 'Search...')} // Show selected option in placeholder
           type="search"
@@ -99,24 +101,26 @@ export default function Dropdown({
         />
 
         {/* Search Icon */}
-        <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
-          {isLoading ? (
-            <LoaderCircle
-              className="h-6 w-6 animate-spin text-purple-400"
-              strokeWidth={2}
-              role="status"
-              aria-label="Loading..."
-            />
-          ) : (
-            <Image
-              src="/search.svg"
-              alt="Search"
-              width={24}
-              height={24}
-              className="h-[24px] w-[24px]"
-            />
-          )}
-        </div>
+        {searchIcon && (
+          <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
+            {isLoading ? (
+              <LoaderCircle
+                className="h-6 w-6 animate-spin text-purple-400"
+                strokeWidth={2}
+                role="status"
+                aria-label="Loading..."
+              />
+            ) : (
+              <Image
+                src="/search.svg"
+                alt="Search"
+                width={24}
+                height={24}
+                className="h-[24px] w-[24px]"
+              />
+            )}
+          </div>
+        )}
 
         {/* Arrow Down Button */}
         <button

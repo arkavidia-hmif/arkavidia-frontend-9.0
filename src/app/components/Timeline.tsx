@@ -18,6 +18,13 @@ const options: Intl.DateTimeFormatOptions = {
 };
 
 const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
+  // Sort the events by timeStart, then by timeEnd
+  const sortedEvents = [...events].sort((a, b) => {
+    const timeA = a.timeStart?.getTime() ?? a.timeEnd?.getTime() ?? Infinity;
+    const timeB = b.timeStart?.getTime() ?? b.timeEnd?.getTime() ?? Infinity;
+    return timeA - timeB;
+  });
+
   return (
     <div
       className={`flex w-full items-center justify-center ${
@@ -26,13 +33,13 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
           : 'flex-col'
       }`}
     >
-      {events.map((event, index) => (
+      {sortedEvents.map((event, index) => (
         <div
           key={index}
           className={`flex gap-4 md:gap-10 ${
             variant === 'horizontal'
               ? 'flex-row lg:w-96 lg:flex-col lg:items-center lg:justify-center'
-              : 'flex-row w-72 sm:w-96 '
+              : 'w-72 flex-row sm:w-96'
           }`}
         >
           {/* Timeline Line */}
@@ -47,7 +54,7 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
             <span
               className={`${
                 variant === 'horizontal'
-                  ? `w-1 h-10 lg:h-1 lg:flex-1 ${
+                  ? `h-10 w-1 lg:h-1 lg:flex-1 ${
                       index === 0 ? 'bg-transparent' : 'bg-[#D2A0FF]'
                     }`
                   : `h-10 w-1 ${index === 0 ? 'bg-transparent' : 'bg-[#D2A0FF]'}`
@@ -55,7 +62,7 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
             />
             {/* Circle */}
             <div
-              className="h-6 w-6 rounded-full bg-[#D2A0FF] relative"
+              className="relative h-6 w-6 rounded-full bg-[#D2A0FF]"
               style={{
                 boxShadow: '0 0 15px 5px rgba(210, 160, 255, 0.5)',
               }}
@@ -64,11 +71,15 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
             <span
               className={`${
                 variant === 'horizontal'
-                  ? `w-1 h-10 lg:h-1 lg:flex-1 ${
-                      index === events.length - 1 ? 'bg-transparent' : 'bg-[#D2A0FF]'
+                  ? `h-10 w-1 lg:h-1 lg:flex-1 ${
+                      index === sortedEvents.length - 1
+                        ? 'bg-transparent'
+                        : 'bg-[#D2A0FF]'
                     }`
                   : `h-10 w-1 ${
-                      index === events.length - 1 ? 'bg-transparent' : 'bg-[#D2A0FF]'
+                      index === sortedEvents.length - 1
+                        ? 'bg-transparent'
+                        : 'bg-[#D2A0FF]'
                     }`
               }`}
             />
@@ -77,16 +88,18 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
           <div
             className={`${
               variant === 'horizontal'
-                ? 'w-96 px-8 text-left flex flex-col justify-center lg:text-center lg:px-0'
-                : 'pl-2 md:pl-8 text-left flex flex-col justify-center'
+                ? 'flex w-96 flex-col justify-center px-8 text-left lg:px-0 lg:text-center'
+                : 'flex flex-col justify-center pl-2 text-left md:pl-8'
             } space-y-2`}
           >
-            <h1 className="text-2xl font-bold text-purple-100">{event.title}</h1>
+            <h1 className="text-2xl font-bold text-purple-100">
+              {event.title}
+            </h1>
             <p className="text-md text-gray-400">
               {event.timeStart &&
-                event.timeStart.toLocaleDateString('id-ID', options) + ' - '}
-              {event.timeEnd && event.timeEnd?.toLocaleDateString('id-ID', options)}
-              {event.timeStart || event.timeEnd ? '' : '-'}
+                event.timeStart.toLocaleDateString('id-ID', options)}
+              {event.timeEnd && ' - ' + event.timeEnd?.toLocaleDateString('id-ID', options)}
+              {event.timeStart || event.timeEnd ? '' : 'Coming Soon'}
             </p>
           </div>
         </div>

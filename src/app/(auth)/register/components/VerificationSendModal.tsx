@@ -30,13 +30,6 @@ export const VerificationModal: React.FC<ModalProps> = ({ isOpen, onClose, email
           Silakan periksa email Anda dan ikuti langkah-langkah untuk memverifikasi akun
           Anda.
         </p>
-
-        <div className="flex flex-col items-center justify-center md:flex-row">
-          <p className="text-center text-sm text-lilac-200">Belum mendapatkan email?</p>
-          <Button variant="link" className="px-2 text-lilac-200 underline">
-            Kirim ulang
-          </Button>
-        </div>
       </div>
     </div>
   )

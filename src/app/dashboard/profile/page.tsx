@@ -9,10 +9,9 @@ import {
 import { ProfileLayout } from '../../components/profile/profile-content-layout'
 import ProfileHero from '../../components/ProfileHero'
 import { useEffect, useState } from 'react'
-import { getUser, GetUserResponse, self, SelfResponse } from '~/api/generated'
+import { getUser, GetUserResponse } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
-import { MenuItem } from '~/app/components/Dropdown'
 import Loading from '~/app/components/Loading'
 import { useAppSelector } from '~/redux/store'
 
@@ -89,6 +88,8 @@ const ProfilePage = () => {
   const [userData, setUserData] = useState<GetUserResponse>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
+  const identityCard = userData?.document?.find((doc) => doc.type === 'kartu-identitas')?.media
+
   useEffect(() => {
     const getSelf = async () => {
       setIsLoading(true)
@@ -137,6 +138,8 @@ const ProfilePage = () => {
               instance={userData?.instance ?? ''}
               phoneNumber={userData?.phoneNumber ?? ''}
               educationOptions={dropdownEducationOptions}
+              identityCard={identityCard}
+              nisn={userData?.nisn}
             />
           }
           socialMedia={

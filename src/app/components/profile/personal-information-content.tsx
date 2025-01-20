@@ -1,9 +1,11 @@
 import { MenuItem } from '../Dropdown'
+import FileData from './file-data'
 import {
   DatePickerProfileData,
   DropdownProfileData,
   InputProfileData
 } from './profile-data'
+import { Media } from '~/api/generated'
 
 export interface ProfileInformationDefaultValue {
   name?: string
@@ -27,6 +29,8 @@ export interface PersonalInfoProps {
   instance: string
   phoneNumber: string
   educationOptions: Array<'SMA/MA/SMK' | 'S1' | 'S2'>
+  identityCard?: Media | undefined
+  nisn?: string | null
 }
 
 interface Props
@@ -57,6 +61,13 @@ export const PersonalInformationContent = (props: PersonalInfoProps) => {
           default_value={props.name}
           placehodler={'Placeholder'}
         />
+        {props.nisn &&
+          <InputProfileData
+            title={'NISN'}
+            default_value={props.nisn}
+            placehodler={'00123456789'}
+          />
+        }
 
         <DatePickerProfileData title={'Birthdate'} default_value={props.birthdate} />
         <DropdownProfileData
@@ -75,6 +86,10 @@ export const PersonalInformationContent = (props: PersonalInfoProps) => {
           title={'Phone Number'}
           default_value={props.phoneNumber}
           placehodler={'Placeholder'}
+        />
+        <FileData
+          initialFileName={props.identityCard?.name ?? '-'}
+          initialFileUrl={'https://' + props.identityCard?.url}
         />
       </div>
     </div>

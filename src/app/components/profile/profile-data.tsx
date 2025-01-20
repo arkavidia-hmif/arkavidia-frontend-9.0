@@ -101,7 +101,7 @@ export const ProfileData = (props: ProfileDataLayoutProps) => {
           </div>
         </div>
         {!isEdit && (
-          <Button variant={'ghost'} onClick={() => setIsEdit(!isEdit)}>
+          <Button variant={'ghost'} onClick={() => setIsEdit(!isEdit)} className='hover:bg-purple-300'>
             <Image
               src={'/images/profile/edit.svg'}
               alt={'Edit Button'}
@@ -134,7 +134,8 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       const fieldMap: Record<string, string> = {
         name: 'fullName',
         phone_number: 'phoneNumber',
-        instance: 'instance'
+        instance: 'instance',
+        nisn: 'nisn'
       }
 
       const fieldName = fieldMap[noSpace]
@@ -165,7 +166,7 @@ export const InputProfileData = (props: InputProfileDataProps) => {
       }
       // console.log('API Response:', response)
       setValue(tempValue)
-    } catch (error) {
+    } catch {
       toast({
         title: 'Failed to update',
         description: 'Something went wrong',
@@ -188,7 +189,7 @@ export const InputProfileData = (props: InputProfileDataProps) => {
         {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
         <Input
           placeholder={props.placehodler}
-          className="min-w-72 bg-lilac-100 py-6 text-purple-400"
+          className="min-w-72 bg-lilac-100 border-purple-400 py-6 text-purple-400"
           value={tempValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTempValue(e.target.value)
