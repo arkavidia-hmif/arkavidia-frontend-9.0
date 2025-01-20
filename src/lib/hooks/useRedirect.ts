@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAppSelector } from '~/redux/store'
 import { toast, useToast } from '~/hooks/use-toast'
 
@@ -17,7 +17,7 @@ const useLoginRedirect = () => {
         description: 'You need to be logged in to access this page',
         variant: 'destructive'
       })
-      router.push('/login') // Change this to the actual login page path
+      router.push('/') // Change this to the actual login page path
     }
   }, [])
 }

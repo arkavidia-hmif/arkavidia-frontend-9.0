@@ -6,6 +6,7 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { Team, postQuitTeam, getUser, getTeams, User } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
 import { expandCompetitionName } from '~/lib/utils'
+import Loading from './Loading'
 
 interface ProfileCompetitionProps {
   competitionName: string
@@ -34,6 +35,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
   const authAxios = useAxiosAuth()
   const { toast } = useToast()
 
+  const [isLoading, setIsLoading] = useState(true)
   const [userData, setUserData] = useState<User>()
   const [userTeams, setUserTeams] = useState<Team[]>([])
   const [activeTeamId, setActiveTeamId] = useState('')
@@ -61,8 +63,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
             setUserTeams(teamReq.data)
             const activeTeamData = teamReq.data.find(
               team =>
-                // @ts-ignore
-                getCompeName(team.competition.title) === competitionName.toLowerCase()
+                getCompeName(team.competition!.title) === competitionName.toLowerCase()
             )
             setActiveTeamId(activeTeamData?.id || '')
             setProfileData({
@@ -70,7 +71,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
               team: activeTeamData?.name || '',
               teamId: activeTeamData?.id || '',
               joinCode: activeTeamData?.joinCode || '',
-              isVerified: activeTeamData?.isVerified || false
+              isVerified: activeTeamData?.document?.every(doc => doc.isVerified) || false
             })
           }
         }
@@ -100,8 +101,9 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
           team: activeTeamData?.name || '',
           teamId: activeTeamData?.id || '',
           joinCode: activeTeamData?.joinCode || '',
-          isVerified: activeTeamData?.isVerified || false
+          isVerified: activeTeamData?.document?.every(doc => doc.isVerified) || false
         })
+        setTimeout(() => setIsLoading(false), 500)
       } catch (error) {
         toast({
           title: 'Failed getting data',
@@ -110,7 +112,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
         })
       }
     }
-
+    setIsLoading(true)
     fetchData()
   }, [competitionName])
 
@@ -153,6 +155,9 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
         description: 'You have left the team',
         variant: 'success'
       })
+      setTimeout(() => {
+        window.location.replace('/dashboard')
+      }, 500)
     } catch (error) {
       toast({
         title: 'Failed leaving team',
@@ -162,6 +167,18 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
     }
   }
 
+  if (isLoading) {
+    return (
+      <>
+        <h1 className="mb-4 text-3xl font-bold text-white [text-shadow:0px_0px_17.7px_0px_#FFFFFF80] md:text-5xl">
+          {expandCompetitionName(competitionName.toUpperCase())}
+        </h1>
+        <div className="relative w-full pb-20">
+          <Loading isSmallVariant={true} />
+        </div>
+      </>
+    )
+  }
   return (
     <div className="mb-4 flex flex-col gap-6 md:mb-8 md:gap-10">
       <h1 className="text-3xl font-bold text-white [text-shadow:0px_0px_17.7px_0px_#FFFFFF80] md:text-5xl">

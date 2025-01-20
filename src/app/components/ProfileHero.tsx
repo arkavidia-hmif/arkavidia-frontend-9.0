@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Button } from '~/app/components/ui/button'
 
 interface ProfileHeroProps {
@@ -7,12 +8,7 @@ interface ProfileHeroProps {
   email: string
 }
 
-function ProfileHero({
-  title,
-  isResetProfile,
-  name,
-  email
-}: ProfileHeroProps) {
+function ProfileHero({ title, isResetProfile, name, email }: ProfileHeroProps) {
   return (
     <div className="flex flex-col gap-6 md:gap-10">
       <h1 className="text-3xl font-bold text-white [text-shadow:0px_0px_17.7px_0px_#FFFFFF80] md:text-5xl">
@@ -25,12 +21,14 @@ function ProfileHero({
         </div>
 
         {!isResetProfile && (
-          <Button
-            className="mt-6 self-start bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs md:mt-0"
-            type="button"
-            variant={'ghost'}>
-            Reset Password
-          </Button>
+          <Link href="/forget-password">
+            <Button
+              className="mt-6 self-start bg-gradient-to-r from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white max-md:text-xs md:mt-0"
+              type="button"
+              variant={'ghost'}>
+              Reset Password
+            </Button>
+          </Link>
         )}
       </div>
     </div>

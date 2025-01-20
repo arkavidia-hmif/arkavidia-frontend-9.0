@@ -1,96 +1,160 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { self } from '~/api/generated/sdk.gen'
-import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { SocialMediaContent } from '~/app/components/profile/social-media-content'
 import {
   PersonalInformationContent,
+  ProfileInformationDefaultValue,
   ProfileInformationDropdownOptions
 } from '../../components/profile/personal-information-content'
 import { ProfileLayout } from '../../components/profile/profile-content-layout'
-import ProfileHero from '~/app/components/ProfileHero'
+import ProfileHero from '../../components/ProfileHero'
+import { useEffect, useState } from 'react'
+import { getUser, GetUserResponse } from '~/api/generated'
+import { useToast } from '~/hooks/use-toast'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import Loading from '~/app/components/Loading'
+import { useAppSelector } from '~/redux/store'
 
-const DropdownOptions: ProfileInformationDropdownOptions = {
+const DummyPersonalInfoData: ProfileInformationDefaultValue = {
+  name: 'Ahdmad Jone Done',
+  birthdate: new Date('2004-09-09'),
+  education: {
+    id: 1,
+    option: 'Institute'
+  },
+  instance: {
+    id: 2,
+    option: 'Ahdmad Jane'
+  },
+  phoneNumber: '+628211912891381',
+  howDoYouKnowArkavidia: {
+    id: 3,
+    option: 'example@gmail.com'
+  }
+}
+
+export type educationOptionsType = 'SMA/MA/SMK' | 'S1' | 'S2'
+const dropdownEducationOptions: Array<educationOptionsType> = ['SMA/MA/SMK', 'S1', 'S2']
+
+const DummyDropdownOptions: ProfileInformationDropdownOptions = {
   educationOptions: [
-    { id: 1, option: 'sma' },
-    { id: 2, option: 's1' },
-    { id: 3, option: 's2' }
+    {
+      id: 1,
+      option: 'SMA/MA/SMK'
+    },
+    {
+      id: 2,
+      option: 'S1'
+    },
+    {
+      id: 3,
+      option: 'S2'
+    }
   ],
   instanceOptions: [
-    { id: 1, option: 'Ahmad Jane' },
-    { id: 2, option: 'Besok Minggu' },
-    { id: 3, option: 'Object Oriented Programming' }
+    {
+      id: 1,
+      option: 'Ahdmad Jane'
+    },
+    {
+      id: 2,
+      option: 'Besok Minggu'
+    },
+    {
+      id: 3,
+      option: 'Object Oriented Programming'
+    }
   ],
   howDoYouKnowArkavOptions: [
-    { id: 1, option: 'example@gmail.com' },
-    { id: 2, option: 'ITB@gmail.com' },
-    { id: 3, option: 'Social Media' }
+    {
+      id: 1,
+      option: 'example@gmail.com'
+    },
+    {
+      id: 2,
+      option: 'ITB@gmail.com'
+    },
+    {
+      id: 3,
+      option: 'Social Media'
+    }
   ]
 }
 
 const ProfilePage = () => {
-  const [userData, setUserData] = useState<any>(null)
-  const [error, setError] = useState<string>('')
+  const username = useAppSelector(state => state.auth.username)
   const axiosAuth = useAxiosAuth()
+  const { toast } = useToast()
+  const [userData, setUserData] = useState<GetUserResponse>()
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  const identityCard = userData?.document?.find((doc) => doc.type === 'kartu-identitas')?.media
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const userResponse = await self({
-          client: axiosAuth
+    const getSelf = async () => {
+      setIsLoading(true)
+      const res = await getUser({ client: axiosAuth })
+      if (res.error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch data',
+          variant: 'destructive'
         })
+      }
 
-        if (userResponse.data) {
-          // console.log(userResponse.data)
-          setUserData(userResponse.data)
-        } else {
-          throw new Error('Failed to fetch user data.')
-        }
-      } catch (err) {
-        setError('Unable to load user information.')
-        console.error(err)
+      if (res.data) {
+        setUserData(res.data)
       }
     }
 
-    fetchUserInfo()
-  }, [axiosAuth])
+    getSelf()
+  }, [])
 
-  if (error) {
-    return <p>{error}</p>
-  }
+  useEffect(() => {
+    if (userData) {
+      setIsLoading(false)
+    }
+  }, [userData])
 
-  if (!userData) {
-    return <p>Loading...</p>
-  }
-
-  return (
-    <main>
-      <div className="mb-8 pt-20">
-        <ProfileHero
-          title="Profile"
-          name={userData.fullName}
-          email={userData.email}
-          isResetProfile={false}
+  if (isLoading) {
+    return <Loading />
+  } else {
+    return (
+      <div>
+        <div className="mb-8">
+          <ProfileHero
+            title="Profile"
+            name={username}
+            email={userData?.email ?? ''}
+            isResetProfile={false}
+          />
+        </div>
+        <ProfileLayout
+          personalInformation={
+            <PersonalInformationContent
+              name={userData?.fullName ?? ''}
+              birthdate={userData?.birthDate ?? ''}
+              education={userData?.education ?? ''}
+              instance={userData?.instance ?? ''}
+              phoneNumber={userData?.phoneNumber ?? ''}
+              educationOptions={dropdownEducationOptions}
+              identityCard={identityCard}
+              nisn={userData?.nisn}
+            />
+          }
+          socialMedia={
+            <SocialMediaContent
+              current={{
+                line: userData?.idLine,
+                discord: userData?.idDiscord,
+                instagram: userData?.idInstagram
+              }}
+            />
+          }
         />
       </div>
-      <ProfileLayout
-        personalInformation={
-          <PersonalInformationContent
-            name={userData.fullName}
-            birthdate={userData.birthdate}
-            education={{ id: 1, option: userData.education }} // Use education
-            howDoYouKnowArkavidia={{ id: 1, option: userData.entrySource }} // Use entry_source
-            instance={{ id: 1, option: userData.instance }} // Use instance
-            phoneNumber={userData.phoneNumber} // Use phone_number
-            educationOptions={DropdownOptions.educationOptions} // Static dropdown options
-            instanceOptions={DropdownOptions.instanceOptions}
-            howDoYouKnowArkavOptions={DropdownOptions.howDoYouKnowArkavOptions}
-          />
-        }
-        socialMedia={<div></div>}
-      />
-    </main>
-  )
+    )
+  }
 }
 
 export default ProfilePage
