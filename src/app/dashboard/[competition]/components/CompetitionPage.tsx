@@ -341,6 +341,26 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             variant: 'destructive'
           })
         }
+
+        if (submitReq.data) {
+          const updatedVerifications = verifications.map(verif => {
+            if (verif.type === type) {
+              return {
+                ...verif,
+                isVerified: false,
+                status: 'submitted' as 'submitted'
+              }
+            }
+            return verif
+          })
+          setVerifications(updatedVerifications)
+          setSelectedVerif(null)
+          toast({
+            title: 'Berhasil',
+            description: 'Dokumen berhasil disimpan',
+            variant: 'success'
+          })
+        }
       } else {
         const submitPersonalReq = await updateTeamMemberDocument({
           client: axiosInstance,
@@ -348,6 +368,34 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             type === 'poster' ? { posterMediaId: mediaId } : { twibbonMediaId: mediaId },
           path: { teamId: team_id ?? '', userId: currentUserId ?? '' }
         })
+
+        if (submitPersonalReq.error) {
+          toast({
+            title: 'Gagal',
+            description: 'Gagal menyimpan dokumen',
+            variant: 'destructive'
+          })
+        }
+
+        if (submitPersonalReq.data) {
+          const updatedVerifications = verifications.map(verif => {
+            if (verif.type === type) {
+              return {
+                ...verif,
+                isVerified: false,
+                status: 'submitted' as 'submitted'
+              }
+            }
+            return verif
+          })
+          setVerifications(updatedVerifications)
+          setSelectedVerif(null)
+          toast({
+            title: 'Berhasil',
+            description: 'Dokumen berhasil disimpan',
+            variant: 'success'
+          })
+        }
       }
     } catch (err) {
       toast({
