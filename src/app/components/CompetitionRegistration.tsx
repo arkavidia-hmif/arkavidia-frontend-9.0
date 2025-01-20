@@ -134,7 +134,7 @@ export default function CompetitionRegistration({
                 Build your team or join forces with others
               </DialogDescription>
             </DialogHeader>
-            <div className="flex justify-around">
+            <div className="mt-4 flex flex-col justify-around gap-y-6 md:gap-y-4 lg:mt-0 lg:flex-row lg:gap-y-0">
               <div className="flex flex-col items-center gap-4">
                 <UserPlus strokeWidth={2.5} size={120} />
                 <CreateTeamPopup
