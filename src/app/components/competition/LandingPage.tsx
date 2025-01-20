@@ -231,7 +231,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
         {/* Time Left Section */}
         <section className="flex flex-col gap-8 md:gap-12" id="registration-time ">
-          <div className="flex  flex-row items-center justify-center gap-2 sm:gap-6 md:gap-10">
+          <div className="flex  flex-row items-center justify-center gap-2 sm:gap-4 md:gap-10">
             {/* Timer Blocks */}
             {[
               { value: days, label: 'Hari' },
@@ -239,14 +239,14 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               { value: minutes, label: 'Menit' },
               { value: seconds, label: 'Detik' }
             ].map(unit => (
-              <div key={unit.label} className="flex flex-col items-center gap-2">
+              <div key={unit.label} className="flex flex-col items-center gap-1 md:gap-2">
                 <div className="flex flex-row gap-1 sm:gap-2 md:gap-3">
-                  <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-3 py-3 text-xl font-bold text-white sm:px-4 sm:py-4 sm:text-2xl md:px-6 md:py-6 md:text-3xl">
+                  <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-3 py-3 text-lg font-bold text-white sm:px-4 sm:py-3 sm:text-xl md:px-6 md:py-6 md:text-3xl">
                     <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
                       {Math.floor(unit.value / 10)}
                     </div>
                   </div>
-                  <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-3 py-3 text-xl font-bold text-white sm:px-4 sm:py-4 sm:text-2xl md:px-6 md:py-6 md:text-3xl">
+                  <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-3 py-3 text-lg font-bold text-white sm:px-4 sm:py-3 sm:text-xl md:px-6 md:py-6 md:text-3xl">
                     <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
                       {unit.value % 10}
                     </div>
