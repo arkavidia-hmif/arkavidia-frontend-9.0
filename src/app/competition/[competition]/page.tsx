@@ -9,7 +9,10 @@ import {
   getCompetitionTimelineWithCompetitionId,
   GetCompetitionTimelineWithCompetitionIdResponse
 } from '~/api/generated'
-import { CompetitionLandingPage, ContactPersonProps } from '~/app/components/competition/LandingPage'
+import {
+  CompetitionLandingPage,
+  ContactPersonProps
+} from '~/app/components/competition/LandingPage'
 import { useRouter } from 'next/navigation'
 import { TimelineEventProps } from '~/app/components/Timeline'
 import Loading from '~/app/components/Loading'
@@ -30,54 +33,54 @@ const COMPETITIONMAP: CompetitionMap = {
     abbr: 'CP',
     logoPath: '/images/competition/cp-logo.svg',
     contactPerson: [
-      {name: 'Farhan', contact: 'farhannr28', type: 'line'},
-      {name: 'Kristo', contact: 'kristoanugrah', type: 'line'},
-    ],
+      { name: 'Farhan', contact: 'farhannr28', type: 'line' },
+      { name: 'Kristo', contact: 'kristoanugrah', type: 'line' }
+    ]
   },
   arkalogica: {
     title: 'Arkalogica',
     abbr: 'Arkalogica',
     logoPath: '/images/competition/arkalogica-logo.svg',
     contactPerson: [
-      {name: 'Nuel', contact: 'imanuelgirsang', type: 'line'},
-      {name: 'Adril', contact: 'manurungadril', type: 'line'},
-    ],
+      { name: 'Nuel', contact: 'imanuelgirsang', type: 'line' },
+      { name: 'Adril', contact: 'manurungadril', type: 'line' }
+    ]
   },
   uxvidia: {
     title: 'UXVidia',
     abbr: 'UXvidia',
     logoPath: '/images/competition/uxvidia-logo.svg',
     contactPerson: [
-      {name: 'Nuel', contact: 'imanuelgirsang', type: 'line'},
-      {name: 'Adril', contact: 'manurungadril', type: 'line'},
-    ],
+      { name: 'Nuel', contact: 'imanuelgirsang', type: 'line' },
+      { name: 'Adril', contact: 'manurungadril', type: 'line' }
+    ]
   },
   'capture-the-flag': {
     title: 'Capture The Flag',
     abbr: 'CTF',
     logoPath: '/images/competition/ctf-logo.svg',
     contactPerson: [
-      {name: 'Dava', contact: 'dovodedomo', type: 'discord'},
-      {name: 'Saad', contact: 'saadabha', type: 'line'},
-    ],
+      { name: 'Dava', contact: 'dovodedomo', type: 'discord' },
+      { name: 'Saad', contact: 'saadabha', type: 'line' }
+    ]
   },
   hackvidia: {
     title: 'Hackvidia',
     abbr: 'Hackvidia',
     logoPath: '/images/competition/hackvidia-logo.svg',
     contactPerson: [
-      {name: 'Syakira', contact: 'syakiraafldz', type: 'line'},
-      {name: 'Edbert', contact: 'yenyenhui', type: 'line'},
-    ],
+      { name: 'Syakira', contact: 'syakiraafldz', type: 'line' },
+      { name: 'Edbert', contact: 'yenyenhui', type: 'line' }
+    ]
   },
   datavidia: {
     title: 'Datavidia',
     abbr: 'Datavidia',
     logoPath: '/images/competition/datavidia-logo.svg',
     contactPerson: [
-      {name: 'Fathur', contact: 'fathurwithyou', type: 'line'},
-      {name: 'Maul', contact: 'maull04', type: 'line'},
-    ],
+      { name: 'Fathur', contact: 'fathurwithyou', type: 'line' },
+      { name: 'Maul', contact: 'maull04', type: 'line' }
+    ]
   }
 }
 
@@ -125,7 +128,7 @@ function CompetitionLanding({ params }: { params: Promise<{ competition: string 
 
         // Validate COMPETITIONMAP entry
         const competitionMeta = COMPETITIONMAP[competition]
-        
+
         if (!competitionMeta) {
           router.push('/404')
           return
@@ -172,7 +175,11 @@ function CompetitionLanding({ params }: { params: Promise<{ competition: string 
   }
 
   if (!competitionData) {
-    return (<Loading/>)
+    return (
+      <div className="relative h-screen w-full">
+        <Loading />
+      </div>
+    )
   }
 
   return (

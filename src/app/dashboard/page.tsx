@@ -340,10 +340,10 @@ function UserDashboard() {
           <div className="relative h-screen w-full">
             <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-y-3">
               <div className="text-center font-belanosima text-[20px]">
-                No competitions joined yet!
+                Tidak ada kompetisi !
               </div>
-              <Link href="/">
-                <Button>Find a competition to join</Button>
+              <Link href="/competition">
+                <Button>Cari kompetisi untuk diikuti</Button>
               </Link>
             </div>
           </div>
@@ -365,16 +365,16 @@ function UserDashboard() {
               <div className="dashboardSeparator mt-4 h-1.5 rounded"></div>
             </div>
 
-            <section className="flex w-full flex-col gap-6 xl:flex-row xl:flex-wrap xl:justify-between xl:gap-[45px]">
+            <section className="flex w-full flex-col gap-6 lg:flex-row lg:justify-between xl:flex-wrap xl:gap-[45px]">
               {/* left section */}
-              <section className="flex flex-col gap-6 xl:flex-grow xl:gap-8">
+              <section className="flex flex-col gap-6 lg:gap-8 xl:flex-grow">
                 {/* Header */}
                 <div>
                   {/* Title */}
                   <div
                     id="header"
                     className="mb-2 flex w-full items-center justify-between">
-                    <p className="mb-2 grow font-belanosima text-[24px] md:text-[28px] lg:text-[36px] xl:text-[48px]">
+                    <p className="mb-2 grow font-belanosima text-[24px] md:text-[28px] lg:text-[34px] xl:text-[46px]">
                       Hi, {userName}!
                     </p>
                     <DashboardCompePicker
@@ -384,7 +384,7 @@ function UserDashboard() {
                   </div>
 
                   {/* Team Information */}
-                  <div className="flex flex-col gap-[18px] text-white xl:flex-row xl:justify-between">
+                  <div className="mt-5 flex flex-col gap-[18px] text-white lg:flex-row lg:justify-between">
                     <div className="flex flex-col gap-[6px]">
                       {/* Team Name */}
                       <div className="flex items-center">
@@ -414,7 +414,7 @@ function UserDashboard() {
                     <div className="flex flex-col gap-[6px]">
                       {/* Team Status */}
                       <div className="flex items-center">
-                        <span className="w-[120px] font-dmsans text-xs md:text-[14px] lg:text-[18px] xl:text-base">
+                        <span className="w-[120px] font-dmsans text-xs md:text-[14px] lg:text-[16px] xl:text-base">
                           Team Status
                         </span>
                         <Tag
@@ -434,7 +434,7 @@ function UserDashboard() {
 
                       {/* Team Stage */}
                       <div className="flex items-center">
-                        <span className="w-[120px] font-dmsans text-xs md:text-[14px] lg:text-[18px] xl:text-base">
+                        <span className="w-[120px] font-dmsans text-xs md:text-[14px] lg:text-[16px] xl:text-base">
                           Team Stage
                         </span>
                         <Tag
@@ -448,7 +448,7 @@ function UserDashboard() {
                 </div>
 
                 {/* Countdown */}
-                <div className="xl:hidden">
+                <div className="lg:hidden">
                   <Countdown eventName={team_stage} eventDate={stage_deadline} />
                 </div>
 
@@ -456,20 +456,20 @@ function UserDashboard() {
                 <Information informations={informations} />
 
                 {/* Submisi */}
-                <div className="hidden xl:block">
+                <div className="hidden lg:block">
                   <Submisi submissions={submissions} />
                 </div>
               </section>
 
               {/* Right section */}
-              <section className="flex w-full flex-col gap-6 xl:w-auto xl:gap-8">
+              <section className="flex w-full flex-col gap-6 lg:w-auto lg:gap-8">
                 {/* Submisi */}
-                <div className="xl:hidden">
+                <div className="lg:hidden">
                   <Submisi submissions={submissions} />
                 </div>
 
                 {/* Countdown */}
-                <div className="hidden xl:block">
+                <div className="hidden lg:block">
                   <Countdown eventName={team_stage} eventDate={stage_deadline} />
                 </div>
 
@@ -478,17 +478,19 @@ function UserDashboard() {
                   <div className="flex flex-col">
                     <Calendar eventDate={events} />
                     {/* Informasi event */}
-                    <div className="mt-[23px] flex flex-col self-start">
+                    <div className="mt-[23px] grid grid-rows-4 self-start">
                       {events &&
                         events.map((event, index) => (
                           <div className="flex items-center gap-2" key={index}>
                             <div className="h-3 w-3 rounded-full bg-gradient-to-br from-[#FF71A0] to-[#CE6AFF]"></div>
-                            <h6 className="text-[14px] font-semibold">
+                            <h6 className="text-[14px] font-semibold lg:text-[12px] xl:text-[14px]">
                               {String(event.date.getDate()).padStart(2, '0')}/
                               {String(event.date.getMonth() + 1).padStart(2, '0')}/
                               {String(event.date.getFullYear()).slice(-2)}
                             </h6>
-                            <p className="text-[14px]">: {event.information}</p>
+                            <p className="text-[14px] lg:text-[12px] xl:text-[14px]">
+                              : {event.information}
+                            </p>
                           </div>
                         ))}
                     </div>
