@@ -307,7 +307,7 @@ function UserDashboard() {
 
   const events = []
   if (competitionTimeline) {
-    team_stage = currentTeam?.stage || 'pre-eliminary'
+    team_stage = currentTeam?.stage ? (currentTeam.stage.charAt(0).toUpperCase() + currentTeam.stage.slice(1)) : 'placeholder-stage'
     stage_deadline = getNearestDeadline(competitionTimeline)
     const transformedData = transformEventData(competitionTimeline)
     events.push(...transformedData)
