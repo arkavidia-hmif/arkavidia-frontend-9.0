@@ -236,8 +236,10 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
         </section>
 
         {/* Time Left Section */}
-        <section className="flex flex-col gap-8 md:gap-12" id="registration-time ">
-          <div className="flex flex-row items-center justify-center gap-2 sm:gap-4 md:gap-10">
+        <section
+          className="flex w-[90%] flex-col gap-8 md:gap-12"
+          id="registration-time ">
+          <div className="grid grid-cols-2 gap-2 sm:gap-4 md:flex md:flex-row md:items-center md:justify-center md:gap-10">
             {/* Timer Blocks */}
             {[
               { value: days, label: 'Hari' },
@@ -266,7 +268,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           </div>
 
           {/* Buttons */}
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8 md:gap-12">
+          <div className="flex flex-col items-center justify-center gap-4 md:flex-row md:gap-8 lg:gap-12">
             <Button variant="outline" className="w-full sm:w-auto">
               <a
                 href={props.handbookLink === '#' ? '#' : props.handbookLink}

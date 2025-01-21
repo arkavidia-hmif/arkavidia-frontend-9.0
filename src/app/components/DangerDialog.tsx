@@ -13,8 +13,9 @@ export const DangerDialog: React.FC<{
   message: string
   actionText: string
   children: React.ReactNode
+  dangerWarning?: string
   action: () => void
-}> = ({ title, message, children, actionText, action }) => {
+}> = ({ title, message, children, actionText, dangerWarning, action }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -23,6 +24,9 @@ export const DangerDialog: React.FC<{
       <AlertDialogContent className="rounded-lg border-none bg-gradient-to-r from-[#2E046A] to-[#162951] p-6 shadow-[0px_0px_10px_0px_rgba(255,255,255,0.2)]">
         <AlertDialogTitle>{title}</AlertDialogTitle>
         <p className="text-sm text-white opacity-80">{message}</p>
+        {dangerWarning && (
+          <p className="text-sm font-bold text-red-400">{dangerWarning}</p>
+        )}
         <AlertDialogFooter>
           <Button
             onClick={() => {
