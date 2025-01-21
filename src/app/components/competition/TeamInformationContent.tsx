@@ -10,7 +10,7 @@ import {
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import Image from 'next/image'
-import { useToast } from '../../../hooks/use-toast'
+import { toast, useToast } from '../../../hooks/use-toast'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import Loading from '../Loading'
@@ -131,6 +131,7 @@ export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
   const [teamName, setTeamName] = useState(name)
   const [tempTeamName, setTempTeamName] = useState(name)
   const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
   const authAxios = useAxiosAuth()
 
   const handleSave = async () => {
@@ -142,11 +143,20 @@ export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
         path: { teamId }
       })
 
+      toast({
+        title: 'Sukses',
+        description: 'Nama tim berhasil diubah',
+        variant: 'success'
+      })
       setTeamName(tempTeamName)
       setIsEdit(false)
     } catch (error) {
       console.error('Failed to update team name:', error)
-      alert('Failed to update team name. Please try again.')
+      toast({
+        title: 'Gagal',
+        description: 'Gagal mengubah nama tim. Silakan coba lagi.',
+        variant: 'destructive'
+      })
     } finally {
       setLoading(false)
     }
@@ -281,7 +291,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
                   }
                   return {
                     name: member.user?.fullName || 'No Name',
-                    verified: member.document.isVerified || false,
+                    verified: member.document?.isVerified || false,
                     title: member.role || 'Member',
                     id: member.userId || 'null'
                   }
