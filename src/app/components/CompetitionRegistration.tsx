@@ -109,19 +109,6 @@ export default function CompetitionRegistration({
       return
     }
 
-    // Check if user is SMA
-    if (competitionAbbreviation.toLowerCase() === 'arkalogica') {
-      const isSMA = await checkUser()
-      if (!isSMA) {
-        toast({
-          variant: 'destructive',
-          title: 'Tidak dapat mendaftar',
-          description: 'Kompetisi ini hanya untuk SMA/SMK'
-        })
-        return
-      }
-    }
-
     // Check if user already filling their data
     const userResponse = await getUser({ client: axiosInstance })
     const user = userResponse.data
@@ -133,6 +120,20 @@ export default function CompetitionRegistration({
           'Anda belum menyelesaikan pendaftaran. Mohon selesaikan proses pendaftaran dahulu'
       })
       router.push('/register/personal-data')
+      return
+    }
+
+    // Check if user is SMA
+    if (competitionAbbreviation.toLowerCase() === 'arkalogica') {
+      const isSMA = await checkUser()
+      if (!isSMA) {
+        toast({
+          variant: 'destructive',
+          title: 'Tidak dapat mendaftar',
+          description: 'Kompetisi ini hanya untuk SMA/SMK'
+        })
+        return
+      }
     }
 
     // Check if user already join a team
