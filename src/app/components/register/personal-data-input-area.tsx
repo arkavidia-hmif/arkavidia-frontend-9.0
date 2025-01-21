@@ -66,9 +66,7 @@ const registerPersonalDataSchema = z.object({
   formacceptance: z.boolean().refine(val => val === true, {
     message: 'Anda harus menyetujui pernyataan kebenaran data'
   }),
-  consent: z.boolean().refine(val => val === true, {
-    message: 'Anda perlu menyetujui pernyataan persetujuan penggunaan data'
-  })
+  consent: z.boolean()
 })
 
 export const PersonalDataForm = (props: PersonalDataProps) => {
@@ -530,6 +528,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                           <span className="max-md:text-xs md:text-sm">
                             Dengan ini, saya menyatakan dengan sesungguhnya bahwa semua
                             data yang diberikan bersifat benar
+                            <span className="text-red-500"> *</span>
                           </span>
                         }
                         textclassName="text-sm"
