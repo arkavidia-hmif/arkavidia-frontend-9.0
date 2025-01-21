@@ -32,6 +32,7 @@ import TaskDropzone from './TaskDropzone'
 import TeamInformationContent from '~/app/components/competition/TeamInformationContent'
 import Dropdown, { MenuItem } from '~/app/components/Dropdown'
 import { toast, useToast } from '~/hooks/use-toast'
+import FilePreview from './FilePreview'
 
 function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
@@ -51,6 +52,8 @@ interface Verification {
   isVerified: boolean
   type: 'bukti-pembayaran' | 'poster' | 'twibbon'
   status: 'unsubmitted' | 'submitted' | 'verified'
+  mediaLink?: string
+  mediaName?: string
 }
 
 interface TeamVerification extends Verification {
@@ -137,36 +140,31 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             path: { teamId }
           })
           // Get team payment verification if the user is a leader
-          const teamLeader = teamVerifData?.data?.teamMembers?.find(
-            user => user.role === 'leader'
-          )
-          if (teamLeader?.userId === currentUserData.data?.id) {
-            if (teamVerifData?.data?.document?.length === 0) {
-              teamVerification = {
-                id: 'team-0',
-                teamId: teamId,
-                type: 'bukti-pembayaran',
-                isVerified: false,
-                status: 'unsubmitted'
-              }
-            } else {
-              const isVerified = teamVerifData?.data?.document?.[0].isVerified ?? false
-              teamVerification = {
-                id: 'team-0',
-                teamId: teamId,
-                type: 'bukti-pembayaran',
-                status: isVerified ? 'verified' : 'submitted',
-                isVerified: isVerified
-              }
+          if (teamVerifData?.data?.document?.length === 0) {
+            teamVerification = {
+              id: 'team-0',
+              teamId: teamId,
+              type: 'bukti-pembayaran',
+              isVerified: false,
+              status: 'unsubmitted'
             }
           } else {
-            teamVerification = null
+            const isVerified = teamVerifData?.data?.document?.[0].isVerified ?? false
+            teamVerification = {
+              id: 'team-0',
+              teamId: teamId,
+              type: 'bukti-pembayaran',
+              status: isVerified ? 'verified' : 'submitted',
+              isVerified: isVerified,
+              mediaLink: teamVerifData.data?.document?.[0].media.url,
+              mediaName: teamVerifData.data?.document?.[0].media.name
+            }
           }
 
           // Get current member data only
           //@ts-ignore
           const currentMemberData = teamVerifData?.data?.teamMembers!.find(
-            (user: any) => user.userId === currentUserData.data?.id
+            user => user.userId === currentUserData.data?.id
           )
 
           // Get current member document
@@ -195,7 +193,9 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                 userId: currentUserData.data?.id,
                 type: docType as 'poster' | 'twibbon',
                 isVerified: isVerified,
-                status: isVerified ? 'verified' : 'submitted'
+                status: isVerified ? 'verified' : 'submitted',
+                mediaLink: memberDoc.media.url,
+                mediaName: memberDoc.media.name
               })
             }
           })
@@ -565,6 +565,12 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                     </p>
                   </div>
                 )}
+                {/* File URL Preview */}
+                <FilePreview
+                  fileURL={verif.mediaLink ?? undefined}
+                  name={verif.mediaName}
+                />
+                {/* End of File URL Preview */}
                 <div className="mt-5 flex w-full items-center gap-3 md:justify-end">
                   <p
                     className={`flex h-10 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getVerifStatusColor(verif.status)}`}>
