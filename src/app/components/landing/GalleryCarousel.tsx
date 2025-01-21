@@ -30,17 +30,17 @@ const GalleryCarousel = () => {
   }
 
   const handleRight = () => {
-    console.log('right')
-
     swiperRef.current?.slideNext(500)
   }
 
   return (
-    <div className="flex w-full items-center justify-center gap-3">
-      <Button onClick={handleLeft} className="cursor-pointer">
-        <FaArrowLeft />
+    <div className="flex w-full items-center justify-center gap-0 md:gap-3">
+      <Button
+        onClick={handleLeft}
+        className="z-10 h-[40px] w-[40px] translate-x-2.5 cursor-pointer md:w-full md:translate-x-0">
+        <FaArrowLeft size={16} />
       </Button>
-      <div className="h-[300px] w-[300px] md:h-[400px] md:w-[400px] lg:h-[500px] lg:w-[500px]">
+      <div className="h-[250px] w-[250px] md:h-[400px] md:w-[400px] lg:h-[500px] lg:w-[500px]">
         {' '}
         {/* Fixed dimensions */}
         <Swiper
@@ -67,7 +67,9 @@ const GalleryCarousel = () => {
           ))}
         </Swiper>
       </div>
-      <Button onClick={handleRight} className="cursor-pointer">
+      <Button
+        onClick={handleRight}
+        className="z-10 h-[40px] w-[40px] -translate-x-2.5 cursor-pointer md:w-full md:-translate-x-0">
         <FaArrowRight />
       </Button>
     </div>

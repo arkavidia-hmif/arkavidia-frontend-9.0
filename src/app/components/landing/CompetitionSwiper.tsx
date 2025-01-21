@@ -49,10 +49,10 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
 
   const swiperRef = useRef<SwiperType | null>(null)
   return (
-    <div className="relative col-span-3 mt-6 max-md:mt-16 flex h-fit w-full items-center justify-center md:mt-48 md:px-10">
+    <div className="relative col-span-3 mt-6 flex h-fit w-full items-center justify-center max-md:mt-16 md:mt-48 md:px-10">
       <ArrowSign onClick={prevSlide} direction={'left'} />
       <div className="relative flex max-h-[800px] w-full flex-col items-center">
-        <h1 className="z-10 text-center font-belanosima text-[36px] text-white md:text-[48px] lg:text-[64px] lg:leading-[88px] md:leading-[60px] leading-10">
+        <h1 className="z-10 text-center font-belanosima text-[36px] leading-10 text-white md:text-[48px] md:leading-[60px] lg:text-[64px] lg:leading-[88px]">
           {getTitle(activeIndex)}
         </h1>
 
@@ -101,12 +101,14 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
           ))}
         </Swiper>
         <div className="z-10 flex w-[300px] translate-y-[-100px] flex-col items-center gap-4 md:w-[450px]">
-          <p className="md:text-lg lg:text-xl">{getDescription(activeIndex)}</p>
+          <p className="font-dmsans md:text-lg lg:text-xl">
+            {getDescription(activeIndex)}
+          </p>
           <Button className="flex flex-row gap-3 rounded-xl px-5">
             <Link
               href={getLink(activeIndex) ?? ''}
               className="flex flex-row items-center gap-3">
-              <p className="mx-5 text-base">Go To Page</p>
+              <p className="mx-5 font-dmsans text-base">Go To Page</p>
               <FaArrowRight />
             </Link>
           </Button>
