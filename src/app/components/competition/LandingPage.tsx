@@ -9,6 +9,10 @@ import { IoMdDownload } from 'react-icons/io'
 import FAQAccordion from '../FAQAccordion'
 import CompetitionRegistration from '../CompetitionRegistration'
 import Link from 'next/link'
+import { getUser } from '~/api/generated'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { useAppSelector } from '~/redux/store'
+import { expandCompetitionName } from '~/lib/utils'
 
 type WinnerPrizeProps = {
   position: string
@@ -61,10 +65,12 @@ type CompetitionLandingPageProps = {
 }
 
 export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = props => {
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
   const [currentOrClosestEvent, setCurrentOrClosestEvent] =
     useState<TimelineEventProps | null>(null)
   const [timeLeft, setTimeLeft] = useState<number>(0) // Time left in milliseconds
   const [isRegistrationActive, setIsRegistrationActive] = useState<boolean>(false)
+  const axiosAuth = useAxiosAuth()
 
   const registrationKeywords = [
     'Register',
@@ -185,8 +191,8 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
         <section
           className="flex flex-col items-center justify-around gap-8 md:gap-12"
           id="competition-information">
-          <div className="flex flex-col justify-center gap-2 lg:flex-row md:gap-0">
-            <div className="select-none flex w-full items-center justify-center lg:w-auto">
+          <div className="flex flex-col justify-center gap-2 md:gap-0 lg:flex-row">
+            <div className="flex w-full select-none items-center justify-center lg:w-auto">
               <Image
                 width={650}
                 height={650}
@@ -231,7 +237,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
         {/* Time Left Section */}
         <section className="flex flex-col gap-8 md:gap-12" id="registration-time ">
-          <div className="flex  flex-row items-center justify-center gap-2 sm:gap-6 md:gap-10">
+          <div className="flex flex-row items-center justify-center gap-2 sm:gap-4 md:gap-10">
             {/* Timer Blocks */}
             {[
               { value: days, label: 'Hari' },
@@ -239,14 +245,14 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               { value: minutes, label: 'Menit' },
               { value: seconds, label: 'Detik' }
             ].map(unit => (
-              <div key={unit.label} className="flex flex-col items-center gap-2">
+              <div key={unit.label} className="flex flex-col items-center gap-1 md:gap-2">
                 <div className="flex flex-row gap-1 sm:gap-2 md:gap-3">
-                  <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-3 py-3 text-xl font-bold text-white sm:px-4 sm:py-4 sm:text-2xl md:px-6 md:py-6 md:text-3xl">
+                  <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-3 py-3 text-lg font-bold text-white sm:px-4 sm:py-3 sm:text-xl md:px-6 md:py-6 md:text-3xl">
                     <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
                       {Math.floor(unit.value / 10)}
                     </div>
                   </div>
-                  <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-3 py-3 text-xl font-bold text-white sm:px-4 sm:py-4 sm:text-2xl md:px-6 md:py-6 md:text-3xl">
+                  <div className="rounded-xl bg-[linear-gradient(180deg,_#A555CC_0%,_#7138C0_100%);] px-3 py-3 text-lg font-bold text-white sm:px-4 sm:py-3 sm:text-xl md:px-6 md:py-6 md:text-3xl">
                     <div className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
                       {unit.value % 10}
                     </div>
@@ -260,7 +266,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
           </div>
 
           {/* Buttons */}
-          <div className="flex flex-col justify-center gap-4 sm:flex-row sm:gap-8 md:gap-12">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8 md:gap-12">
             <Button variant="outline" className="w-full sm:w-auto">
               <a
                 href={props.handbookLink === '#' ? '#' : props.handbookLink}
@@ -350,9 +356,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               <div className="flex w-full flex-col flex-wrap gap-4 sm:gap-2 md:flex-row">
                 {props.contactPerson?.map(contact => (
                   <Link key={contact.contact} href={contact.contact || '#'}>
-                    <Button
-                      variant="outline"
-                      className="w-full sm:w-auto">
+                    <Button variant="outline" className="w-full sm:w-auto">
                       <div className="flex flex-row items-center justify-center gap-2 px-4">
                         <Image
                           src={contactLogo[contact.type] || ''}
