@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '~/hooks/use-toast'
 import { getTeams, getUser } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 
 export type CompetitionType =
   | 'CP'
@@ -48,14 +49,54 @@ export default function CompetitionRegistration({
   competitionID: string
   disabled: boolean
 }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [competitionType, setCompetitionType] = useState<CompetitionType>('Default')
-  const { toast } = useToast()
-
-  // Check if user already logged in
   const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
   const router = useRouter()
   const axiosInstance = useAxiosAuth()
+  const { toast } = useToast()
+
+  const [isOpen, setIsOpen] = useState(false)
+  const [competitionType, setCompetitionType] = useState<CompetitionType>('Default')
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false)
+  const [isUserSMA, setIsUserSMA] = useState(false)
+
+  // Fetch user data to check if user is SMA
+  const checkUser = async () => {
+    const user = await getUser({ client: axiosInstance })
+    if (user.data) {
+      const isSMA = user.data.education === 'sma'
+      setIsUserSMA(isSMA)
+      return isSMA
+    }
+  }
+
+  function generateTooltip() {
+    if (competitionAbbreviation.toLowerCase() === 'arkalogica') {
+      if (!isLoggedIn) {
+        return null
+      } else if (!disabled && !isUserSMA) {
+        return (
+          <TooltipContent
+            side="bottom"
+            sideOffset={10}
+            className="z-10 bg-black font-dmsans text-white">
+            <p className="text-[15px]">Hanya untuk SMA/SMK</p>
+          </TooltipContent>
+        )
+      } else if (disabled) {
+        return (
+          <TooltipContent
+            side="bottom"
+            sideOffset={10}
+            className="z-10 bg-black font-dmsans text-white">
+            <p className="text-[15px]">Registrasi belum dapat dilakukan</p>
+          </TooltipContent>
+        )
+      } else if (isUserSMA) {
+        return null
+      }
+    }
+  }
+
   const handleOpenDialog = async function () {
     // Check if user logged in
     if (!isLoggedIn) {
@@ -66,6 +107,19 @@ export default function CompetitionRegistration({
       // Redirect to login if not authenticated
       router.push('/login')
       return
+    }
+
+    // Check if user is SMA
+    if (competitionAbbreviation.toLowerCase() === 'arkalogica') {
+      const isSMA = await checkUser()
+      if (!isSMA) {
+        toast({
+          variant: 'destructive',
+          title: 'Tidak dapat mendaftar',
+          description: 'Kompetisi ini hanya untuk SMA/SMK'
+        })
+        return
+      }
     }
 
     // Check if user already filling their data
@@ -105,18 +159,29 @@ export default function CompetitionRegistration({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          size="sm"
-          onClick={() => {
-            !disabled ? handleOpenDialog() : () => {}
-          }}
-          disabled={disabled}
-          className="">
-          <div className="flex items-center justify-center gap-2 lg:w-[200px] lg:gap-5 lg:text-base">
-            <p>Register Now </p>
-            <ArrowRight />
-          </div>
-        </Button>
+        <TooltipProvider>
+          <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
+            <TooltipTrigger asChild>
+              <div
+                className="cursor-pointer"
+                onClick={() => setIsTooltipOpen(!isTooltipOpen)}>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    !disabled ? handleOpenDialog() : () => {}
+                  }}
+                  disabled={disabled}
+                  className="cursor-pointer">
+                  <div className="flex items-center justify-center gap-2 lg:w-[200px] lg:gap-5 lg:text-base">
+                    <p>Register Now </p>
+                    <ArrowRight />
+                  </div>
+                </Button>
+              </div>
+            </TooltipTrigger>
+            {generateTooltip()}
+          </Tooltip>
+        </TooltipProvider>
       </DialogTrigger>
       <DialogContent className="flex max-w-5xl items-center gap-4 bg-[url('/images/join-competition/bg.png')] bg-cover bg-center bg-no-repeat px-[3rem] py-[3rem] font-teachers md:justify-center">
         <div className="flex w-full flex-col justify-center md:gap-4">
