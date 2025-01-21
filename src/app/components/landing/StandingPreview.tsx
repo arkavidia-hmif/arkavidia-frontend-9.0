@@ -15,7 +15,7 @@ export const StandingPreview = ({ preview, isActive = false }: StandingPreviewPr
   const MarginTop = isActive ? '' : 'translate-y-[100px]'
   return (
     <div
-      className={`relative select-none flex w-full flex-col items-center justify-center ${MarginTop}`}>
+      className={`relative flex w-full select-none flex-col items-center justify-center ${MarginTop}`}>
       <Image
         src={preview}
         alt="Competiton Preview"
@@ -23,11 +23,13 @@ export const StandingPreview = ({ preview, isActive = false }: StandingPreviewPr
         height={PreviewHeight}
         className={`z-10 w-[${PreviewWidth}] max-w-none`}
         style={{ width: PreviewWidth }}
+        quality={100}
       />
       <Image
         src={StandingPod}
         alt="Standing Pod"
         className={`${StandingTranslateY} ml-[10px] ${StandingWidth} object-scale-down`}
+        quality={100}
       />
     </div>
   )
