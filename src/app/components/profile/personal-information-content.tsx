@@ -1,3 +1,4 @@
+import { getEducation } from '~/lib/utils'
 import { MenuItem } from '../Dropdown'
 import FileData from './file-data'
 import {
@@ -50,7 +51,7 @@ export const PersonalInformationContent = (props: PersonalInfoProps) => {
     })
   )
   const currentEducation = educationOptions.find(
-    options => options.option.toLowerCase() === props.education.toLowerCase()
+    options => getEducation(options.option) === props.education.toLowerCase()
   )
 
   return (
