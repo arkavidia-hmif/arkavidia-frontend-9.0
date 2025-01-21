@@ -109,7 +109,7 @@ function CustomDatePicker({ onChange, restriction }: DatePickerProps) {
             onChange={handleInputChange}
             placeholder="dd/mm/yyyy"
             className="h-9 flex-1 border-none bg-transparent px-3 py-1 font-dmsans text-base text-purple-400 focus:outline-none max-md:text-xs md:text-sm"
-          />
+          />  
           {/* Calendar Toggle Button */}
           <button
             className="flex h-9 w-9 items-center justify-center rounded-r-md bg-transparent text-purple-400 transition-colors hover:cursor-pointer hover:opacity-90"

@@ -33,13 +33,17 @@ interface PersonalDataProps {
   educationOptions: MenuItem[]
 }
 
-const supportedFormats = ['jpg', 'jpeg', 'png'];
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB limit
+const supportedFormats = ['jpg', 'jpeg', 'png']
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB limit
 
 // Form Schema
 const registerPersonalDataSchema = z.object({
   fullname: z.string().min(1, { message: 'Nama lengkap wajib diisi' }),
-  birthdate: z.date({ message: 'Tanggal lahir harus valid' }),
+  birthdate: z
+    .date({ message: 'Tanggal lahir harus valid' })
+    .refine(d => d < new Date(), {
+      message: 'Tanggal lahir tidak valid'
+    }),
   education: z
     .string()
     .refine(val => val !== '', { message: 'Jenjang pendidikan wajib diisi' }),
@@ -61,7 +65,8 @@ const registerPersonalDataSchema = z.object({
   discord: z.string().optional(),
   formacceptance: z.boolean().refine(val => val === true, {
     message: 'Anda harus menyetujui pernyataan kebenaran data'
-  })
+  }),
+  consent: z.boolean()
 })
 
 export const PersonalDataForm = (props: PersonalDataProps) => {
@@ -98,11 +103,13 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
       education: '',
       institution: '',
       phonenumber: '',
+      nisn: '',
       identityCard: undefined,
       lineid: '',
       instagram: '',
       discord: '',
-      formacceptance: false
+      formacceptance: false,
+      consent: false
     }
   })
 
@@ -114,24 +121,24 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
    */
   async function onSubmit(values: z.infer<typeof registerPersonalDataSchema>) {
     // TODO: Replace with backend logic
-    const fileExt = values.identityCard[0].name.split(".").pop()?.toLowerCase();
+    const fileExt = values.identityCard[0].name.split('.').pop()?.toLowerCase()
     if (!fileExt || !supportedFormats.includes(fileExt)) {
-        toast({
-        title: "Unsupported File Format",
-        description: `Allowed formats: ${supportedFormats.join(", ")}`,
-        variant: "destructive",
-        });
-      return;
+      toast({
+        title: 'Unsupported File Format',
+        description: `Allowed formats: ${supportedFormats.join(', ')}`,
+        variant: 'destructive'
+      })
+      return
     }
 
-    const fileSize = values.identityCard[0].size;
-    if(fileSize > MAX_FILE_SIZE) {
+    const fileSize = values.identityCard[0].size
+    if (fileSize > MAX_FILE_SIZE) {
       toast({
-        title: "File too large",
+        title: 'File too large',
         description: `Maximum file size is 10MB`,
-        variant: "destructive",
-      });
-      return;
+        variant: 'destructive'
+      })
+      return
     }
 
     if (isFormAccepted) {
@@ -220,10 +227,12 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                   education: getEducation(values.education),
                   instance: values.institution,
                   phoneNumber: values.phonenumber,
+                  nisn: values.nisn,
                   idLine: values.lineid,
                   idInstagram: values.instagram,
                   idDiscord: values.discord,
-                  consent: values.formacceptance
+                  consent: values.formacceptance,
+                  realConsent: values.consent
                 }
               })
 
@@ -426,7 +435,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                   <FormControl className="flex items-center">
                     <Input
                       type="file"
-                      accept='image/*'
+                      accept="image/*"
                       className="cursor-pointer gap-x-1 border-[1.5px] border-purple-300 bg-lilac-100 pr-10 text-purple-500 file:cursor-pointer file:rounded-md file:border file:bg-purple-800 file:text-xs placeholder:text-purple-500 max-md:text-xs"
                       placeholder=""
                       {...fileRef}
@@ -519,9 +528,34 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                           <span className="max-md:text-xs md:text-sm">
                             Dengan ini, saya menyatakan dengan sesungguhnya bahwa semua
                             data yang diberikan bersifat benar
+                            <span className="text-red-500"> *</span>
                           </span>
                         }
                         textclassName="text-sm"
+                        checked={field.value}
+                        onCheckedChange={checked => field.onChange(checked)}></Checkbox>
+                    </div>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="consent"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div>
+                      <Checkbox
+                        text={
+                          <span className="max-md:text-xs md:text-sm">
+                            Dengan ini, saya memberikan persetujuan kepada Arkavidia 9.0
+                            untuk menggunakan data pribadi saya di atas secara bertanggung
+                            jawab untuk mendukung keberlangsungan kegiatan Arkavidia 9.0
+                            serta untuk kepentingan perusahaan mitra Arkavidia 9.0
+                          </span>
+                        }
+                        textclassName="text-sm text-justify"
                         checked={field.value}
                         onCheckedChange={checked => field.onChange(checked)}></Checkbox>
                     </div>

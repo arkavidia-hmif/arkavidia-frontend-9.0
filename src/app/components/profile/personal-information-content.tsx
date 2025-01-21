@@ -62,13 +62,13 @@ export const PersonalInformationContent = (props: PersonalInfoProps) => {
           default_value={props.name}
           placehodler={'Placeholder'}
         />
-        {props.nisn &&
+        {(props.nisn || (props.education === 'sma' && !props.nisn)) && (
           <InputProfileData
             title={'NISN'}
-            default_value={props.nisn}
+            default_value={props.nisn ?? ''}
             placehodler={'00123456789'}
           />
-        }
+        )}
 
         <DatePickerProfileData title={'Birthdate'} default_value={props.birthdate} />
         <DropdownProfileData
