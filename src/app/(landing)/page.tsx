@@ -10,7 +10,7 @@ const competitions = [
   {
     title: 'Arkalogica',
     description:
-      'Arkalogica merupakan salah satu kompetisi dalam rangkaian acara Arkavidia 9.0 yang dirancang khusus untuk pelajar SMA/SMK. Kompetisi ini bertujuan untuk menguji kemampuan logika dan matematika peserta melalui berbagai soal dan permainan yang menarik dan menantang. Arkalogica berupaya mendorong para siswa SMA/SMK untuk mengasah kemampuan berpikir kritis dan analitis yang sangat relevan di era modern saat ini. Perlombaan ini diadakan secara beregu, dengan setiap regu terdiri atas dua siswa yang berasal dari sekolah/institusi yang sama.',
+      'Arkalogica merupakan salah satu kompetisi dalam rangkaian acara Arkavidia 9.0 yang dirancang khusus untuk pelajar SMA/SMK. Kompetisi ini bertujuan untuk menguji kemampuan logika dan matematika peserta melalui berbagai soal dan permainan yang menarik dan menantang.',
     preview: '/images/competition/arkalogica-preview.png',
     carousel: '/images/competition/arkalogica-logo.png',
     link: '/competition/arkalogica'
@@ -75,7 +75,7 @@ const MainLandingCompetitionPage = () => {
           boxShadow:
             '0 0 -5px 5px rgba(72, 230, 255, 0.2), 0 0 10px rgba(72, 230, 255, 0.2)'
         }}>
-        <p className="lg-[24px] text-left font-dmsans text-[16px] leading-5 tracking-wider text-lilac-100 md:text-[20px] md:leading-6 lg:leading-7">
+        <p className="lg-[24px] text-justify font-dmsans text-[16px] leading-5 tracking-wider text-lilac-100 md:text-[20px] md:leading-6 lg:leading-7">
           Arkavidia merupakan acara IT tahunan yang diadakan oleh Himpunan Mahasiswa
           Informatika ITB. Dengan tema Innovate for Impact: Bridging Technology and
           Society”, Arkavidia 9.0 diharapkan akan lebih banyak individu sadar akan hak dan

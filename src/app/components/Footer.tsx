@@ -77,7 +77,7 @@ function Footer() {
             {/* <img src='/x.svg' alt='X Logo' className='w-6 h-6' /> */}
           </a>
         </div>
-        <p className="text-sm text-white">© 2024 ARKAVIDIA. All rights reserved.</p>
+        <p className="text-sm text-white">© 2025 ARKAVIDIA. All rights reserved.</p>
       </div>
     </div>
   )
