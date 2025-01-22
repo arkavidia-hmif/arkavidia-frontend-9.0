@@ -548,7 +548,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                     <div>
                       <Checkbox
                         text={
-                          <div className='max-w-[800px]'>
+                          <div className='max-w-[650px]'>
                             <span className="max-md:text-xs md:text-sm">
                               Dengan ini, saya memberikan persetujuan kepada Arkavidia 9.0
                               untuk menggunakan data pribadi saya di atas secara bertanggung
