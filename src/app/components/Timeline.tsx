@@ -39,7 +39,7 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
           className={`flex gap-4 md:gap-10 ${
             variant === 'horizontal'
               ? 'flex-row lg:w-96 lg:flex-col lg:items-center lg:justify-center'
-              : 'w-72 flex-row sm:w-96'
+              : 'w-72 flex-row md:w-96'
           }`}
         >
           {/* Timeline Line */}
@@ -92,7 +92,7 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
                 : 'flex flex-col justify-center pl-2 text-left md:pl-8'
             } space-y-2`}
           >
-            <h1 className="text-2xl font-bold text-purple-100">
+            <h1 className="md:text-2xl text-xl font-bold text-purple-100">
               {event.title}
             </h1>
             <p className="text-md text-gray-400">
