@@ -85,7 +85,12 @@ export const InputArea = () => {
       ) {
         toast({
           title: 'Login Gagal',
-          description: 'Email belum terverifikasi. Email verifikasi telah dikirim ulang',
+          description: 'Email belum terverifikasi.',
+          variant: 'destructive'
+        })
+        toast({
+          title: 'Verifikasi Email',
+          description: 'Email verifikasi telah dikirim ulang',
           variant: 'info'
         })
       } else if (
