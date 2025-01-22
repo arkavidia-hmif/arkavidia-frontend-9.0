@@ -184,8 +184,7 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
   const { days, hours, minutes, seconds } = formatTimeUnits(timeLeft)
 
   return (
-    <div className="min-h-screen min-w-full">
-      <Navbar />
+    <div className="min-h-screen min-w-full py-10">
       <div className="lg:gap-18 mx-4 flex flex-col items-center gap-16 py-6 font-dmsans sm:mx-8 md:mx-12 md:gap-16 md:py-24 lg:mx-16 lg:py-24">
         {/* Competition Information Section */}
         <section
