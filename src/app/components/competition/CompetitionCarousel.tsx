@@ -163,7 +163,7 @@ const CompetitionCarousel = () => {
     <div>
       {/* Preview */}
       <div className="flex w-full select-none justify-center">
-        <div className="grid md:max-w-[90%] grid-cols-1 md:grid-cols-2 grid-rows-[auto] md:grid-rows-[400px_auto] items-center justify-center gap-2 px-8 lg:px-0">
+        <div className="grid md:max-w-[90%] lg:max-w-5xl grid-cols-1 md:grid-cols-2 grid-rows-[auto] md:grid-rows-[400px_auto] items-center justify-center gap-2 px-8 lg:px-0">
           <div className="flex items-center justify-center">
             <Image
               src={competitions[activeIndex].preview}
