@@ -65,7 +65,7 @@ function Navbar() {
   }
 
   return (
-    <nav className="fixed z-[100] w-full bg-transparent px-4 pb-1 pt-6 backdrop-blur-lg lg:px-12">
+    <nav className="fixed z-[100] w-full bg-transparent px-4 py-6 backdrop-blur-lg lg:px-12">
       <div className="flex flex-row items-center justify-between">
         <Link href="/" className="flex flex-row items-center justify-center gap-2 px-4">
           <Image
