@@ -66,7 +66,7 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
           onSlideChange={swiper => setActiveIndex(swiper.realIndex)}
           loop={true}
           onSwiper={swiper => (swiperRef.current = swiper)}
-          className="flex h-full w-full items-center"
+          className="flex h-full w-full items-center overflow-visible"
           breakpoints={{
             0: {
               slidesPerView: 1, // For smaller screens, show one slide
@@ -100,7 +100,7 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
             </SwiperSlide>
           ))}
         </Swiper>
-        <div className="z-10 flex w-[300px] translate-y-[-100px] flex-col items-center gap-4 md:w-[450px]">
+        <div className="absolute z-10 flex w-[300px] top-[35rem] flex-col items-center gap-4 md:w-[600px]">
           <p className="font-dmsans md:text-lg lg:text-xl">
             {getDescription(activeIndex)}
           </p>

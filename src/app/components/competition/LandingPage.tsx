@@ -292,14 +292,12 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
         {/* Timeline Section */}
         <section
-          className="mt-20 flex flex-col items-center gap-8 md:gap-16"
+          className="mt-20 flex flex-col items-center gap-8 md:gap-16 w-full"
           id="competition-timeline">
           <h1 className="text-center font-belanosima text-3xl font-extrabold uppercase sm:text-4xl md:text-5xl">
             Competition Timeline
           </h1>
-          <div className="flex w-full flex-col items-center justify-center">
-            <Timeline events={props.registrationDeadline} variant="vertical" />
-          </div>
+          <Timeline events={props.registrationDeadline} variant="vertical" />
         </section>
 
         {/* Prize Section */}
