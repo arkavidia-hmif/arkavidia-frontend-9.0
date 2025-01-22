@@ -548,12 +548,14 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                     <div>
                       <Checkbox
                         text={
-                          <span className="max-md:text-xs md:text-sm">
-                            Dengan ini, saya memberikan persetujuan kepada Arkavidia 9.0
-                            untuk menggunakan data pribadi saya di atas secara bertanggung
-                            jawab untuk mendukung keberlangsungan kegiatan Arkavidia 9.0
-                            serta untuk kepentingan perusahaan mitra Arkavidia 9.0
-                          </span>
+                          <div className='max-w-[800px]'>
+                            <span className="max-md:text-xs md:text-sm">
+                              Dengan ini, saya memberikan persetujuan kepada Arkavidia 9.0
+                              untuk menggunakan data pribadi saya di atas secara bertanggung
+                              jawab untuk mendukung keberlangsungan kegiatan Arkavidia 9.0
+                              serta untuk kepentingan perusahaan mitra Arkavidia 9.0
+                            </span>
+                          </div>
                         }
                         textclassName="text-sm text-justify"
                         checked={field.value}
