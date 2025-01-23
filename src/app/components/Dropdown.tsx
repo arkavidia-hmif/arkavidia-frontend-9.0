@@ -89,7 +89,7 @@ export default function Dropdown({
         <input
           id="input-27"
           className={clsx(
-            'h-fit w-full appearance-none truncate rounded-xl border-[1.5px] border-purple-400 bg-lilac-200 p-3 pe-12 ps-4 font-dmsans font-normal leading-6 text-inherit text-purple-500 shadow-[0_0_0_3px_rgba(113,56,192,1)] placeholder:font-dmsans placeholder:font-normal placeholder:leading-6 placeholder:text-inherit placeholder:text-purple-500 placeholder:opacity-100 focus:outline-none'
+            'h-fit w-full appearance-none truncate rounded-xl border-[1.5px] border-purple-400 bg-lilac-200 p-3 pl-10 font-dmsans font-normal leading-6 text-inherit text-purple-500 shadow-[0_0_0_3px_rgba(113,56,192,1)] placeholder:font-dmsans placeholder:font-normal placeholder:leading-6 placeholder:text-inherit placeholder:text-purple-500 placeholder:opacity-100 focus:outline-none '
           )}
           placeholder={selectedItem ? selectedItem.option : (placeholder ?? 'Search...')} // Show selected option in placeholder
           type="search"

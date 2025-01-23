@@ -1,3 +1,4 @@
+import { getEducation } from '~/lib/utils'
 import { MenuItem } from '../Dropdown'
 import FileData from './file-data'
 import {
@@ -50,7 +51,7 @@ export const PersonalInformationContent = (props: PersonalInfoProps) => {
     })
   )
   const currentEducation = educationOptions.find(
-    options => options.option.toLowerCase() === props.education.toLowerCase()
+    options => getEducation(options.option) === props.education.toLowerCase()
   )
 
   return (
@@ -61,13 +62,13 @@ export const PersonalInformationContent = (props: PersonalInfoProps) => {
           default_value={props.name}
           placehodler={'Placeholder'}
         />
-        {props.nisn &&
+        {(props.nisn || (props.education === 'sma' && !props.nisn)) && (
           <InputProfileData
             title={'NISN'}
-            default_value={props.nisn}
+            default_value={props.nisn ?? ''}
             placehodler={'00123456789'}
           />
-        }
+        )}
 
         <DatePickerProfileData title={'Birthdate'} default_value={props.birthdate} />
         <DropdownProfileData

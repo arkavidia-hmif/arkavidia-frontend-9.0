@@ -14,7 +14,8 @@ import {
 import { useAuth } from '../contexts/AuthContext'
 import { useAppSelector } from '~/redux/store'
 import { toast } from '~/hooks/use-toast'
-import { MouseEventHandler } from 'react'
+import { cn } from '~/lib/utils'
+import { useEffect, useState } from 'react'
 
 type NavItem = {
   name: string
@@ -34,6 +35,7 @@ function Navbar() {
     { name: 'Event', link: '/event' },
     { name: 'Competition', link: '/competition' }
   ]
+  const [scrollY, setScrollY] = useState(0)
 
   async function handleLogout() {
     await logout()
@@ -64,8 +66,28 @@ function Navbar() {
     }
   }
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+    }
+
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll)
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
   return (
-    <nav className="fixed z-[100] w-full bg-transparent px-4 pb-1 pt-6 backdrop-blur-lg lg:px-12">
+    <nav
+      className={cn(
+        'fixed z-[100] w-full bg-transparent px-4 py-6 lg:px-12',
+        scrollY > 10
+          ? 'backdrop-blur-lg transition-all duration-300 ease-in-out'
+          : ''
+      )}>
       <div className="flex flex-row items-center justify-between">
         <Link href="/" className="flex flex-row items-center justify-center gap-2 px-4">
           <Image
@@ -88,7 +110,7 @@ function Navbar() {
           <DropdownMenuTrigger className="rounded-md data-[state=open]:bg-purple-700 md:hidden">
             <Menu size={24} className="m-3" color="white" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="z-10 mr-2 mt-3 min-w-[167px] gap-4 rounded-lg border-none bg-purple-700 px-3 py-5 font-teachers text-base font-bold text-white">
+          <DropdownMenuContent className="z-[999] mr-2 mt-3 min-w-[167px] gap-4 rounded-lg border-none bg-purple-700 px-3 py-5 font-teachers text-base font-bold text-white">
             {NAV_ITEMS.map((item, index) => (
               <DropdownMenuItem
                 key={index}

@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 function Footer() {
   return (
@@ -43,15 +44,12 @@ function Footer() {
         />
         {/* <img src='/Logos.svg' alt='Arkavidia Logo' className='w-[150px] h-[40px] object-contain' /> */}
         <div className="flex flex-row items-center justify-center space-x-4 font-teachers text-sm font-bold text-white">
-          <a href="/about-us" className="hover:underline">
-            About Us
-          </a>
-          <a href="/events" className="hover:underline">
+          <Link href="/event" className="hover:underline">
             Events
-          </a>
-          <a href="/competitions" className="hover:underline">
+          </Link>
+          <Link href="/competition" className="hover:underline">
             Competitions
-          </a>
+          </Link>
         </div>
         <div className="flex flex-row items-center justify-center space-x-2">
           <a
@@ -79,7 +77,7 @@ function Footer() {
             {/* <img src='/x.svg' alt='X Logo' className='w-6 h-6' /> */}
           </a>
         </div>
-        <p className="text-sm text-white">© 2024 ARKAVIDIA. All rights reserved.</p>
+        <p className="text-sm text-white">© 2025 ARKAVIDIA. All rights reserved.</p>
       </div>
     </div>
   )

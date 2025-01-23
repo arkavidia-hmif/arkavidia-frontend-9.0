@@ -117,7 +117,11 @@ const getNearestDeadline = (data: GetCompetitionTimelineWithCompetitionIdRespons
   const now = new Date()
   const deadlines = data
     .filter(item => new Date(item.endDate || item.startDate) >= now) // Filter berdasarkan startDate
-    .map(item => new Date(item.endDate || item.startDate))
+    .map(item => ({
+      date: new Date(item.endDate || item.startDate),
+      stageName: item.title
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 
   if (deadlines.length === 0) {
     return null
@@ -296,6 +300,7 @@ function UserDashboard() {
   // }, [])
 
   let team_stage = ''
+  let stage_name = ''
   let stage_deadline = null
   if (submissionRequirementData) {
     // team_stage = (getTeamStage(submissionRequirementData)?.stage || '')
@@ -308,7 +313,9 @@ function UserDashboard() {
   const events = []
   if (competitionTimeline) {
     team_stage = currentTeam?.stage ? (currentTeam.stage.charAt(0).toUpperCase() + currentTeam.stage.slice(1)) : 'placeholder-stage'
-    stage_deadline = getNearestDeadline(competitionTimeline)
+    const event_stage = getNearestDeadline(competitionTimeline)
+    stage_deadline = event_stage?.date
+    stage_name = event_stage?.stageName || 'placeholder-stage';
     const transformedData = transformEventData(competitionTimeline)
     events.push(...transformedData)
   }
@@ -471,7 +478,7 @@ function UserDashboard() {
 
                 {/* Countdown */}
                 <div className="lg:hidden">
-                  <Countdown eventName={team_stage} eventDate={stage_deadline} />
+                  <Countdown eventName={stage_name} eventDate={stage_deadline} />
                 </div>
 
                 {/* Pengunguman */}
@@ -492,7 +499,7 @@ function UserDashboard() {
 
                 {/* Countdown */}
                 <div className="hidden lg:block">
-                  <Countdown eventName={team_stage} eventDate={stage_deadline} />
+                  <Countdown eventName={stage_name} eventDate={stage_deadline} />
                 </div>
 
                 {/* Calendar */}

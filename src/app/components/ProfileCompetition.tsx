@@ -3,10 +3,26 @@
 import { MdCheck, MdExitToApp, MdLink } from 'react-icons/md'
 import { useState, useEffect } from 'react'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
-import { Team, postQuitTeam, getUser, getTeams, User } from '~/api/generated'
+import {
+  Team,
+  postQuitTeam,
+  getUser,
+  getTeams,
+  User,
+  getTeamMemberById
+} from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
 import { expandCompetitionName } from '~/lib/utils'
 import Loading from './Loading'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from './ui/alert-dialog'
+import { Button } from './Button'
+import { DangerDialog } from './DangerDialog'
 
 interface ProfileCompetitionProps {
   competitionName: string
@@ -37,6 +53,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
 
   const [isLoading, setIsLoading] = useState(true)
   const [userData, setUserData] = useState<User>()
+  const [isUserTeamLeader, setIsUserTeamLeader] = useState(false)
   const [userTeams, setUserTeams] = useState<Team[]>([])
   const [activeTeamId, setActiveTeamId] = useState('')
   const [profileData, setProfileData] = useState({
@@ -51,6 +68,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Get user data
         const userReq = await getUser({ client: authAxios })
         const userData = userReq.data
 
@@ -60,12 +78,30 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
           const teamReq = await getTeams({ client: authAxios })
 
           if (teamReq.data && teamReq.data.length > 0) {
-            setUserTeams(teamReq.data)
+            setUserTeams(teamReq.data) // Store all user teams
             const activeTeamData = teamReq.data.find(
               team =>
                 getCompeName(team.competition!.title) === competitionName.toLowerCase()
             )
             setActiveTeamId(activeTeamData?.id || '')
+
+            // Check if user is team leader in current shown team
+            if (activeTeamData) {
+              // Get the team members
+              const currentUser = await getTeamMemberById({
+                client: authAxios,
+                path: {
+                  teamId: activeTeamData.id,
+                  userId: userData.id
+                }
+              })
+
+              if (currentUser.data && currentUser.data.role === 'leader') {
+                setIsUserTeamLeader(true)
+              } else {
+                setIsUserTeamLeader(false)
+              }
+            }
             setProfileData({
               name: userData?.fullName || '',
               team: activeTeamData?.name || '',
@@ -96,6 +132,24 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
             getCompeName(team.competition.title) === competitionName.toLowerCase()
         )
         setActiveTeamId(activeTeamData?.id || '')
+
+        // Check if user is team leader in current shown team
+        if (activeTeamData && userData) {
+          // Get the team members
+          const currentUser = await getTeamMemberById({
+            client: authAxios,
+            path: {
+              teamId: activeTeamData.id,
+              userId: userData.id
+            }
+          })
+
+          if (currentUser.data && currentUser.data.role === 'leader') {
+            setIsUserTeamLeader(true)
+          } else {
+            setIsUserTeamLeader(false)
+          }
+        }
         setProfileData({
           name: userData?.fullName || '',
           team: activeTeamData?.name || '',
@@ -222,9 +276,20 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
 
         {/* Leave Team */}
         <div className="flex flex-col justify-start md:justify-center">
-          <div onClick={leaveTeam} className="mt-3 hover:cursor-pointer md:mt-0">
-            <MdExitToApp className="text-3xl text-red-200 md:text-4xl" />
-          </div>
+          <DangerDialog
+            title="Tinggalkan Team"
+            message="Apakah anda yakin ingin meninggalkan tim?"
+            actionText="Tinggalkan"
+            dangerWarning={
+              isUserTeamLeader
+                ? 'Tim akan dihapus karena Anda adalah ketua tim!'
+                : undefined
+            }
+            action={leaveTeam}>
+            <div className="mt-3 hover:cursor-pointer md:mt-0">
+              <MdExitToApp className="text-3xl text-red-200 md:text-4xl" />
+            </div>
+          </DangerDialog>
         </div>
       </div>
     </div>
