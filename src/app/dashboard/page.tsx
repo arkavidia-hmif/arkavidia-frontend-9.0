@@ -7,7 +7,9 @@ import {
   getUser,
   getCompetitionTimelineWithCompetitionId,
   getCompetitionSubmissionRequirement,
-  getAdminCompAnnouncement
+  getAdminCompAnnouncement,
+  GetCompetitionTimelineWithCompetitionIdResponse,
+  GetCompetitionTimelineWithCompetitionIdData
 } from '~/api/generated'
 import { toast } from '~/hooks/use-toast'
 import { useRouter } from 'next/navigation'
@@ -111,6 +113,27 @@ const getTeamStage = (
   }
 }
 
+const getNearestDeadline = (data: GetCompetitionTimelineWithCompetitionIdResponse) => {
+  const now = new Date()
+  const deadlines = data
+    .filter(item => new Date(item.endDate || item.startDate) >= now) // Filter berdasarkan startDate
+    .map(item => ({
+      date: new Date(item.endDate || item.startDate),
+      stageName: item.title
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  if (deadlines.length === 0) {
+    return null
+  }
+
+  const nearestDeadline = deadlines.reduce((earliest, current) =>
+    current < earliest ? current : earliest
+  )
+
+  return nearestDeadline
+}
+
 function UserDashboard() {
   const [hasCompetitions, setHasCompetitions] = React.useState(true)
   const [userTeams, setUserTeams] = React.useState<Team[]>([])
@@ -124,7 +147,8 @@ function UserDashboard() {
 
   const axiosAuth = useAxiosAuth()
   const router = useRouter()
-  const [competitionTimeline, setCompetitionTimeline] = React.useState<any>()
+  const [competitionTimeline, setCompetitionTimeline] =
+    React.useState<GetCompetitionTimelineWithCompetitionIdResponse>()
   const [submissionRequirementData, setSubmissionRequirementData] = React.useState<any>()
 
   // Fetching user name
@@ -276,17 +300,22 @@ function UserDashboard() {
   // }, [])
 
   let team_stage = ''
+  let stage_name = ''
   let stage_deadline = null
   if (submissionRequirementData) {
-    team_stage = (getTeamStage(submissionRequirementData)?.stage || '')
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ')
-    stage_deadline = getTeamStage(submissionRequirementData)?.deadline
+    // team_stage = (getTeamStage(submissionRequirementData)?.stage || '')
+    //   .split(' ')
+    //   .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    //   .join(' ')
+    // stage_deadline = getTeamStage(submissionRequirementData)?.deadline
   }
 
   const events = []
   if (competitionTimeline) {
+    team_stage = currentTeam?.stage ? (currentTeam.stage.charAt(0).toUpperCase() + currentTeam.stage.slice(1)) : 'placeholder-stage'
+    const event_stage = getNearestDeadline(competitionTimeline)
+    stage_deadline = event_stage?.date
+    stage_name = event_stage?.stageName || 'placeholder-stage';
     const transformedData = transformEventData(competitionTimeline)
     events.push(...transformedData)
   }
@@ -449,7 +478,7 @@ function UserDashboard() {
 
                 {/* Countdown */}
                 <div className="lg:hidden">
-                  <Countdown eventName={team_stage} eventDate={stage_deadline} />
+                  <Countdown eventName={stage_name} eventDate={stage_deadline} />
                 </div>
 
                 {/* Pengunguman */}
@@ -470,7 +499,7 @@ function UserDashboard() {
 
                 {/* Countdown */}
                 <div className="hidden lg:block">
-                  <Countdown eventName={team_stage} eventDate={stage_deadline} />
+                  <Countdown eventName={stage_name} eventDate={stage_deadline} />
                 </div>
 
                 {/* Calendar */}

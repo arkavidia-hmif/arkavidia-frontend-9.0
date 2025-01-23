@@ -194,7 +194,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="center"
-                    className="m-auto ml-1 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-[0_0_12px] shadow-lilac-200">
+                    className="m-auto ml-1 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-lilac-200 border-transparent overflow-hidden">
                     <Link href="/" className="cursor-pointer">
                       <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
                         <Image

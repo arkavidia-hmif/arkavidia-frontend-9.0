@@ -37,8 +37,8 @@ const ButtonVariants = cva(
           "active:bg-[#522A66] " +
           "disabled:bg-[#CCCCCC] disabled:bg-none disabled:text-white ",
         destructive:
-          "bg-red-500 text-white " +
-          "hover:bg-red-600 transition-color duration-300 ease-out " +
+          "bg-gradient-to-br from-red-500 to-[#C159D8] text-white " +
+          "hover:shadow-[0px_4px_15px_0px_#FF0000] transition-all duration-300 ease-out " +
           "focus:outline-none focus:bg-red-600 focus:border focus:border-2 focus:border-red-400 " +
           "active:bg-red-700 active:border-0 " +
           "disabled:bg-gray-400 disabled:text-white ",

@@ -95,13 +95,16 @@ export const ProfileData = (props: ProfileDataLayoutProps) => {
                   : 'translate-y-0 opacity-100'
               } transition-all duration-300 ease-in-out`}>
               <h2 className="font-dmsans text-[1rem] text-lg font-normal">
-                {props.value}
+                {props.value.length > 0 ? props.value : 'No data'}
               </h2>
             </div>
           </div>
         </div>
         {!isEdit && (
-          <Button variant={'ghost'} onClick={() => setIsEdit(!isEdit)}>
+          <Button
+            variant={'ghost'}
+            onClick={() => setIsEdit(!isEdit)}
+            className="hover:bg-purple-300">
             <Image
               src={'/images/profile/edit.svg'}
               alt={'Edit Button'}
@@ -189,7 +192,7 @@ export const InputProfileData = (props: InputProfileDataProps) => {
         {props.logoSrc && <div className="mr-2">{props.logoSrc}</div>}
         <Input
           placeholder={props.placehodler}
-          className="min-w-72 bg-lilac-100 py-6 text-purple-400"
+          className="min-w-72 border-purple-400 bg-lilac-100 py-6 text-purple-400"
           value={tempValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTempValue(e.target.value)

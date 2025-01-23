@@ -33,8 +33,8 @@ const COMPETITIONMAP: CompetitionMap = {
     abbr: 'CP',
     logoPath: '/images/competition/cp-logo.svg',
     contactPerson: [
-      { name: 'Farhan', contact: 'farhannr28', type: 'line' },
-      { name: 'Kristo', contact: 'kristoanugrah', type: 'line' }
+      { name: 'Farhan', contact: 'https://wa.me/6281311106310', type: 'whatsapp' },
+      { name: 'Kristo', contact: 'https://wa.me/6285813153747', type: 'whatsapp' }
     ]
   },
   arkalogica: {
@@ -42,8 +42,8 @@ const COMPETITIONMAP: CompetitionMap = {
     abbr: 'Arkalogica',
     logoPath: '/images/competition/arkalogica-logo.svg',
     contactPerson: [
-      { name: 'Nuel', contact: 'imanuelgirsang', type: 'line' },
-      { name: 'Adril', contact: 'manurungadril', type: 'line' }
+      { name: 'Nuel', contact: 'https://wa.me/6281217551251', type: 'whatsapp' },
+      { name: 'Adril', contact: 'https://wa.me/6282297365702', type: 'whatsapp' }
     ]
   },
   uxvidia: {
@@ -51,8 +51,8 @@ const COMPETITIONMAP: CompetitionMap = {
     abbr: 'UXvidia',
     logoPath: '/images/competition/uxvidia-logo.svg',
     contactPerson: [
-      { name: 'Nuel', contact: 'imanuelgirsang', type: 'line' },
-      { name: 'Adril', contact: 'manurungadril', type: 'line' }
+      { name: 'Lina', contact: 'https://wa.me/6285971635307', type: 'whatsapp' },
+      { name: 'Angie', contact: 'https://wa.me/6281290362644', type: 'whatsapp' }
     ]
   },
   'capture-the-flag': {
@@ -60,8 +60,8 @@ const COMPETITIONMAP: CompetitionMap = {
     abbr: 'CTF',
     logoPath: '/images/competition/ctf-logo.svg',
     contactPerson: [
-      { name: 'Dava', contact: 'dovodedomo', type: 'discord' },
-      { name: 'Saad', contact: 'saadabha', type: 'line' }
+      { name: 'Dava', contact: 'https://wa.me/6285659251632', type: 'whatsapp' },
+      { name: 'Saad', contact: 'https://wa.me/6281289131528', type: 'whatsapp' }
     ]
   },
   hackvidia: {
@@ -69,8 +69,8 @@ const COMPETITIONMAP: CompetitionMap = {
     abbr: 'Hackvidia',
     logoPath: '/images/competition/hackvidia-logo.svg',
     contactPerson: [
-      { name: 'Syakira', contact: 'syakiraafldz', type: 'line' },
-      { name: 'Edbert', contact: 'yenyenhui', type: 'line' }
+      { name: 'Syakira', contact: 'https://wa.me/6287824078423', type: 'whatsapp' },
+      { name: 'Edbert', contact: 'https://wa.me/6285345871185', type: 'whatsapp' }
     ]
   },
   datavidia: {
@@ -78,11 +78,12 @@ const COMPETITIONMAP: CompetitionMap = {
     abbr: 'Datavidia',
     logoPath: '/images/competition/datavidia-logo.svg',
     contactPerson: [
-      { name: 'Fathur', contact: 'fathurwithyou', type: 'line' },
-      { name: 'Maul', contact: 'maull04', type: 'line' }
+      { name: 'Fathur', contact: 'https://wa.me/62895392152737', type: 'whatsapp' },
+      { name: 'Maul', contact: 'https://wa.me/6287728997015', type: 'whatsapp' }
     ]
   }
-}
+};
+
 
 const transformToTimelineEvents = (
   competitionTimeline: CompetitionTimeline[]
@@ -92,7 +93,7 @@ const transformToTimelineEvents = (
     const arr = {
       title: event.title,
       timeStart: event.startDate ? new Date(event.startDate) : undefined,
-      timeEnd: event.endDate ? new Date(event.endDate) : new Date()
+      timeEnd: event.endDate ? new Date(event.endDate) : undefined
     }
     data.push(arr)
   })

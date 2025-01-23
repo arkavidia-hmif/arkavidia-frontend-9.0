@@ -76,22 +76,35 @@ export const InputArea = () => {
     if (login.error) {
       if (login.message === "User isn't verified") {
         toast({
-          title: 'Login Error',
+          title: 'Login Gagal',
           description: 'Email belum terverifikasi',
           variant: 'destructive'
+        })
+      } else if (
+        login.message === "User isn't verified. Verification email has ben sent!"
+      ) {
+        toast({
+          title: 'Login Gagal',
+          description: 'Email belum terverifikasi.',
+          variant: 'destructive'
+        })
+        toast({
+          title: 'Verifikasi Email',
+          description: 'Email verifikasi telah dikirim ulang',
+          variant: 'info'
         })
       } else if (
         login.message === 'Email not found' ||
         login.message === 'Wrong password'
       ) {
         toast({
-          title: 'Login Error',
+          title: 'Login Gagal',
           description: 'Email atau password salah',
           variant: 'destructive'
         })
       } else {
         toast({
-          title: 'Login Error',
+          title: 'Login Gagal',
           description: 'Terjadi kegagalan saat login',
           variant: 'destructive'
         })

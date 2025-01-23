@@ -10,10 +10,11 @@ import {
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import Image from 'next/image'
-import { useToast } from '../../../hooks/use-toast'
+import { toast, useToast } from '../../../hooks/use-toast'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import Loading from '../Loading'
+import { DangerDialog } from '../DangerDialog'
 
 // ProfileData Component
 const capitalizeFirstLetter = (str: string) => {
@@ -94,18 +95,24 @@ const ProfileData = ({
 
         {/* Tampilkan tombol kick hanya jika userRole === 'leader' dan userId !== currentUserId */}
         {userRole === 'leader' && currentUserId !== userId && (
-          <Button variant={'ghost'} onClick={handleKickMember} disabled={loading}>
-            {loading ? (
-              <span>Loading</span>
-            ) : (
-              <Image
-                src={'/images/profile/close.svg'}
-                alt={'Kick Button'}
-                width={24}
-                height={24}
-              />
-            )}
-          </Button>
+          <DangerDialog
+            title="Keluarkan Member"
+            message={`Apakah kamu yakin ingin mengeluarkan ${name} dari tim?`}
+            actionText="Keluarkan"
+            action={handleKickMember}>
+            <Button variant={'ghost'} disabled={loading}>
+              {loading ? (
+                <span>Loading</span>
+              ) : (
+                <Image
+                  src={'/images/profile/close.svg'}
+                  alt={'Kick Button'}
+                  width={24}
+                  height={24}
+                />
+              )}
+            </Button>
+          </DangerDialog>
         )}
       </div>
     </div>
@@ -124,6 +131,7 @@ export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
   const [teamName, setTeamName] = useState(name)
   const [tempTeamName, setTempTeamName] = useState(name)
   const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
   const authAxios = useAxiosAuth()
 
   const handleSave = async () => {
@@ -135,11 +143,20 @@ export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
         path: { teamId }
       })
 
+      toast({
+        title: 'Sukses',
+        description: 'Nama tim berhasil diubah',
+        variant: 'success'
+      })
       setTeamName(tempTeamName)
       setIsEdit(false)
     } catch (error) {
       console.error('Failed to update team name:', error)
-      alert('Failed to update team name. Please try again.')
+      toast({
+        title: 'Gagal',
+        description: 'Gagal mengubah nama tim. Silakan coba lagi.',
+        variant: 'destructive'
+      })
     } finally {
       setLoading(false)
     }
@@ -274,7 +291,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
                   }
                   return {
                     name: member.user?.fullName || 'No Name',
-                    verified: member.document.isVerified || false,
+                    verified: member.document?.isVerified || false,
                     title: member.role || 'Member',
                     id: member.userId || 'null'
                   }
