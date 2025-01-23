@@ -4,7 +4,7 @@ import { Tab } from "~/app/components/Tab";
 import TeamInfo from "~/app/components/team-lists/detail/TeamInfo";
 import Submission from "~/app/components/team-lists/detail/Submission";
 import { useEffect, useState } from "react";
-import { getCompetitionNameById, getCompetitionSubmissionTeam, getTeamDetail, GetTeamDetailResponse } from "~/api/generated";
+import { getCompetitionById, getCompetitionSubmissionTeam, getTeamDetail, GetTeamDetailResponse } from "~/api/generated";
 import useAxiosAuth from "~/lib/hooks/useAxiosAuth";
 import { useParams, useRouter } from "next/navigation";
 import Hero from "~/app/components/team-lists/detail/Hero";
@@ -17,13 +17,6 @@ const payment_placeholder = {
     url: URL_PLACEHOLDER,
     typeID: '12'
 }
-
-// submissionsTypeID: {
-//     name: string;
-//     studentCard: string;
-//     poster: string;
-//     twibbon: string;
-// }
 
 const submission_placeholder = [
     {
@@ -59,7 +52,7 @@ function TeamDetails() {
         if (!value) {
             return false;
         }
-        const resp = await getCompetitionNameById({
+        const resp = await getCompetitionById({
             client: axiosAuth,
             path: {
                 competitionId: value 
@@ -80,7 +73,8 @@ function TeamDetails() {
         const competitionParam = params.competitionID as string;
 
         if (!competitionParam || !validateCompetition(competitionParam)) {
-            router.push('/404');
+            console.log("Competition param not found");
+            // router.push('/404');
             return;
         }
 
@@ -96,7 +90,8 @@ function TeamDetails() {
             });
             
             if (resp.error || !resp.data) {
-                router.push('/404');
+                console.log(resp.error)
+                // router.push('/404');
                 return;
             }
 
