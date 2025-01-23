@@ -28,7 +28,7 @@ export default function Dropdown({
   className
 }: {
   data: MenuItem[]
-  label: string
+  label?: string
   isRequired?: boolean
   helper_text?: string
   placeholder?: string
