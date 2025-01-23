@@ -81,12 +81,11 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     return teamData.filter(team => {
       // Check if statusFilter is not set or matches the verification status
       const matchesStatus =
-        !statusFilter || team.isVerified === (statusFilter === 'Verified')
+        !statusFilter || team.document?.[0].isVerified === (statusFilter === 'Verified')
 
       // Check if CompetitionStatusFilter is not set or matches the verification status
-      const matchesCompetitionStatus =
-        !CompetitionStatusFilter
-        // TODO: add field untuk menampilkan stage tim
+      const matchesCompetitionStatus = !CompetitionStatusFilter
+      // TODO: add field untuk menampilkan stage tim
 
       // Check if the team name or team ID contains the search term (case-insensitive)
       const matchesSearchTerm =
@@ -105,13 +104,39 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     setCurrentPage(prevPage => Math.min(prevPage, totalPages || 1))
   }, [totalPages])
 
+  // Function to get team status
+  const getTeamStatus = (team: Team) => {}
+
   // Unique attributes for filter
-  const uniqueStatuses = Array.from(new Set(teamData.map(team => team.isVerified))).map(
-    isVerified => (isVerified ? 'Verified' : 'Not Verified')
-  )
-  const uniqueCompetitionStatuss = Array.from(
-    new Set(["Final", "Playoff"])
-  )
+  const stageSet = new Set<string>()
+  const statusesSet = new Set<string>()
+
+  teamData.forEach(team => {
+    if (team.stage) {
+      stageSet.add(team.stage)
+    }
+
+    if (!team.document?.[0]) {
+      statusesSet.add('Payment Not Submitted')
+    } else if (team.document?.[0].isVerified) {
+      statusesSet.add('Verified')
+    } else {
+      statusesSet.add('Not verified')
+    }
+  })
+
+  teamData.map(team => {
+    if (!team.document?.[0]) {
+      return 'Payment Not Submitted'
+    } else if (team.document?.[0].isVerified) {
+      return 'Verified'
+    } else {
+      return 'Not Verified'
+    }
+  })
+
+  const uniqueStatuses = Array.from(statusesSet)
+  const uniqueCompetitionStatuss = Array.from(new Set(['Pre-eliminary', 'Final']))
 
   // Map status to their tag color
   const mapStatusTag: Record<
@@ -171,7 +196,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
         {/* Search and Filters Section */}
         <div className="flex flex-col space-y-4 sm:gap-2 sm:space-y-0 md:flex-row md:items-center md:space-x-4 xl:gap-48">
           {/* Search Bar */}
-          <div className="relative w-full flex-grow">
+          <div className="relative w-full flex-grow xl:w-[500px]">
             <Input
               type="text"
               placeholder="Search by team name or team ID"
@@ -186,7 +211,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
           {/* Filter on stages */}
           <div className="grid flex-shrink-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4">
             <Select onValueChange={handleCompetitionStatusFilterChange}>
-              <SelectTrigger className="h-10 w-full border-[1.5px] border-[#7138C0] bg-[#F5E1FF] font-dmsans font-medium text-[#7138C0] sm:h-12 xl:w-96">
+              <SelectTrigger className="h-10 w-full border-[1.5px] border-[#7138C0] bg-[#F5E1FF] font-dmsans font-medium text-[#7138C0] sm:h-12 xl:w-72">
                 <SelectValue placeholder="Filter by Stage" />
               </SelectTrigger>
               <SelectContent className="bg-[#F5E1FF] font-dmsans font-medium text-[#7138C0]">
@@ -205,7 +230,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
 
             {/* Filter on team status */}
             <Select onValueChange={handleStatusFilterChange}>
-              <SelectTrigger className="h-10 w-full border-[1.5px] border-[#7138C0] bg-[#F5E1FF] font-dmsans font-medium text-[#7138C0] sm:h-12 xl:w-96">
+              <SelectTrigger className="h-10 w-full border-[1.5px] border-[#7138C0] bg-[#F5E1FF] font-dmsans font-medium text-[#7138C0] sm:h-12 xl:w-72">
                 <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
@@ -243,17 +268,21 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                     <TableCell>{team.name}</TableCell>
                     <TableCell>
                       <Tag
-                        text={team.isVerified ? 'Verified' : 'Not Verified'}
+                        text={team.document?.[0].isVerified ? 'Verified' : 'Not Verified'}
                         variant={
-                          mapStatusTag[team.isVerified ? 'Verified' : 'Not Verified']
+                          mapStatusTag[
+                            team.document?.[0].isVerified ? 'Verified' : 'Not Verified'
+                          ]
                         }
                       />
                     </TableCell>
                     <TableCell>
                       <Tag
-                        text={team.isVerified ? 'Verified' : 'Not Verified'}
+                        text={team.document?.[0].isVerified ? 'Verified' : 'Not Verified'}
                         variant={
-                          mapStatusTag[team.isVerified ? 'Verified' : 'Not Verified']
+                          mapStatusTag[
+                            team.document?.[0].isVerified ? 'Verified' : 'Not Verified'
+                          ]
                         }
                       />
                     </TableCell>
