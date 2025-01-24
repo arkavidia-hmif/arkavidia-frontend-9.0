@@ -73,8 +73,7 @@ function TeamDetails() {
         const competitionParam = params.competitionID as string;
 
         if (!competitionParam || !validateCompetition(competitionParam)) {
-            console.log("Competition param not found");
-            // router.push('/404');
+            router.push('/404');
             return;
         }
 
@@ -90,8 +89,7 @@ function TeamDetails() {
             });
             
             if (resp.error || !resp.data) {
-                console.log(resp.error)
-                // router.push('/404');
+                router.push('/404');
                 return;
             }
 
