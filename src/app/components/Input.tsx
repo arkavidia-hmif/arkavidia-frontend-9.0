@@ -126,7 +126,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             </span>
           </label>
         )}
-        <div className="relative w-fit">
+        <div className="relative w-full">
           {leftIcon && typeof leftIcon === 'object' && (
             <div className={cn(IconVariants({ size, position: 'left' }))}>{leftIcon}</div>
           )}
