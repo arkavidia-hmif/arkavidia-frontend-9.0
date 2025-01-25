@@ -20,6 +20,8 @@ import Tag from './../Tag'
 import { Input } from './../ui/input'
 import { Search, Pencil } from 'lucide-react'
 import { Team } from '~/api/generated'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 interface Pagination {
   currentPage: number
@@ -64,6 +66,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     null
   )
   const [searchTerm, setSearchTerm] = useState('')
+  const pathname = usePathname()
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return
@@ -105,7 +108,17 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   }, [totalPages])
 
   // Function to get team status
-  const getTeamStatus = (team: Team) => {}
+  const getTeamStatus = (team: Team) => {
+    if (!team.document?.[0]) {
+      return 'Payment Not Submitted'
+    } else if (team.document?.[0].isVerified) {
+      return 'Verified'
+    } else if (!team.document?.[0].isVerified) {
+      return 'Not verified'
+    } else {
+      return ''
+    }
+  }
 
   // Unique attributes for filter
   const stageSet = new Set<string>()
@@ -116,23 +129,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
       stageSet.add(team.stage)
     }
 
-    if (!team.document?.[0]) {
-      statusesSet.add('Payment Not Submitted')
-    } else if (team.document?.[0].isVerified) {
-      statusesSet.add('Verified')
-    } else {
-      statusesSet.add('Not verified')
-    }
-  })
-
-  teamData.map(team => {
-    if (!team.document?.[0]) {
-      return 'Payment Not Submitted'
-    } else if (team.document?.[0].isVerified) {
-      return 'Verified'
-    } else {
-      return 'Not Verified'
-    }
+    statusesSet.add(getTeamStatus(team))
   })
 
   const uniqueStatuses = Array.from(statusesSet)
@@ -287,9 +284,11 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                       />
                     </TableCell>
                     <TableCell>
-                      <a className="flex w-full justify-center align-middle" href="#">
+                      <Link
+                        href={`${pathname}/${team.id}`}
+                        className="flex w-full justify-center align-middle">
                         <Pencil className="h-auto w-5" />
-                      </a>
+                      </Link>
                     </TableCell>
                   </TableRow>
                 ))}
