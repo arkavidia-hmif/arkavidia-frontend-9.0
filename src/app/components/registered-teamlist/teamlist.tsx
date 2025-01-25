@@ -22,6 +22,7 @@ import { Search, Pencil } from 'lucide-react'
 import { Team } from '~/api/generated'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { capitalizeFirstLetter } from '~/lib/utils'
 
 interface Pagination {
   currentPage: number
@@ -34,7 +35,7 @@ interface Pagination {
 interface RegisteredTeamListProps {
   teamData: Team[]
   pagination: Pagination
-  competitionId: string | null
+  competitionName: string | null
   onPageChange: (newPage: number) => void // Callback for handling page changes
 }
 
@@ -58,7 +59,7 @@ const getPaginationRange = (current: number, total: number, delta = 2) => {
 export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   teamData,
   pagination,
-  competitionId,
+  competitionName,
   onPageChange
 }) => {
   const [currentPage, setCurrentPage] = useState(pagination.currentPage)
@@ -68,6 +69,21 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     null
   )
   const [searchTerm, setSearchTerm] = useState('')
+
+  // Function to get team status
+  const getTeamStatus = (team: Team) => {
+    if (!team.document?.[0]) {
+      return 'Payment Not Submitted'
+    } else if (team.document?.[0].isVerified) {
+      return 'Verified'
+    } else if (team.document?.[0].verificationError) {
+      return 'Rejected'
+    } else if (!team.document?.[0].isVerified) {
+      return 'Not Verified'
+    } else {
+      return ''
+    }
+  }
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return
@@ -80,12 +96,13 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     setSearchTerm('')
   }
 
+  const currentPath = usePathname()
+
   // Apply filter
   const filteredData = useMemo(() => {
     return teamData.filter(team => {
       // Check if statusFilter is not set or matches the verification status
-      const matchesStatus =
-        !statusFilter || team.document?.[0].isVerified === (statusFilter === 'Verified')
+      const matchesStatus = !statusFilter || getTeamStatus(team) === statusFilter
 
       // Check if CompetitionStatusFilter is not set or matches the verification status
       const matchesCompetitionStatus = !CompetitionStatusFilter
@@ -108,33 +125,18 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     setCurrentPage(prevPage => Math.min(prevPage, totalPages || 1))
   }, [totalPages])
 
-  // Function to get team status
-  const getTeamStatus = (team: Team) => {
-    if (!team.document?.[0]) {
-      return 'Payment Not Submitted'
-    } else if (team.document?.[0].isVerified) {
-      return 'Verified'
-    } else if (!team.document?.[0].isVerified) {
-      return 'Not verified'
-    } else {
-      return ''
-    }
-  }
+  const possibleTeamStatus = [
+    'Verified',
+    'Rejected',
+    'Not Verified',
+    'Payment Not Submitted'
+  ]
+
+  const possibleCompetitionStatus = ['pre-eliminary', 'final']
 
   // Unique attributes for filter
-  const stageSet = new Set<string>()
-  const statusesSet = new Set<string>()
-
-  teamData.forEach(team => {
-    if (team.stage) {
-      stageSet.add(team.stage)
-    }
-
-    statusesSet.add(getTeamStatus(team))
-  })
-
-  const uniqueStatuses = Array.from(statusesSet)
-  const uniqueCompetitionStatuss = Array.from(new Set(['Pre-eliminary', 'Final']))
+  const uniqueStatuses = Array.from(new Set<string>(possibleTeamStatus))
+  const uniqueCompetitionStatuss = Array.from(new Set(possibleCompetitionStatus))
 
   // Map status to their tag color
   const mapStatusTag: Record<
@@ -150,8 +152,9 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     | 'neutral'
   > = {
     Verified: 'success',
-    Waiting: 'warning',
-    Denied: 'danger'
+    Rejected: 'warning',
+    'Not Verified': 'danger',
+    'Payment Not Submitted': 'blue'
   }
 
   const mapStageTag: Record<
@@ -235,7 +238,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                 <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="default">All Statuses</SelectItem>
+                <SelectItem value="default">All Status</SelectItem>
                 {uniqueStatuses.map(status => (
                   <SelectItem key={status} value={status}>
                     {status}
@@ -269,27 +272,19 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                     <TableCell>{team.name}</TableCell>
                     <TableCell>
                       <Tag
-                        text={team.document?.[0].isVerified ? 'Verified' : 'Not Verified'}
-                        variant={
-                          mapStatusTag[
-                            team.document?.[0].isVerified ? 'Verified' : 'Not Verified'
-                          ]
-                        }
+                        text={getTeamStatus(team)}
+                        variant={mapStatusTag[getTeamStatus(team)]}
                       />
                     </TableCell>
                     <TableCell>
                       <Tag
-                        text={team.document?.[0].isVerified ? 'Verified' : 'Not Verified'}
-                        variant={
-                          mapStatusTag[
-                            team.document?.[0].isVerified ? 'Verified' : 'Not Verified'
-                          ]
-                        }
+                        text={capitalizeFirstLetter(team.stage)}
+                        variant={mapStageTag[capitalizeFirstLetter(team.stage)]}
                       />
                     </TableCell>
                     <TableCell>
                       <Link
-                        href={`/dashboard/admin/competition/${competitionId}/team/${team.id}`}
+                        href={`/dashboard/admin/competition/${competitionName}/team/${team.id}`}
                         className="flex w-full justify-center align-middle">
                         <Pencil className="h-auto w-5" />
                       </Link>

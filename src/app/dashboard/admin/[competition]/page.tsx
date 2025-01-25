@@ -32,7 +32,9 @@ function AdminCompetitionDashboard() {
   const limit = searchParams.get('limit') ?? '10'
 
   const [isCompetitionFound, setIsCompetitionFound] = useState(true)
-  const [currentCompetitionId, setCurrentCompetitionId] = useState<string | null>(null)
+  const [currentCompetitionName, setCurrentCompetitionName] = useState<string | null>(
+    null
+  )
   const [teamData, setTeamData] = useState<Team[]>([])
   const [pagination, setPagination] = useState<Pagination>({
     currentPage: currentPage,
@@ -62,7 +64,7 @@ function AdminCompetitionDashboard() {
       }
 
       setIsCompetitionFound(true)
-      setCurrentCompetitionId(competitions.data[0].id)
+      setCurrentCompetitionName(competitions.data[0].title)
 
       const response = await getCompetitionParticipant({
         client: authAxios,
@@ -139,7 +141,7 @@ function AdminCompetitionDashboard() {
         <RegisteredTeamList
           teamData={teamData}
           pagination={pagination}
-          competitionId={currentCompetitionId ?? null}
+          competitionName={currentCompetitionName ?? null}
           onPageChange={handlePageChange}
         />
       )}
