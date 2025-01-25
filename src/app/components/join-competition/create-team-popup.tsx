@@ -168,6 +168,13 @@ export const CreateTeamPopup: React.FC<{
       })
 
       if (resp.error) {
+        // @ts-expect-error
+        if (resp.error.error.startsWith('A team with the name')) {
+          toast({
+            title: 'A team with the same name already exists.',
+            variant: 'destructive'
+          })
+        }
         setError('Failed to create team.')
         return
       }
