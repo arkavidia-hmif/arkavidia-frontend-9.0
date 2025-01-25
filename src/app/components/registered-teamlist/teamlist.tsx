@@ -35,7 +35,7 @@ interface Pagination {
 interface RegisteredTeamListProps {
   teamData: Team[]
   pagination: Pagination
-  competitionName: string | null
+  competitionId: string | null
   onPageChange: (newPage: number) => void // Callback for handling page changes
 }
 
@@ -56,10 +56,75 @@ const getPaginationRange = (current: number, total: number, delta = 2) => {
   return range
 }
 
+// Function to get team status
+export const getTeamStatus = (team: Team) => {
+  if (!team.document?.[0]) {
+    return 'Payment Not Submitted'
+  } else if (team.document?.[0].isVerified) {
+    return 'Verified'
+  } else if (team.document?.[0].verificationError) {
+    return 'Rejected'
+  } else if (!team.document?.[0].isVerified) {
+    return 'Not Verified'
+  } else {
+    return ''
+  }
+}
+
+export type TeamStatus =
+  | 'Verified'
+  | 'Rejected'
+  | 'Not Verified'
+  | 'Payment Not Submitted'
+  | ''
+export const possibleTeamStatus: Array<TeamStatus> = [
+  'Verified',
+  'Rejected',
+  'Not Verified',
+  'Payment Not Submitted'
+]
+
+// Map status to their tag color
+export const mapStatusTag: Record<
+  string,
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'lilac'
+  | 'purple'
+  | 'teal'
+  | 'pink'
+  | 'blue'
+  | 'neutral'
+> = {
+  Verified: 'success',
+  Rejected: 'warning',
+  'Not Verified': 'danger',
+  'Payment Not Submitted': 'blue'
+}
+
+export const mapStageTag: Record<
+  string,
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'lilac'
+  | 'purple'
+  | 'teal'
+  | 'pink'
+  | 'blue'
+  | 'neutral'
+> = {
+  'Pre-eliminary': 'danger',
+  Final: 'success'
+}
+
+export const possibleCompetitionStatus = ['pre-eliminary', 'final']
+
 export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   teamData,
   pagination,
-  competitionName,
+  competitionId,
   onPageChange
 }) => {
   const [currentPage, setCurrentPage] = useState(pagination.currentPage)
@@ -69,21 +134,6 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     null
   )
   const [searchTerm, setSearchTerm] = useState('')
-
-  // Function to get team status
-  const getTeamStatus = (team: Team) => {
-    if (!team.document?.[0]) {
-      return 'Payment Not Submitted'
-    } else if (team.document?.[0].isVerified) {
-      return 'Verified'
-    } else if (team.document?.[0].verificationError) {
-      return 'Rejected'
-    } else if (!team.document?.[0].isVerified) {
-      return 'Not Verified'
-    } else {
-      return ''
-    }
-  }
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return
@@ -95,8 +145,6 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     setCompetitionStatusFilter(null)
     setSearchTerm('')
   }
-
-  const currentPath = usePathname()
 
   // Apply filter
   const filteredData = useMemo(() => {
@@ -125,53 +173,9 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     setCurrentPage(prevPage => Math.min(prevPage, totalPages || 1))
   }, [totalPages])
 
-  const possibleTeamStatus = [
-    'Verified',
-    'Rejected',
-    'Not Verified',
-    'Payment Not Submitted'
-  ]
-
-  const possibleCompetitionStatus = ['pre-eliminary', 'final']
-
   // Unique attributes for filter
   const uniqueStatuses = Array.from(new Set<string>(possibleTeamStatus))
   const uniqueCompetitionStatuss = Array.from(new Set(possibleCompetitionStatus))
-
-  // Map status to their tag color
-  const mapStatusTag: Record<
-    string,
-    | 'success'
-    | 'warning'
-    | 'danger'
-    | 'lilac'
-    | 'purple'
-    | 'teal'
-    | 'pink'
-    | 'blue'
-    | 'neutral'
-  > = {
-    Verified: 'success',
-    Rejected: 'warning',
-    'Not Verified': 'danger',
-    'Payment Not Submitted': 'blue'
-  }
-
-  const mapStageTag: Record<
-    string,
-    | 'success'
-    | 'warning'
-    | 'danger'
-    | 'lilac'
-    | 'purple'
-    | 'teal'
-    | 'pink'
-    | 'blue'
-    | 'neutral'
-  > = {
-    'Pre-eliminary': 'danger',
-    Final: 'success'
-  }
 
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value === 'default' ? null : value)
@@ -190,9 +194,6 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
 
   return (
     <div className="flex flex-col gap-6 space-y-6 px-4 py-16 sm:px-6 lg:px-8">
-      <p className="font-dmsans text-6xl font-bold [text-shadow:0px_0px_17.7px_rgba(255,255,255,0.5)]">
-        Team List
-      </p>
       <p className="font-dmsans text-6xl font-bold [text-shadow:0px_0px_17.7px_rgba(255,255,255,0.5)]">
         Team List
       </p>
@@ -284,7 +285,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                     </TableCell>
                     <TableCell>
                       <Link
-                        href={`/dashboard/admin/competition/${competitionName}/team/${team.id}`}
+                        href={`/dashboard/admin/competition/${competitionId}/team/${team.id}`}
                         className="flex w-full justify-center align-middle">
                         <Pencil className="h-auto w-5" />
                       </Link>
