@@ -34,6 +34,7 @@ interface Pagination {
 interface RegisteredTeamListProps {
   teamData: Team[]
   pagination: Pagination
+  competitionId: string | null
   onPageChange: (newPage: number) => void // Callback for handling page changes
 }
 
@@ -57,6 +58,7 @@ const getPaginationRange = (current: number, total: number, delta = 2) => {
 export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   teamData,
   pagination,
+  competitionId,
   onPageChange
 }) => {
   const [currentPage, setCurrentPage] = useState(pagination.currentPage)
@@ -66,7 +68,6 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     null
   )
   const [searchTerm, setSearchTerm] = useState('')
-  const pathname = usePathname()
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return
@@ -151,6 +152,9 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     Verified: 'success',
     Waiting: 'warning',
     Denied: 'danger'
+    Verified: 'success',
+    Waiting: 'warning',
+    Denied: 'danger'
   }
 
   const mapStageTag: Record<
@@ -166,6 +170,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     | 'neutral'
   > = {
     'Pre-eliminary': 'danger',
+    Final: 'success'
     Final: 'success'
   }
 
@@ -186,6 +191,9 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
 
   return (
     <div className="flex flex-col gap-6 space-y-6 px-4 py-16 sm:px-6 lg:px-8">
+      <p className="font-dmsans text-6xl font-bold [text-shadow:0px_0px_17.7px_rgba(255,255,255,0.5)]">
+        Team List
+      </p>
       <p className="font-dmsans text-6xl font-bold [text-shadow:0px_0px_17.7px_rgba(255,255,255,0.5)]">
         Team List
       </p>
@@ -285,7 +293,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                     </TableCell>
                     <TableCell>
                       <Link
-                        href={`${pathname}/${team.id}`}
+                        href={`/dashboard/admin/competition/${competitionId}/team/${team.id}`}
                         className="flex w-full justify-center align-middle">
                         <Pencil className="h-auto w-5" />
                       </Link>

@@ -32,6 +32,7 @@ function AdminCompetitionDashboard() {
   const limit = searchParams.get('limit') ?? '10'
 
   const [isCompetitionFound, setIsCompetitionFound] = useState(true)
+  const [currentCompetitionId, setCurrentCompetitionId] = useState<string | null>(null)
   const [teamData, setTeamData] = useState<Team[]>([])
   const [pagination, setPagination] = useState<Pagination>({
     currentPage: currentPage,
@@ -61,7 +62,8 @@ function AdminCompetitionDashboard() {
       }
 
       setIsCompetitionFound(true)
-    
+      setCurrentCompetitionId(competitions.data[0].id)
+
       const response = await getCompetitionParticipant({
         client: authAxios,
         path: { competitionId: competitions.data[0].id },
@@ -123,19 +125,21 @@ function AdminCompetitionDashboard() {
     fetchTeams(currentPage)
   }, [currentPage])
 
-
   return (
     <>
       {isLoading ? (
-        <div className='fixed inset-0 flex items-center justify-center'>
-            <Loading />
+        <div className="fixed inset-0 flex items-center justify-center">
+          <Loading />
         </div>
       ) : !isCompetitionFound ? (
-        <h1 className='font-belanosima text-3xl text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.7)] md:text-5xl'>No competition found with the name "${params.competition}"</h1>
+        <h1 className="font-belanosima text-3xl text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.7)] md:text-5xl">
+          No competition found with the name "${params.competition}"
+        </h1>
       ) : (
         <RegisteredTeamList
           teamData={teamData}
           pagination={pagination}
+          competitionId={currentCompetitionId ?? null}
           onPageChange={handlePageChange}
         />
       )}
