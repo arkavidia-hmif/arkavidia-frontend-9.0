@@ -153,7 +153,8 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
       const matchesStatus = !statusFilter || getTeamStatus(team) === statusFilter
 
       // Check if CompetitionStatusFilter is not set or matches the verification status
-      const matchesCompetitionStatus = !CompetitionStatusFilter
+      const matchesCompetitionStatus =
+        !CompetitionStatusFilter || team.stage === CompetitionStatusFilter.toLowerCase()
       // TODO: add field untuk menampilkan stage tim
 
       // Check if the team name or team ID contains the search term (case-insensitive)
@@ -226,8 +227,10 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                   All Stages
                 </SelectItem>
                 {uniqueCompetitionStatuss.map(stat => (
-                  <SelectItem key={stat} value={stat}>
-                    {stat}
+                  <SelectItem
+                    key={capitalizeFirstLetter(stat)}
+                    value={capitalizeFirstLetter(stat)}>
+                    {capitalizeFirstLetter(stat)}
                   </SelectItem>
                 ))}
               </SelectContent>
