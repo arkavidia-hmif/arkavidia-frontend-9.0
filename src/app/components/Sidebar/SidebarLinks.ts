@@ -14,22 +14,22 @@ function getSidebarURL({
 
   switch (competitionName) {
     case 'CP':
-      url += '/cp'
+      url += '/CP'
       break
     case 'CTF':
-      url += '/ctf'
+      url += '/CTF'
       break
     case 'UXvidia':
-      url += '/uxvidia'
+      url += '/UXvidia'
       break
     case 'Arkalogica':
-      url += '/arkalogica'
+      url += '/Arkalogica'
       break
     case 'Datavidia':
-      url += '/datavidia'
+      url += '/Datavidia'
       break
     case 'Hackvidia':
-      url += '/hackvidia'
+      url += '/Hackvidia'
       break
     default:
       break
