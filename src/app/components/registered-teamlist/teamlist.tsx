@@ -152,9 +152,6 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     Verified: 'success',
     Waiting: 'warning',
     Denied: 'danger'
-    Verified: 'success',
-    Waiting: 'warning',
-    Denied: 'danger'
   }
 
   const mapStageTag: Record<
@@ -170,7 +167,6 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     | 'neutral'
   > = {
     'Pre-eliminary': 'danger',
-    Final: 'success'
     Final: 'success'
   }
 
