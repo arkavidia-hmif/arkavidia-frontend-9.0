@@ -1,15 +1,28 @@
-"use client";
+'use client'
 
-import { Tab } from "~/app/components/Tab";
-import TeamInfo from "~/app/components/team-lists/detail/TeamInfo";
-import Submission from "~/app/components/team-lists/detail/Submission";
-import { useEffect, useState } from "react";
-import { getCompetitionById, getCompetitionSubmissionTeam, getTeamDetail, GetTeamDetailResponse } from "~/api/generated";
-import useAxiosAuth from "~/lib/hooks/useAxiosAuth";
-import { useParams, useRouter } from "next/navigation";
-import Hero from "~/app/components/team-lists/detail/Hero";
+import { Tab } from '~/app/components/Tab'
+import TeamInfo from '~/app/components/team-lists/detail/TeamInfo'
+import Submission from '~/app/components/team-lists/detail/Submission'
+import { useEffect, useState } from 'react'
+import {
+    getCompetitionById,
+    // getCompetitionSubmissionTeam,
+    getAdminCompetitionTeamInformation,
+    GetAdminCompetitionTeamInformationResponse,
+    getAdminCompetitionTeamSubmissions
+} from '~/api/generated'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { useParams, useRouter } from 'next/navigation'
+import Hero from '~/app/components/team-lists/detail/Hero'
 
-type Competition = 'CP' | 'CTF' | 'Hackvidia' | 'UXvidia' | 'Datavidia';
+// type Competition = 'CP' | 'CTF' | 'Hackvidia' | 'UXvidia' | 'Datavidia';
+type Competition =
+    | 'fr44bkra'
+    | 'nt0bgnc4'
+    | 'y5naakpm'
+    | 'gg6iayu9'
+    | 'zn42p6sr'
+    | 'zyfsfc9k'
 
 const URL_PLACEHOLDER = 'https://picsum.photos/200/300'
 
@@ -23,13 +36,13 @@ const submission_placeholder = [
         name: 'Participant 1',
         studentCard: URL_PLACEHOLDER,
         poster: URL_PLACEHOLDER,
-        twibbon: URL_PLACEHOLDER,
+        twibbon: URL_PLACEHOLDER
     },
     {
         name: 'Participant 2',
         studentCard: URL_PLACEHOLDER,
         poster: URL_PLACEHOLDER,
-        twibbon: URL_PLACEHOLDER,
+        twibbon: URL_PLACEHOLDER
     },
     {
         name: 'Participant 3',
@@ -39,137 +52,145 @@ const submission_placeholder = [
     }
 ]
 
-
-
 function TeamDetails() {
-    const router = useRouter();
-    const params = useParams();
-    const [competition, setCompetition] = useState<Competition>();
-    const [teamData, setTeamData] = useState<GetTeamDetailResponse>();
-    const axiosAuth = useAxiosAuth();
+    const router = useRouter()
+    const params = useParams()
+    const [competition, setCompetition] = useState<Competition>()
+    const [teamData, setTeamData] = useState<GetAdminCompetitionTeamInformationResponse>()
+    const axiosAuth = useAxiosAuth()
 
     async function validateCompetition(value: string | null): Promise<boolean> {
         if (!value) {
-            return false;
+            return false
         }
         const resp = await getCompetitionById({
             client: axiosAuth,
             path: {
-                competitionId: value 
+                competitionId: value
             }
-        });
+        })
 
         if (resp.error || !resp.data) {
-            return false;
+            return false
         }
-        setCompetition(resp.data.title as Competition);
+        setCompetition(resp.data.title as Competition)
 
         // TODO: Uncomment this when the competition ID is finalized
-        return ['CP', 'CTF', 'Hackvidia', 'UXvidia', 'Datavidia'].includes(value as Competition);
+        return [
+            'fr44bkra',
+            'nt0bgnc4',
+            'y5naakpm',
+            'gg6iayu9',
+            'zn42p6sr',
+            'zyfsfc9k'
+        ].includes(value as Competition)
     }
 
-
     useEffect(() => {
-        const competitionParam = params.competitionID as string;
+        const competitionParam = params.competitionID as string
 
         if (!competitionParam || !validateCompetition(competitionParam)) {
-            router.push('/404');
-            return;
+            router.push('/404')
+            return
         }
 
-        let isMounted = true;
+        let isMounted = true
 
         const fetchTeamData = async () => {
-            const resp = await getTeamDetail({
+            const resp = await getAdminCompetitionTeamInformation({
                 client: axiosAuth,
                 path: {
                     teamId: params.teamID as string,
                     competitionId: competitionParam
                 }
-            });
-            
+            })
+
             if (resp.error || !resp.data) {
                 router.push('/404');
-                return;
+                return
             }
 
             if (isMounted) {
-                setTeamData(resp.data);
+                setTeamData(resp.data)
             }
-        };
+        }
 
         // TODO: Integrate
         const fetchTeamSubmission = async () => {
-            const resp = await getCompetitionSubmissionTeam({
-                client: axiosAuth,
-                path: {
-                    teamId: params.teamID as string,
-                }
-            })
+          const resp = await getAdminCompetitionTeamSubmissions({
+            client: axiosAuth,
+            path: {
+              teamId: params.teamID as string,
+              competitionId: competitionParam
+            }
+          })
         }
 
-
-        fetchTeamData();
-        fetchTeamSubmission();
+        fetchTeamData()
+        fetchTeamSubmission()
 
         return () => {
-            isMounted = false;
-        };
-    }, [params, axiosAuth]);
+            isMounted = false
+        }
+    }, [params, axiosAuth])
 
     if (!teamData) {
-        return ;
+        return
     }
 
     return (
         <div
-            className="flex flex-col gap-7 px-4 min-h-screen bg-gradient-to-r from-[#1F0246] to-[#2E046A]"
+            className="flex min-h-screen flex-col gap-7 bg-gradient-to-r from-[#1F0246] to-[#2E046A] px-4"
             style={{
                 backgroundImage: "url('/images/profile/bg.png')",
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
-                backgroundSize: 'cover',
-            }}
-        >
+                backgroundSize: 'cover'
+            }}>
             <Hero
                 teamName={teamData.name}
-                teamID={'#'+teamData.joinCode}
-                teamStatus={teamData.isVerified? 'Verified' : 'Unverified'}
-                teamStage={teamData.competitionStage} 
+                teamID={'#' + teamData.joinCode}
+                teamStatus={teamData.isVerified ? 'Verified' : 'Unverified'}
+                teamStage={teamData.stage}
             />
-            {competition && (
-                competition === 'UXvidia' || competition === 'Datavidia' ? (
-                    <Tab 
-                        contentType={['Team Information', 'Submission']} 
+            {competition &&
+                (competition === 'gg6iayu9' || competition === 'zn42p6sr' ? (
+                    <Tab
+                        contentType={['Team Information', 'Submission']}
                         content={[
-                            <TeamInfo 
+                            <TeamInfo
+                                competitionID={params.competitionID as string}
+                                final={teamData.finalStatus}
+                                prelim={teamData.preeliminaryStatus}
                                 key="team-info"
                                 members={teamData?.teamMembers}
                                 paymentProof={payment_placeholder}
                                 teamID={teamData.id}
                                 submissionsTypeID={submission_placeholder}
-                                existsSubmission                         
+                                existsSubmission
                             />,
                             <Submission key="submission" />
-                        ]} 
+                        ]}
                     />
                 ) : (
-                    <Tab 
-                        contentType={['Team Information']} 
+                    <Tab
+                        contentType={['Team Information']}
                         content={[
-                            <TeamInfo 
+                            <TeamInfo
+                                competitionID={params.competitionID as string}
+                                final={teamData.finalStatus}
+                                prelim={teamData.preeliminaryStatus}
                                 key="team-info"
                                 members={teamData?.teamMembers}
                                 paymentProof={payment_placeholder}
-                                submissionsTypeID={submission_placeholder}   
-                                teamID={teamData.id}                      
-                            />,
-                        ]} 
+                                submissionsTypeID={submission_placeholder}
+                                teamID={teamData.id}
+                            />
+                        ]}
                     />
-                )
-            )}
+                ))}
         </div>
-    );
+    )
 }
 
-export default TeamDetails;
+export default TeamDetails
