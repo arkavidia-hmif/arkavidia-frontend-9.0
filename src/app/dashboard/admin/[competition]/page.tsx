@@ -11,6 +11,7 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 
 import { RegisteredTeamList } from '~/app/components/registered-teamlist/teamlist'
 import Loading from '~/app/components/Loading'
+import { AxiosError } from 'axios'
 
 interface Pagination {
   currentPage: number
@@ -91,11 +92,11 @@ function AdminCompetitionDashboard() {
           prev: null
         })
       }
-    } catch (error) {
-      // console.error('Error fetching teams:', error)
+    } catch (err: unknown) {
+      const error = err as AxiosError
       toast({
         title: 'Failed to fetch teams',
-        description: error.error.message,
+        description: error.message,
         variant: 'destructive'
       })
     } finally {
@@ -141,12 +142,17 @@ function AdminCompetitionDashboard() {
           No competition found with the name "${params.competition}"
         </h1>
       ) : (
-        <RegisteredTeamList
+        currentCompetitionId === null ? 
+        (<div className='font-belanosima text-2xl text-whitemd:text-3xl'>
+          Competition ID not valid
+        </div>) 
+        :
+        (<RegisteredTeamList
           teamData={teamData}
           pagination={pagination}
-          competitionId={currentCompetitionId ?? null}
+          competitionId={currentCompetitionId}
           onPageChange={handlePageChange}
-        />
+        />)
       )}
     </>
   )
