@@ -21,7 +21,6 @@ import { Input } from './../ui/input'
 import { Search, Pencil } from 'lucide-react'
 import { Team } from '~/api/generated'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { capitalizeFirstLetter } from '~/lib/utils'
 
 interface Pagination {
@@ -35,7 +34,7 @@ interface Pagination {
 interface RegisteredTeamListProps {
   teamData: Team[]
   pagination: Pagination
-  competitionId: string | null
+  competitionId: string | 'null'
   onPageChange: (newPage: number) => void // Callback for handling page changes
 }
 
@@ -50,42 +49,60 @@ const getPaginationRange = (current: number, total: number, delta = 2) => {
 
   if (left > 2) range.push('...')
   for (let i = left; i <= right; i++) range.push(i)
-  if (right < total - 1) range.push('...')
+if (right < total - 1) range.push('...')
   if (total > 1) range.push(total)
-
-  return range
-}
-
+    
+    return range
+  }
+  
+  //! HARDCODED
 // Function to get team status
 export const getTeamStatus = (team: Team) => {
   if (!team.document?.[0]) {
-    return 'Payment Not Submitted'
+    return 'NO DOCUMENT YET'
   } else if (team.document?.[0].isVerified) {
-    return 'Verified'
+    return 'VERIFIED'
   } else if (team.document?.[0].verificationError) {
-    return 'Rejected'
+    return 'DENIED'
   } else if (!team.document?.[0].isVerified) {
-    return 'Not Verified'
+    return 'WAITING'
   } else {
-    return ''
+    return 'WAITING'
   }
 }
 
 export type TeamStatus =
-  | 'Verified'
-  | 'Rejected'
-  | 'Not Verified'
-  | 'Payment Not Submitted'
-  | ''
-export const possibleTeamStatus: Array<TeamStatus> = [
-  'Verified',
-  'Rejected',
-  'Not Verified',
-  'Payment Not Submitted'
-]
+  Team['verificationStatus']
 
-// Map status to their tag color
-export const mapStatusTag: Record<
+//! HARDCODED
+export const possibleTeamStatus: Array<NonNullable<TeamStatus>> = [
+  'VERIFIED' , 'DENIED' , 'WAITING' , 'CHANGED' ]
+  
+  //! HARDCODED
+  // Map status to their tag color
+  export const mapStatusTag: Record<
+  string,
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'lilac'
+  | 'purple'
+  | 'teal'
+  | 'pink'
+  | 'blue'
+  | 'neutral'
+  > = {
+    'VERIFIED': 'success',
+    'DENIED': 'danger',
+    'WAITING': 'warning',
+    'CHANGED': 'blue',
+    'NO DOCUMENT YET': 'neutral'
+  }
+  
+  export type TeamStage = Team['stage']
+  
+  //! HARDCODED
+  export const mapStageTag: Record<
   string,
   | 'success'
   | 'warning'
@@ -97,29 +114,12 @@ export const mapStatusTag: Record<
   | 'blue'
   | 'neutral'
 > = {
-  Verified: 'success',
-  Rejected: 'warning',
-  'Not Verified': 'danger',
-  'Payment Not Submitted': 'blue'
+  'pre-eliminary': 'danger',
+  'final': 'success',
+  'verification': 'warning'
 }
 
-export const mapStageTag: Record<
-  string,
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'lilac'
-  | 'purple'
-  | 'teal'
-  | 'pink'
-  | 'blue'
-  | 'neutral'
-> = {
-  'Pre-eliminary': 'danger',
-  Final: 'success'
-}
-
-export const possibleCompetitionStatus = ['pre-eliminary', 'final']
+export const possibleCompetitionStatus: Array<TeamStage> = ['pre-eliminary', 'final', 'verification']
 
 export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   teamData,
@@ -155,7 +155,6 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
       // Check if CompetitionStatusFilter is not set or matches the verification status
       const matchesCompetitionStatus =
         !CompetitionStatusFilter || team.stage === CompetitionStatusFilter.toLowerCase()
-      // TODO: add field untuk menampilkan stage tim
 
       // Check if the team name or team ID contains the search term (case-insensitive)
       const matchesSearchTerm =
@@ -283,7 +282,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                     <TableCell>
                       <Tag
                         text={capitalizeFirstLetter(team.stage)}
-                        variant={mapStageTag[capitalizeFirstLetter(team.stage)]}
+                        variant={mapStageTag[team.stage]}
                       />
                     </TableCell>
                     <TableCell>
