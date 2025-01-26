@@ -58,17 +58,7 @@ if (right < total - 1) range.push('...')
   //! HARDCODED
 // Function to get team status
 export const getTeamStatus = (team: Team) => {
-  if (!team.document?.[0]) {
-    return 'NO DOCUMENT YET'
-  } else if (team.document?.[0].isVerified) {
-    return 'VERIFIED'
-  } else if (team.document?.[0].verificationError) {
-    return 'DENIED'
-  } else if (!team.document?.[0].isVerified) {
-    return 'WAITING'
-  } else {
-    return 'WAITING'
-  }
+  return team.verificationStatus
 }
 
 export type TeamStatus =
@@ -275,8 +265,8 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                     <TableCell>{team.name}</TableCell>
                     <TableCell>
                       <Tag
-                        text={getTeamStatus(team)}
-                        variant={mapStatusTag[getTeamStatus(team)]}
+                        text={getTeamStatus(team) || 'NO DOCUMENT YET'}
+                        variant={mapStatusTag[getTeamStatus(team) || 'NO DOCUMENT YET']}
                       />
                     </TableCell>
                     <TableCell>
