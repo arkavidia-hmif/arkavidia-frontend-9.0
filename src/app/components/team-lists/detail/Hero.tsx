@@ -1,8 +1,7 @@
 import {
-  getTeamStatus,
+  mapStageTag,
   mapStatusTag,
-  possibleTeamStatus,
-  TeamStatus
+  TeamStatus,
 } from '../../registered-teamlist/teamlist'
 import Tag from '../../Tag'
 
@@ -27,9 +26,10 @@ function Hero({ teamName, teamID, teamStatus, teamStage }: ProfileHeroProps) {
             <h1 className="font-teachers text-xl font-bold">Team Status</h1>
           </div>
           <div className="mx-auto">
+            {/* //! HARDCODED */}
             <Tag
-              variant={mapStatusTag[teamStatus]}
-              text={teamStatus}
+              variant={mapStatusTag[teamStatus === null ? 'NO DOCUMENT YET' : teamStatus]}
+              text={teamStatus === null ? 'No Document Yet' : teamStatus}
               className="w-[100px]"
             />
           </div>
@@ -39,7 +39,7 @@ function Hero({ teamName, teamID, teamStatus, teamStage }: ProfileHeroProps) {
             <h1 className="font-teachers text-xl font-bold">Team Stage</h1>
           </div>
           <div>
-            <Tag variant="danger" text={teamStage} className="w-[100px]" />
+            <Tag variant={mapStageTag[teamStage]} text={teamStage} className="w-[100px]" />
           </div>
         </div>
       </div>
