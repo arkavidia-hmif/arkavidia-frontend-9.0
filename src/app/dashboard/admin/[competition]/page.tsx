@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
-import { getCompetitionByName, getCompetitionParticipant } from '~/api/generated'
+import { getAdminAllCompetitionTeams, getCompetitionByName } from '~/api/generated'
 import { Team } from '~/api/generated'
 
 import { useToast } from '~/hooks/use-toast'
@@ -64,7 +64,7 @@ function AdminCompetitionDashboard() {
       setIsCompetitionFound(true)
       setCurrentCompetitionId(competitions.data[0].id)
 
-      const response = await getCompetitionParticipant({
+      const response = await getAdminAllCompetitionTeams({
         client: authAxios,
         path: { competitionId: competitions.data[0].id },
         query: { page: page.toString(), limit: limit }
@@ -92,7 +92,12 @@ function AdminCompetitionDashboard() {
         })
       }
     } catch (error) {
-      console.error('Error fetching teams:', error)
+      // console.error('Error fetching teams:', error)
+      toast({
+        title: 'Failed to fetch teams',
+        description: error.error.message,
+        variant: 'destructive'
+      })
     } finally {
       setIsLoading(false)
     }
