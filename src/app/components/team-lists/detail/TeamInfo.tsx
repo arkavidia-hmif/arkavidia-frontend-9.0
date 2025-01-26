@@ -398,6 +398,7 @@ export function TeamStatus({
                             variant={'outline'}
                             size={'sm'}
                             onClick={() => {
+                                setQualification(null)
                                 setHidden(false)
                             }}>
                             <X size={10} className="text-white" strokeWidth={3} />
