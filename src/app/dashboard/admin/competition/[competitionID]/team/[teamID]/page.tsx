@@ -3,7 +3,7 @@
 import { Tab } from "~/app/components/Tab";
 import TeamInfo from "~/app/components/team-lists/detail/TeamInfo";
 import Submission from "~/app/components/team-lists/detail/Submission";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getCompetitionById, getAdminCompetitionTeamInformation, GetAdminCompetitionTeamInformationResponse, TeamMemberDocument, UserDocument } from "~/api/generated";
 import useAxiosAuth from "~/lib/hooks/useAxiosAuth";
 import { useToast } from "~/hooks/use-toast";
@@ -32,10 +32,13 @@ function TeamDetails() {
     const [competition, setCompetition] = useState<Competition>();
     const [teamData, setTeamData] = useState<GetAdminCompetitionTeamInformationResponse>();
     const [teamSubmission, setTeamSubmission] = useState<submissionsTypeID>()
-    const axiosAuth = useAxiosAuth();
     const [competitionID, setCompetitionID] = useState<string>('')
     
-    async function validateCompetition(value: string | null): Promise<boolean> {
+    const {toast} = useToast()
+    const axiosAuth = useAxiosAuth();
+    
+    // Validate competition function
+    const validateCompetition = useCallback(async (value: string | null): Promise<boolean> => {
         if (!value) {
             return false;
         }
@@ -50,17 +53,85 @@ function TeamDetails() {
             return false;
         }
         setCompetition(resp.data.title as Competition);
-        
-        // Check by getCompetitionById is enough; if the getCompetitionById fails, that means no such competition ID
         return true;
-    }
-    
-    
-    const {toast} = useToast()
-    useEffect(() => {
+    }, [axiosAuth]);
+
+    // Fetch team data function
+    const fetchTeamData = useCallback(async () => {
         const competitionParam = params.competitionID as string;
         const teamIdParam = params.teamID as string;
-    
+
+        const resp = await getAdminCompetitionTeamInformation({
+            client: axiosAuth,
+            path: {
+                teamId: teamIdParam,
+                competitionId: competitionParam
+            }
+        });
+
+        if (resp.error || !resp.data) {
+            const responseError = resp.error;
+
+            if ('validationErrors' in responseError) {
+                toast({
+                    title: 'Validation Error of fetching team data',
+                    description: 'Unknown validation error.',
+                    variant: 'destructive',
+                });
+            } else if ('error' in responseError) {
+                toast({
+                    title: 'Failed to fetch team data',
+                    description: responseError.error || 'An unknown error occurred.',
+                    variant: 'destructive',
+                });
+            }
+            router.replace('/404');
+            return;
+        }
+
+        setTeamData(resp.data);
+    }, [axiosAuth, params.competitionID, params.teamID, router, toast]);
+
+    // Process team submission data
+    const processTeamSubmission = useCallback((teamData: GetAdminCompetitionTeamInformationResponse) => {
+        const tempTeamSubmission: submissionsTypeID = [];
+        teamData.teamMembers?.forEach((member) => {
+            let latestPoster: TeamMemberDocument | null = null;
+            let latestTwibbon: TeamMemberDocument | null = null;
+
+            const documents: TeamMemberDocument[] = Array.isArray(member.document)
+                ? member.document
+                : member.document
+                    ? [member.document]
+                    : [];
+
+            for (const doc of documents) {
+                if (doc.type === "poster") {
+                    if (!latestPoster || new Date(doc.media.createdAt) > new Date(latestPoster.media.createdAt)) {
+                        latestPoster = doc;
+                    }
+                } else if (doc.type === "twibbon") {
+                    if (!latestTwibbon || new Date(doc.media.createdAt) > new Date(latestTwibbon.media.createdAt)) {
+                        latestTwibbon = doc;
+                    }
+                }
+            }
+
+            tempTeamSubmission.push({
+                name: member.user?.fullName || '',
+                studentCard: (member.user?.document?.find((doc: UserDocument) => doc.type === "kartu-identitas")) || null,
+                twibbon: latestTwibbon || null,
+                poster: latestPoster || null,
+            });
+        });
+
+        setTeamSubmission(tempTeamSubmission);
+    }, []);
+
+    // Initial data fetch
+    useEffect(() => {
+        const competitionParam = params.competitionID as string;
+        
         if (!competitionParam || !validateCompetition(competitionParam)) {
             toast({
                 title: 'Competition not found',
@@ -69,107 +140,35 @@ function TeamDetails() {
             router.replace('/404');
             return;
         }
-    
-        const fetchTeamData = async () => {
-            const resp = await getAdminCompetitionTeamInformation({
-                client: axiosAuth,
-                path: {
-                    teamId: teamIdParam,
-                    competitionId: competitionParam
-                }
-            });
-    
-            if (resp.error || !resp.data) {
-                const responseError = resp.error;
-    
-                // Check if it's a ValidationError
-                if ('validationErrors' in responseError) {
-                    toast({
-                        title: 'Validation Error of fetching team data',
-                        description: 'Unknown validation error.',
-                        variant: 'destructive',
-                    });
-                } else if ('error' in responseError) {
-                    toast({
-                        title: 'Failed to fetch team data',
-                        description: responseError.error || 'An unknown error occurred.',
-                        variant: 'destructive',
-                    });
-                }
-                router.replace('/404');
-                return;
-            }
-    
-            setTeamData(resp.data);
-        };
-    
+
         fetchTeamData();
-        setCompetitionID(params.competitionID as string)
-    }, [params, axiosAuth]);
-    
+        setCompetitionID(competitionParam);
+    }, [params, validateCompetition, fetchTeamData, router, toast]);
+
+    // Process submission data when teamData changes
     useEffect(() => {
         if (!teamData) return;
-    
-        // Fetch submission data after `teamData` is loaded
-        const tempTeamSubmission: submissionsTypeID = [];
-        teamData.teamMembers?.forEach((member) => {
-            let latestPoster: TeamMemberDocument | null = null;
-            let latestTwibbon: TeamMemberDocument | null = null;
-    
-            const documents: TeamMemberDocument[] = Array.isArray(member.document)
-                ? member.document
-                : member.document
-                    ? [member.document] // Wrap a single object into an array
-                    : []; // Default to an empty array if null/undefined
-    
-            for (const doc of documents) {
-                if (doc.type === "poster") {
-                    if (
-                        !latestPoster ||
-                        new Date(doc.media.createdAt) > new Date(latestPoster.media.createdAt)
-                    ) {
-                        latestPoster = doc;
-                    }
-                } else if (doc.type === "twibbon") {
-                    if (
-                        !latestTwibbon ||
-                        new Date(doc.media.createdAt) > new Date(latestTwibbon.media.createdAt)
-                    ) {
-                        latestTwibbon = doc;
-                    }
-                }
-            }
-    
-            const tempMemberData = {
-                name: member.user?.fullName || '',
-                studentCard: (member.user?.document?.find((doc: UserDocument) => doc.type === "kartu-identitas")) || null,
-                twibbon: latestTwibbon || null,
-                poster: latestPoster || null,
-            };
-    
-            tempTeamSubmission.push(tempMemberData);
-        });
-    
-        setTeamSubmission(tempTeamSubmission);
-    }, [teamData]);
-    
+        processTeamSubmission(teamData);
+    }, [teamData, processTeamSubmission]);
 
     if (!teamData) {
-        return ;
+        return null;
     }
 
-    // NOTE: since there could be several payment proof, this method only takes the latest payment proof uploaded
+    // Get latest payment proof
     const paymentProof = (() => {
         if (!teamData.document || teamData.document.length === 0) {
-          return null
+            return null;
         }
-      
-        // Find the latest document based on the createdAt field
         return teamData.document.reduce((latest, current) =>
-          new Date(current.media.createdAt) > new Date(latest.media.createdAt) ? current : latest
+            new Date(current.media.createdAt) > new Date(latest.media.createdAt) ? current : latest
         );
+    })();
 
-      })();
+    // Refetch handler that will be passed to TeamInfo
+    const handleRefetch = async () => {
+        await fetchTeamData();
+    };
 
     return (
         <div
@@ -200,6 +199,7 @@ function TeamDetails() {
                                 teamID={teamData.id}
                                 submissionsTypeID={teamSubmission}
                                 existsSubmission
+                                onRefetch={handleRefetch}
                             />,
                             <Submission key="submission" />
                         ]} 
@@ -214,7 +214,8 @@ function TeamDetails() {
                                 members={teamData?.teamMembers}
                                 paymentProof={paymentProof}
                                 submissionsTypeID={teamSubmission}   
-                                teamID={teamData.id}                      
+                                teamID={teamData.id}
+                                onRefetch={handleRefetch}
                             />,
                         ]} 
                     />

@@ -24,6 +24,7 @@ type GetTeamDetailResponse = {
     members?: Array<TeamMember> | undefined; // Make members optional
     existsSubmission?: boolean;
     paymentProof: TeamDocument | null;
+    onRefetch: () => Promise<void>;
     submissionsTypeID: {
         name: string;
         studentCard: UserDocument | null;
@@ -46,11 +47,11 @@ function Field({title, value}: {title: string, value: string}) {
 }
 
 function PaymentProof({
-    file, teamID, competitionID
+    file, teamID, competitionID, onRefetch
 }
 : 
 {
-    file: TeamDocument, teamID: string, competitionID: string
+    file: TeamDocument, teamID: string, competitionID: string, onRefetch: () => Promise<void>
 }) {
     return (
         <div className="mb-6">
@@ -61,6 +62,7 @@ function PaymentProof({
                     isPaymentProof={true}
                     teamID={teamID}
                     competitionID={competitionID}
+                    onRefetch={onRefetch}
                 />
             ) : (
                 <p className="text-2xl text-white font-belanosima">No payment proof found</p>
@@ -71,7 +73,7 @@ function PaymentProof({
 
 function FileRequirements(
     {
-        file, editable, teamID, isPaymentProof, competitionID, userID
+        file, editable, teamID, isPaymentProof, competitionID, userID, onRefetch
     }
     : 
     {
@@ -80,7 +82,8 @@ function FileRequirements(
         teamID: string,
         isPaymentProof?: boolean,
         competitionID: string,
-        userID?: string
+        userID?: string,
+        onRefetch: () => Promise<void>
     }
 ) {
     const { toast } = useToast();
@@ -101,7 +104,7 @@ function FileRequirements(
                 ? [
                       {
                           userId: userID || '', 
-                          [file.type]: {
+                          [file.type === 'kartu-identitas' ? 'kartuIdentitas' : file.type]: {
                               isVerified,
                               verificationError: isVerified ? '' : feedback,
                           },
@@ -132,6 +135,10 @@ function FileRequirements(
             description: `Document ${isVerified ? 'verified' : 'rejected successfully.'}`,
             variant: 'success',
         });
+
+        if (onRefetch) {
+            await onRefetch();
+        }
     }
     
 
@@ -226,7 +233,8 @@ function MemberCard(
         poster,
         twibbon,
         competitionID,
-        userID
+        userID,
+        onRefetch
     }:
     {
         isTeamLeader?: boolean, 
@@ -238,7 +246,8 @@ function MemberCard(
         poster: TeamMemberDocument | null,
         twibbon: TeamMemberDocument | null,
         competitionID: string,
-        userID: string
+        userID: string, 
+        onRefetch: () => Promise<void>,
     }
 ) {
 
@@ -258,6 +267,7 @@ function MemberCard(
                 teamID={teamID}
                 competitionID={competitionID}
                 userID={userID}
+                onRefetch={onRefetch}
                 />) : (
                     <p className="text-lg text-red-100">Student ID Card not found</p>
                 )
@@ -271,6 +281,7 @@ function MemberCard(
                 teamID={teamID}
                 competitionID={competitionID}
                 userID={userID}
+                onRefetch={onRefetch}
                 />
             ) : (
                 <p className="text-lg text-red-100">Poster not found</p>
@@ -285,6 +296,7 @@ function MemberCard(
                 teamID={teamID}
                 competitionID={competitionID}
                 userID={userID}
+                onRefetch={onRefetch}
                 />
             ) : (
                 <p className="text-lg text-red-100">Twibbon not found</p>
@@ -368,7 +380,8 @@ export default function TeamInfo(
         submissionsTypeID,
         existsSubmission, 
         paymentProof,
-        competitionID
+        competitionID,
+        onRefetch
     } : GetTeamDetailResponse) 
     {
 
@@ -387,7 +400,7 @@ export default function TeamInfo(
                 <h1 className="font-teachers font-bold text-[32px]">Verification</h1>
             </div>
             { paymentProof ? (
-                <PaymentProof file={paymentProof} teamID={teamID} competitionID={competitionID} />
+                <PaymentProof file={paymentProof} teamID={teamID} competitionID={competitionID} onRefetch={onRefetch} />
             ) :
             (<p className="text-xl mb-4 text-white font-bold py-2 px-2 border-[1px] border-white rounded-sm">Payment proof document not found</p>)
             }
@@ -409,6 +422,7 @@ export default function TeamInfo(
                                 twibbon={data?.twibbon || null}
                                 competitionID={competitionID}
                                 userID={member.userId}
+                                onRefetch={onRefetch}
                             />
                         )
                     })
