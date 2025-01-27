@@ -268,19 +268,20 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
           {/* Buttons */}
           <div className="flex flex-col items-center justify-center gap-4 md:flex-row md:gap-8 lg:gap-12">
-            <Button variant="outline" className="w-full sm:w-auto">
-              <a
-                href={props.handbookLink === '#' ? '#' : props.handbookLink}
-                target={
-                  props.handbookLink === '#' || props.handbookLink === '' ? '' : '_blank'
-                }
-                rel="noopener noreferrer">
-                <div className="flex flex-row items-center justify-center gap-2">
-                  <IoMdDownload className="text-[#48E6FF]" />
-                  <span>Download Handbook</span>
-                </div>
-              </a>
-            </Button>
+            <Link
+              href={props.handbookLink === '#' ? '#' : props.handbookLink}
+              target={
+                props.handbookLink === '#' || props.handbookLink === '' ? '' : '_blank'
+              }
+              rel="noopener noreferrer"
+            >
+              <Button variant="outline" className="w-full sm:w-auto">
+                  <div className="flex flex-row items-center justify-center gap-2">
+                    <IoMdDownload className="text-[#48E6FF]" />
+                    <span>Download Handbook</span>
+                  </div>
+              </Button>
+            </Link>
             <CompetitionRegistration
               competitionID={props.competitionCode}
               competitionAbbreviation={props.competitionAbbr}
