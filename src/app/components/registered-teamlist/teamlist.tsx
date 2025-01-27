@@ -86,7 +86,7 @@ export const possibleTeamStatus: Array<NonNullable<TeamStatus>> = [
     'DENIED': 'danger',
     'WAITING': 'warning',
     'CHANGED': 'blue',
-    'NO DOCUMENT YET': 'neutral'
+    'NO STATUS YET': 'neutral'
   }
   
   export type TeamStage = Team['stage']
@@ -265,14 +265,16 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                     <TableCell>{team.name}</TableCell>
                     <TableCell>
                       <Tag
-                        text={getTeamStatus(team) || 'NO DOCUMENT YET'}
-                        variant={mapStatusTag[getTeamStatus(team) || 'NO DOCUMENT YET']}
-                      />
+                        text={getTeamStatus(team) || 'No Status Yet'}
+                        variant={mapStatusTag[getTeamStatus(team) || 'NO STATUS YET']}
+                        className='capitalize'
+                        />
                     </TableCell>
                     <TableCell>
                       <Tag
                         text={capitalizeFirstLetter(team.stage)}
                         variant={mapStageTag[team.stage]}
+                        className='capitalize'
                       />
                     </TableCell>
                     <TableCell>

@@ -31,8 +31,8 @@ function Hero({ teamName, teamID, teamStatus, teamStage }: ProfileHeroProps) {
           <div className="mx-auto">
             {/* //! HARDCODED */}
             <Tag
-              variant={mapStatusTag[teamStatus === null ? 'NO DOCUMENT YET' : teamStatus]}
-              text={teamStatus === null ? 'No Document Yet' : teamStatus}
+              variant={mapStatusTag[teamStatus ? teamStatus : 'NO STATUS YET']}
+              text={teamStatus ? teamStatus : 'No Status Yet'}
               className='px-6 capitalize'
             />
           </div>
