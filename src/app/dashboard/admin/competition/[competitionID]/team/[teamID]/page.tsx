@@ -16,11 +16,14 @@ type Competition = 'CP' | 'CTF' | 'Hackvidia' | 'UXvidia' | 'Datavidia';
 
 type submissionsTypeID = {
     name: string;
-    studentCard: string | null;
-    poster: string | null;
-    twibbon: string | null;
+    studentCard: UserDocument | null;
+    poster: TeamMemberDocument | null;
+    twibbon: TeamMemberDocument | null;
 }[];
 
+/* ASSUMPTIONS
+* IF there are for example several payment proofs or posters or twibbons, frontend WILL only get the latest file
+*/
 
 
 function TeamDetails() {
@@ -137,11 +140,9 @@ function TeamDetails() {
     
             const tempMemberData = {
                 name: member.user?.fullName || '',
-                studentCard: (member.user?.document?.find((doc: UserDocument) => doc.type === "kartu-identitas")?.media.url)
-                    ? `https://${member.user?.document?.find((doc: UserDocument) => doc.type === "kartu-identitas")?.media.url}`
-                    : null,
-                twibbon: latestTwibbon?.media.url ? `https://${latestTwibbon.media.url}` : null,
-                poster: latestPoster?.media.url ? `https://${latestPoster.media.url}` : null,
+                studentCard: (member.user?.document?.find((doc: UserDocument) => doc.type === "kartu-identitas")) || null,
+                twibbon: latestTwibbon || null,
+                poster: latestPoster || null,
             };
     
             tempTeamSubmission.push(tempMemberData);
@@ -158,23 +159,14 @@ function TeamDetails() {
     // NOTE: since there could be several payment proof, this method only takes the latest payment proof uploaded
     const paymentProof = (() => {
         if (!teamData.document || teamData.document.length === 0) {
-          return { url: null, typeID: null };
+          return null
         }
       
         // Find the latest document based on the createdAt field
-        const latestDocument = teamData.document.reduce((latest, current) =>
+        return teamData.document.reduce((latest, current) =>
           new Date(current.media.createdAt) > new Date(latest.media.createdAt) ? current : latest
         );
-      
-        // Extract and format the URL
-        const url = latestDocument.media.url.includes('http')
-          ? latestDocument.media.url
-          : `https://${latestDocument.media.url}`;
-      
-        return {
-          url: url || null,
-          typeID: latestDocument.type || null,
-        };
+
       })();
 
     return (
