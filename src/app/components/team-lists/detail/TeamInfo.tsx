@@ -1,7 +1,7 @@
 import { Check, ExternalLink, Pencil, SendHorizonal, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Media, TeamMember, updateSubmissionFeedback } from "~/api/generated";
+import { putAdminCompetitionTeamVerification, PutAdminCompetitionTeamVerificationData, TeamDocument, TeamMember, TeamMemberDocument, UserDocument } from "~/api/generated";
 import { Button } from "~/app/components/Button";
 import Tag from "~/app/components/Tag";
 import { cn } from "~/lib/utils";
@@ -9,29 +9,27 @@ import { Input } from "../../Input";
 import Dropdown, { MenuItem } from "../../Dropdown";
 import MoonLoader from "react-spinners/ClipLoader";
 import useAxiosAuth from "~/lib/hooks/useAxiosAuth";
-import axios from "axios";
 import { useToast } from "~/hooks/use-toast";
 
+/* NOTE: NULL verificationStatus should be indicated by no document uploaded yet. 
+*  Assumption: frontend won't automatically change any status EXCEPT the user decided to
+*  Assumption: frontend con't check if the verification status corresponding is 
+*/
 const DEFAULT_FIELD = "has not been filled";
-const URL_PLACEHOLDER = 'https://picsum.photos/200/300'
-const TYPE_ID_PLACEHOLDER = '6969'
 
-type MediaIDType = {
-    url: string;
-    typeID: string;
-}
 
 type GetTeamDetailResponse = {
     teamID: string;
+    competitionID: string;
     members?: Array<TeamMember> | undefined; // Make members optional
     existsSubmission?: boolean;
-    paymentProof: MediaIDType;
+    paymentProof: TeamDocument | null;
     submissionsTypeID: {
         name: string;
-        studentCard: string;
-        poster: string;
-        twibbon: string;
-    }[];
+        studentCard: UserDocument | null;
+        poster: TeamMemberDocument | null;
+        twibbon: TeamMemberDocument | null;
+    }[] | undefined;
 };
 
 function Field({title, value}: {title: string, value: string}) {
@@ -47,40 +45,42 @@ function Field({title, value}: {title: string, value: string}) {
     )
 }
 
-function PaymentProof({url, teamID, typeID}: {url?: string | null, teamID: string, typeID: string}) {
+function PaymentProof({
+    file, teamID, competitionID
+}
+: 
+{
+    file: TeamDocument, teamID: string, competitionID: string
+}) {
     return (
         <div className="mb-6">
-                <div className="border border-white rounded-lg py-3 px-6 ">
-                    <FileRequirements 
-                        filetype="Payment Proof" 
-                        url={url? url : URL_PLACEHOLDER} 
-                        editable={true} 
-                        isPaymentProof
-                        teamID={teamID}
-                        typeID={typeID}
-                    />
-                </div>
+            {file?.media?.url && file.type ? (
+                <FileRequirements
+                    file={file}
+                    editable={true}
+                    isPaymentProof={true}
+                    teamID={teamID}
+                    competitionID={competitionID}
+                />
+            ) : (
+                <p className="text-2xl text-white font-belanosima">No payment proof found</p>
+            )}
         </div>
     )
 }
 
 function FileRequirements(
     {
-        filetype, 
-        url, 
-        editable, 
-        isPaymentProof, 
-        teamID, 
-        typeID
+        file, editable, teamID, isPaymentProof, competitionID, userID
     }
     : 
     {
-        filetype: string, 
-        url: string, 
-        editable?: boolean, 
-        isPaymentProof?: boolean,
+        file: TeamDocument | TeamMemberDocument | UserDocument,
+        editable: boolean,
         teamID: string,
-        typeID: string
+        isPaymentProof?: boolean,
+        competitionID: string,
+        userID?: string
     }
 ) {
     const { toast } = useToast();
@@ -89,96 +89,144 @@ function FileRequirements(
     const [feedback, setFeedback] = useState<string>('');
     const [loading, setLoading] = useState(false);
 
-    async function submitHandler() {
+    // Submit handler for document status change
+    async function submitHandler(isVerified: boolean) {
         setLoading(true);
-        const resp = await updateSubmissionFeedback({
+    
+        const bodyUpdate: PutAdminCompetitionTeamVerificationData['body'] = {
+            buktiPembayaran: isPaymentProof
+                ? { isVerified, verificationError: isVerified ? '' : feedback }
+                : undefined,
+            teamMember: !isPaymentProof
+                ? [
+                      {
+                          userId: userID || '', 
+                          [file.type]: {
+                              isVerified,
+                              verificationError: isVerified ? '' : feedback,
+                          },
+                      },
+                  ]
+                : [],
+        };
+    
+        const resp = await putAdminCompetitionTeamVerification({
             client: axiosAuth,
-            path: {
-                teamId: teamID,
-                typeId: typeID
-            },
-            body: {
-                feedback: feedback
-            }
-        })
+            path: { teamId: teamID, competitionId: competitionID || '' },
+            body: bodyUpdate,
+        });
+    
         setLoading(false);
         setIsFeedback(false);
         if (resp.error) {
             toast({
                 title: 'Feedback Error',
                 description: 'Failed to submit feedback',
-                variant: 'destructive'
-              })
-            return
+                variant: 'destructive',
+            });
+            return;
         }
+    
         toast({
-            title: 'Feedback Success',
-            description: 'Feedback submitted',
-            variant: 'success'
-          })
+            title: isVerified ? 'Verified Successfully' : 'Rejection Submitted',
+            description: `Document ${isVerified ? 'verified' : 'rejected successfully.'}`,
+            variant: 'success',
+        });
+    }
+    
 
+    //! HARDCODED
+    const fileType: Record<string, string> = {
+        'bukti-pembayaran': 'Bukti Pembayaran',
+        'nisn': 'NISN',
+        'kartu-identitas': 'Kartu Identitas',
+        'poster': 'Poster',
+        'twibbon': 'Twibbon',
     }
 
     return (
-        <div className={cn("flex justify-between", isFeedback ? 'md:flex-row gap-2 flex-col' : '')}>
-            <div className={cn("flex items-center", isPaymentProof ? 'gap-4' : 'gap-1')} >
-                <ExternalLink size={24} />
-                <div className="mt-1">
-                    <Link href={url}>
-                        <p className={cn("hover:underline hover:cursor-pointer", isPaymentProof ? 'text-lg font-semibold' : '')}>{filetype}</p>
-                    </Link>
-                </div>
-            </div>
-            {
-                editable ? 
-                    <>
-                        <div className={cn("gap-5", isFeedback ? 'hidden' : 'flex')}>
-                            <Button variant={'outline'} size={'sm'} onClick={() => setIsFeedback(true)}>
-                                <X size={10} className="text-white" strokeWidth={3} />
-                            </Button>
-                            <Button size={'sm'}>
-                                <Check size={10}  strokeWidth={3}/>
-                            </Button>
+        <div className="mb-6">
+            {file?.media?.url && file.type ? (
+                <div className="border border-white rounded-lg py-3 px-6">
+                    {/* First Row: File URL, File Type and Status */}
+                    <div className="flex justify-between items-center mb-4">
+                        <div className="flex items-center gap-4">
+                            <ExternalLink size={24} />
+                            <Link href={`https://${file.media.url}`} target="_blank">
+                                <p className="text-lg font-semibold text-white hover:underline">
+                                    {fileType[file.type]}
+                                </p>
+                            </Link>
                         </div>
-                        <div className={cn("gap-5 items-center justify-start", isFeedback ? 'flex' : 'hidden')}>
-                                <Input 
-                                    placeholder="Send what's wrong" 
+                        {/* Document Status */}
+                        <div className="text-right">
+    <p className={`text-sm font-medium ${file?.isVerified ? 'text-green-300' : 'text-purple-100'}`}>
+        {file?.isVerified ? 'Verified' : 'Not Verified'}
+    </p>
+    {file?.verificationError && (
+        <p className="text-sm text-red-100 mt-1">
+            <b>Rejection Reason:</b> {file.verificationError}
+        </p>
+    )}
+</div>
+
+                    </div>
+
+                    {/* "Ganti Status" and Buttons */}
+                    <div className="flex flex-col gap-3">
+                        <p className=" text-white">Ganti Status</p>
+                        {editable && !isFeedback && (
+                            <div className="flex gap-3">
+                                <Button variant="outline" size="sm" onClick={() => setIsFeedback(true)}>
+                                    <X size={10} className="text-white" strokeWidth={3} />
+                                </Button>
+                                <Button size="sm" onClick={() => submitHandler(true)}>
+                                    <Check size={10} strokeWidth={3} />
+                                </Button>
+                            </div>
+                        )}
+                        {isFeedback && (
+                            <div className="flex items-center gap-2">
+                                <Input
+                                    placeholder="Send what's wrong"
                                     className="max-w-[250px]"
-                                    onChange={(e) => setFeedback(e.target.value)} 
+                                    value={feedback}
+                                    onChange={(e) => setFeedback(e.target.value)}
                                 />
                                 <Button
                                     className={cn(loading ? 'cursor-not-allowed' : '')}
-                                    size={'sm'} 
-                                    onClick={() => {
-                                        if (!loading) {
-                                            submitHandler();
-                                        }
-                                    }}
+                                    size="sm"
+                                    onClick={() => !loading && submitHandler(false)}
                                 >
-                                    {loading ? <MoonLoader color="#fff" size={15} /> : <SendHorizonal size={15}  strokeWidth={3}/>}
+                                    {loading ? <MoonLoader color="#fff" size={15} /> : <SendHorizonal size={15} strokeWidth={3} />}
                                 </Button>
-                        </div> 
-                    </>
-                    : 
-                    <div>
-                        <Check size={30}  strokeWidth={2}/>
+                                <Button variant="outline" size="xs" onClick={() => setIsFeedback(false)}>
+                                    <X size={10} className="text-white" strokeWidth={3} />
+                                </Button>
+                            </div>
+                        )}
                     </div>
-            }
-            
+                </div>
+            ) : (
+                <p className="text-2xl text-white font-belanosima">No payment proof found</p>
+            )}
         </div>
-    )
+    );
 }
+
 
 function MemberCard(
     {
-        isTeamLeader, 
+        isTeamLeader,
         teamID,
         name, 
         email, 
         phone,
         studentCard,
         poster,
-        twibbon
+        twibbon,
+        competitionID,
+        userID
     }:
     {
         isTeamLeader?: boolean, 
@@ -186,9 +234,11 @@ function MemberCard(
         name: string, 
         email: string, 
         phone: string,
-        studentCard: MediaIDType,
-        poster: MediaIDType,
-        twibbon: MediaIDType
+        studentCard: UserDocument | null,
+        poster: TeamMemberDocument | null,
+        twibbon: TeamMemberDocument | null,
+        competitionID: string,
+        userID: string
     }
 ) {
 
@@ -198,27 +248,47 @@ function MemberCard(
             <Field title="Name" value={name} />
             <Field title="Email" value={email} />
             <Field title="Phone" value={phone? phone : '-'} />
-            <FileRequirements 
-                filetype="Student ID Card" 
-                url={studentCard.url} 
-                editable={!isTeamLeader}
+
+            <h3 className="font-semibold">Team Member Document</h3>
+            {/* Student card */}
+            {(studentCard?.media.url && studentCard?.type) ?
+            (<FileRequirements 
+                file={studentCard}
+                editable={true}
                 teamID={teamID}
-                typeID={studentCard.typeID}
-            />
-            <FileRequirements 
-                filetype="Poster" 
-                url={poster.url}  
-                editable={!isTeamLeader} 
+                competitionID={competitionID}
+                userID={userID}
+                />) : (
+                    <p className="text-lg text-red-100">Student ID Card not found</p>
+                )
+            }
+
+        {/* Student poster */}
+            {(poster?.type && poster?.media.url) ? (
+                <FileRequirements 
+                file={poster}
+                editable={true}
                 teamID={teamID}
-                typeID={poster.typeID}
-            />
-            <FileRequirements 
-                filetype="Twibbon" 
-                url={twibbon.url}  
-                editable={!isTeamLeader}
+                competitionID={competitionID}
+                userID={userID}
+                />
+            ) : (
+                <p className="text-lg text-red-100">Poster not found</p>
+            )}
+
+        {/* Student twibbon */}
+            {(twibbon?.type && twibbon?.media.url) ? (
+                
+                <FileRequirements 
+                file={twibbon} 
+                editable={true}
                 teamID={teamID}
-                typeID={twibbon.typeID}
-            />
+                competitionID={competitionID}
+                userID={userID}
+                />
+            ) : (
+                <p className="text-lg text-red-100">Twibbon not found</p>
+            )}
         </div>
     )
 }
@@ -297,7 +367,8 @@ export default function TeamInfo(
         members,
         submissionsTypeID,
         existsSubmission, 
-        paymentProof
+        paymentProof,
+        competitionID
     } : GetTeamDetailResponse) 
     {
 
@@ -313,28 +384,18 @@ export default function TeamInfo(
     return (
         <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 shadow-lg px-[2rem] py-[1rem] font-dmsans">
             <div className="mb-3 mr-2">
-                <h1 className="font-teachers font-bold text-[32px]">Verfication</h1>
+                <h1 className="font-teachers font-bold text-[32px]">Verification</h1>
             </div>
-            <PaymentProof url={paymentProof.url} teamID={teamID} typeID={paymentProof.typeID} />
+            { paymentProof ? (
+                <PaymentProof file={paymentProof} teamID={teamID} competitionID={competitionID} />
+            ) :
+            (<p className="text-xl mb-4 text-white font-bold py-2 px-2 border-[1px] border-white rounded-sm">Payment proof document not found</p>)
+            }
             <div className={cn("xl:grid-cols-3 grid-cols-1 gap-7", members ? 'grid' : 'hidden')}>
                 {
-                    members && 
+                    members && submissionsTypeID &&
                     members.map((member, index) => {
                         const data = submissionsTypeID.find((data) => data.name === member.user?.fullName);
-
-                        const studentCard = {
-                            url: member.kartu?.url ? member.kartu.url : URL_PLACEHOLDER,
-                            typeID: data?.studentCard ? data.studentCard : TYPE_ID_PLACEHOLDER
-                        }
-                        const poster = {
-                            url: member.poster?.url ? member.poster.url : URL_PLACEHOLDER,
-                            typeID: data?.poster ? data.poster : TYPE_ID_PLACEHOLDER
-                        }
-                        const twibbon = {
-                            url: member.twibbon?.url ? member.twibbon.url : URL_PLACEHOLDER,
-                            typeID: data?.twibbon ? data.twibbon : TYPE_ID_PLACEHOLDER
-                        }
-
                         return (
                             <MemberCard 
                                 key={index} 
@@ -343,14 +404,17 @@ export default function TeamInfo(
                                 email={member.user?.email ? member.user?.email : DEFAULT_FIELD} 
                                 phone={member.user?.phoneNumber ? member.user.phoneNumber.toString() : DEFAULT_FIELD} 
                                 isTeamLeader={member.role === 'leader'}
-                                studentCard={studentCard}
-                                poster={poster}
-                                twibbon={twibbon}
+                                studentCard={data?.studentCard || null}
+                                poster={data?.poster || null}
+                                twibbon={data?.twibbon || null}
+                                competitionID={competitionID}
+                                userID={member.userId}
                             />
                         )
                     })
                 }
             </div>
+            {/* // TODO: integrate submission for UXVidia and Hackvidia */}
             {
                 !existsSubmission && (
                     <>

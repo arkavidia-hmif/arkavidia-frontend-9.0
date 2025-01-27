@@ -33,6 +33,7 @@ function TeamDetails() {
     const [teamData, setTeamData] = useState<GetAdminCompetitionTeamInformationResponse>();
     const [teamSubmission, setTeamSubmission] = useState<submissionsTypeID>()
     const axiosAuth = useAxiosAuth();
+    const [competitionID, setCompetitionID] = useState<string>('')
     
     async function validateCompetition(value: string | null): Promise<boolean> {
         if (!value) {
@@ -103,6 +104,7 @@ function TeamDetails() {
         };
     
         fetchTeamData();
+        setCompetitionID(params.competitionID as string)
     }, [params, axiosAuth]);
     
     useEffect(() => {
@@ -192,6 +194,7 @@ function TeamDetails() {
                         content={[
                             <TeamInfo 
                                 key="team-info"
+                                competitionID={competitionID}
                                 members={teamData?.teamMembers}
                                 paymentProof={paymentProof}
                                 teamID={teamData.id}
@@ -207,6 +210,7 @@ function TeamDetails() {
                         content={[
                             <TeamInfo 
                                 key="team-info"
+                                competitionID={competitionID}
                                 members={teamData?.teamMembers}
                                 paymentProof={paymentProof}
                                 submissionsTypeID={teamSubmission}   
