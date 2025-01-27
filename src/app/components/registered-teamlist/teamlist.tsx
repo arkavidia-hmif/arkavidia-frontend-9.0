@@ -49,28 +49,31 @@ const getPaginationRange = (current: number, total: number, delta = 2) => {
 
   if (left > 2) range.push('...')
   for (let i = left; i <= right; i++) range.push(i)
-if (right < total - 1) range.push('...')
+  if (right < total - 1) range.push('...')
   if (total > 1) range.push(total)
-    
-    return range
-  }
-  
-  //! HARDCODED
+
+  return range
+}
+
+//! HARDCODED
 // Function to get team status
 export const getTeamStatus = (team: Team) => {
   return team.verificationStatus
 }
 
-export type TeamStatus =
-  Team['verificationStatus']
+export type TeamStatus = Team['verificationStatus']
 
 //! HARDCODED
 export const possibleTeamStatus: Array<NonNullable<TeamStatus>> = [
-  'VERIFIED' , 'DENIED' , 'WAITING' , 'CHANGED' ]
-  
-  //! HARDCODED
-  // Map status to their tag color
-  export const mapStatusTag: Record<
+  'VERIFIED',
+  'DENIED',
+  'WAITING',
+  'CHANGED'
+]
+
+//! HARDCODED
+// Map status to their tag color
+export const mapStatusTag: Record<
   string,
   | 'success'
   | 'warning'
@@ -81,18 +84,18 @@ export const possibleTeamStatus: Array<NonNullable<TeamStatus>> = [
   | 'pink'
   | 'blue'
   | 'neutral'
-  > = {
-    'VERIFIED': 'success',
-    'DENIED': 'danger',
-    'WAITING': 'warning',
-    'CHANGED': 'blue',
-    'NO STATUS YET': 'neutral'
-  }
-  
-  export type TeamStage = Team['stage']
-  
-  //! HARDCODED
-  export const mapStageTag: Record<
+> = {
+  VERIFIED: 'success',
+  DENIED: 'danger',
+  WAITING: 'warning',
+  CHANGED: 'blue',
+  'NO STATUS YET': 'neutral'
+}
+
+export type TeamStage = Team['stage']
+
+//! HARDCODED
+export const mapStageTag: Record<
   string,
   | 'success'
   | 'warning'
@@ -105,11 +108,15 @@ export const possibleTeamStatus: Array<NonNullable<TeamStatus>> = [
   | 'neutral'
 > = {
   'pre-eliminary': 'danger',
-  'final': 'success',
-  'verification': 'warning'
+  final: 'success',
+  verification: 'warning'
 }
 
-export const possibleCompetitionStatus: Array<TeamStage> = ['pre-eliminary', 'final', 'verification']
+export const possibleCompetitionStatus: Array<TeamStage> = [
+  'pre-eliminary',
+  'final',
+  'verification'
+]
 
 export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   teamData,
@@ -267,14 +274,14 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                       <Tag
                         text={getTeamStatus(team) || 'No Status Yet'}
                         variant={mapStatusTag[getTeamStatus(team) || 'NO STATUS YET']}
-                        className='capitalize'
-                        />
+                        className="capitalize"
+                      />
                     </TableCell>
                     <TableCell>
                       <Tag
                         text={capitalizeFirstLetter(team.stage)}
                         variant={mapStageTag[team.stage]}
-                        className='capitalize'
+                        className="capitalize"
                       />
                     </TableCell>
                     <TableCell>
