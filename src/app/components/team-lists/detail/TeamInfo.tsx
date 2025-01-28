@@ -19,7 +19,7 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
 
 /* NOTE: NULL verificationStatus should be indicated by no document uploaded yet.
- *  Assumption: frontend won't automatically change any status EXCEPT the user decided to
+ *  Assumption: frontend won't automatically change any status EXCEPT the user decided to.
  *  Assumption: frontend con't check if the verification status corresponding is
  */
 const DEFAULT_FIELD = 'has not been filled'
@@ -169,25 +169,35 @@ function FileRequirements({
       {file?.media?.url && file.type ? (
         <div className="rounded-lg border border-white px-6 py-3">
           {/* First Row: File URL, File Type and Status */}
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <ExternalLink size={24} />
-              <Link href={`https://${file.media.url}`} target="_blank">
+          <div className="mb-4 flex justify-between gap-5">
+            <Link href={`https://${file.media.url}`} target="_blank">
+              <div className="flex items-center gap-4">
+                <ExternalLink size={30} />
                 <p className="text-lg font-semibold text-white hover:underline">
                   {fileType[file.type]}
                 </p>
-              </Link>
-            </div>
+              </div>
+            </Link>
             {/* Document Status */}
-            <div className="text-right">
+            <div className="inline-block h-fit w-full break-words text-right">
               <p
                 className={`text-sm font-medium ${file?.isVerified ? 'text-green-300' : 'text-purple-100'}`}>
                 {file?.isVerified ? 'Verified' : 'Not Verified'}
               </p>
               {file?.verificationError && (
-                <p className="mt-1 text-sm text-red-100">
-                  <b>Rejection Reason:</b> {file.verificationError}
-                </p>
+                <div className="mt-1 text-right">
+                  <p className="textD-red-100 text-sm">
+                    <b>Rejection Reason:</b>
+                  </p>
+                  <p
+                    className="textD-red-100 break-words text-sm"
+                    style={{
+                      overflowWrap: 'break-word',
+                      wordBreak: 'break-word' // Ensures long words break
+                    }}>
+                    {file.verificationError}
+                  </p>
+                </div>
               )}
             </div>
           </div>
@@ -206,7 +216,7 @@ function FileRequirements({
               </div>
             )}
             {isFeedback && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Input
                   placeholder="Send what's wrong"
                   className="max-w-[250px]"
