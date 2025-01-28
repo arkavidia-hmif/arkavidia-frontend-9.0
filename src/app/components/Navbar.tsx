@@ -47,6 +47,10 @@ function Navbar() {
   }
 
   const checkHasFilledInfo = () => {
+    if (isAdmin) {
+      setTimeout(() => router.push('/dashboard/admin'), 500)
+      return
+    }
     if (!hasFilledInfo) {
       toast({
         title: 'Please fill in your information',
@@ -56,13 +60,10 @@ function Navbar() {
       })
       setTimeout(() => {
         router.push('/register/personal-data')
+        // router.push('/dashboard/admin')
       }, 500)
     } else {
-      if (isAdmin) {
-        setTimeout(() => router.push('/dashboard/admin'), 500)
-      } else {
-        setTimeout(() => router.push('/dashboard'), 500)
-      }
+      setTimeout(() => router.push('/dashboard'), 500)
     }
   }
 
@@ -84,9 +85,7 @@ function Navbar() {
     <nav
       className={cn(
         'fixed z-[100] w-full bg-transparent px-4 py-6 lg:px-12',
-        scrollY > 10
-          ? 'backdrop-blur-lg transition-all duration-300 ease-in-out'
-          : ''
+        scrollY > 10 ? 'backdrop-blur-lg transition-all duration-300 ease-in-out' : ''
       )}>
       <div className="flex flex-row items-center justify-between">
         <Link href="/" className="flex flex-row items-center justify-center gap-2 px-4">

@@ -42,7 +42,7 @@ function getTagStyling(variant: string) {
 function Tag({ variant, text, className }: TagProps) {
   const tagClass =
     getTagStyling(variant) +
-    ' border-4 border-solid flex w-full items-center justify-center py-1 px-1 text-xs md:text-sm lg:text-base min-w-[100px]'
+    ' border-4 border-solid flex w-full items-center justify-center py-1 px-1 text-xs md:text-sm lg:text-base min-w-[100px] text-center'
 
   return (
     <div className={cn(tagClass, 'rounded-[25px]', className)}>

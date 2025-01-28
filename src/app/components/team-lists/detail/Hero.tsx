@@ -9,7 +9,7 @@ import Tag from '../../Tag'
 interface ProfileHeroProps {
   teamName: string
   teamID: string
-  teamStatus: TeamStatus
+  teamStatus: string
   teamStage: string
 }
 
