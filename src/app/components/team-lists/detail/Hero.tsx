@@ -26,8 +26,8 @@ function Hero({ teamName, teamID, teamStatus, teamStage }: ProfileHeroProps) {
           </div>
           <div className="">
             <Tag
-              variant={mapStatusTag[teamStatus]}
-              text={teamStatus}
+              variant={mapStatusTag[teamStatus ? teamStatus : 'NO STATUS YET']}
+              text={teamStatus ? teamStatus : 'No Status Yet'}
               className="w-[100px] text-center capitalize lg:w-[240px] lg:text-left"
             />
           </div>
@@ -38,7 +38,7 @@ function Hero({ teamName, teamID, teamStatus, teamStage }: ProfileHeroProps) {
           </div>
           <div>
             <Tag
-              variant="danger"
+              variant={mapStageTag[teamStage]}
               text={teamStage}
               className="w-[100px] text-center capitalize lg:w-[240px] lg:text-left"
             />
