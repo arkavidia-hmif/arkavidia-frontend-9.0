@@ -1,12 +1,16 @@
 'use client'
 import React, { useEffect } from 'react'
 import FrameTugas from './FrameTugas'
-import { getCompetitionStatistic, GetCompetitionStatisticResponse } from '~/api/generated'
+import {
+  getAdminAllCompetitionTeams,
+  getCompetitionStatistic,
+  GetCompetitionStatisticResponse
+} from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
 
 interface FrameSubmissionsProps {
-  compe_id?: string
+  compe_id: string
   totalTeam: number
 }
 
@@ -22,8 +26,11 @@ const FrameSubmissions = ({ compe_id, totalTeam }: FrameSubmissionsProps) => {
     async function fetchCompetitionSubmission() {
       // fetch competition submission
       try {
-        const res = await getCompetitionStatistic({
-          client: axiosInstance
+        const res = await getAdminAllCompetitionTeams({
+          client: axiosInstance,
+          path: {
+            competitionId: compe_id
+          }
         })
 
         if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {

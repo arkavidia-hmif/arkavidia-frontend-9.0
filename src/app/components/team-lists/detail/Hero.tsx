@@ -20,28 +20,27 @@ function Hero({ teamName, teamID, teamStatus, teamStage }: ProfileHeroProps) {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between gap-4">
+        <div className="flex justify-between gap-4 lg:gap-8">
           <div className="flex items-center">
             <h1 className="font-teachers text-xl font-bold">Team Status</h1>
           </div>
-          <div className="mx-auto">
-            {/* //! HARDCODED */}
+          <div className="">
             <Tag
-              variant={mapStatusTag[teamStatus ? teamStatus : 'NO STATUS YET']}
-              text={teamStatus ? teamStatus : 'No Status Yet'}
-              className="px-6 capitalize"
+              variant={mapStatusTag[teamStatus]}
+              text={teamStatus}
+              className="w-[100px] text-center capitalize lg:w-[240px] lg:text-left"
             />
           </div>
         </div>
-        <div className="flex justify-between gap-4">
+        <div className="flex justify-between gap-4 lg:gap-8">
           <div className="flex items-center">
             <h1 className="font-teachers text-xl font-bold">Team Stage</h1>
           </div>
           <div>
             <Tag
-              variant={mapStageTag[teamStage]}
+              variant="danger"
               text={teamStage}
-              className="px-4 capitalize"
+              className="w-[100px] text-center capitalize lg:w-[240px] lg:text-left"
             />
           </div>
         </div>

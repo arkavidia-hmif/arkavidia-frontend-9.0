@@ -7,12 +7,12 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import {
   getCompetitionByName,
   GetCompetitionByNameData,
-  GetTeamStatisticResponse
+  GetCompetitionStatisticResponse
 } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
 import FrameInfoSkeleton from './FrameInfoSkeleton'
 
-const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
+const CompetitionContext = ({ result }: GetCompetitionStatisticResponse) => {
   const axiosInstance = useAxiosAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = React.useState(true)
@@ -25,8 +25,6 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
     { id: 5, option: 'Arkalogica' },
     { id: 6, option: 'Datavidia' },
     { id: 7, option: 'Hackvidia' }
-    // { id: 8, option: 'ArkavX' },
-    // { id: 9, option: 'Academya' }
   ]
 
   const [selectedCompetition, setSelectedCompetition] = React.useState<MenuItem | null>(
@@ -44,7 +42,7 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
         } as GetCompetitionByNameData)
 
         if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {
-          throw new Error('Competition not found')
+          // throw new Error('Competition not found')
         }
 
         const competitionId = (res.data as Array<{ id: string }>)[0].id
@@ -65,7 +63,6 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
           variant: 'warning'
         })
         setCompNumber({ unverified: 0, registered: 0 })
-        setSelectedCompetitionId('')
       } finally {
         setIsLoading(false)
       }
@@ -115,12 +112,12 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
       </div>
 
       {/* Submissions */}
-      {!isLoading && selectedCompetitionId && (
+      {/* {!isLoading && selectedCompetitionId && (
         <FrameSubmissions
           compe_id={selectedCompetitionId}
           totalTeam={CompNumber.registered}
         />
-      )}
+      )} */}
     </>
   )
 }

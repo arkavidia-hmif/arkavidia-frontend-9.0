@@ -8,7 +8,7 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useRouter } from 'next/navigation'
 import { useToast } from '~/hooks/use-toast'
 import { useAppSelector } from '~/redux/store'
-import { getTeamStatistic, GetTeamStatisticResponse } from '~/api/generated'
+import { getCompetitionStatistic, GetCompetitionStatisticResponse } from '~/api/generated'
 import FrameInfoSkeleton from '~/app/components/admin-dashboard/FrameInfoSkeleton'
 
 const AdminDashboardPage = () => {
@@ -37,16 +37,16 @@ const AdminDashboardPage = () => {
     unverified: 0,
     registered: 0
   })
-  const [stats, setStats] = React.useState<GetTeamStatisticResponse>()
+  const [stats, setStats] = React.useState<GetCompetitionStatisticResponse>()
 
   useEffect(() => {
     ;(async () => {
       try {
-        const statsResponse = await getTeamStatistic({ client: axiosInstance })
+        const statsResponse = await getCompetitionStatistic({ client: axiosInstance })
         const data = statsResponse.data
 
-        const totalVerified = data?.totalVerifiedTeam ?? 0
-        const totalTeam = data?.totalTeam ?? 0
+        const totalVerified = data?.verifiedCount ?? 0
+        const totalTeam = data?.count ?? 0
 
         setOverallStats({
           registered: totalVerified,
@@ -121,8 +121,8 @@ const AdminDashboardPage = () => {
 
       {/* Competition */}
       <CompetitionContext
-        totalTeam={stats?.totalTeam ?? 0}
-        totalVerifiedTeam={stats?.totalVerifiedTeam ?? 0}
+        count={stats?.count ?? 0}
+        verifiedCount={stats?.verifiedCount ?? 0}
         result={stats?.result || []}
       />
     </>
