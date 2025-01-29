@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
-import { getCompetitionByName, getCompetitionParticipant } from '~/api/generated'
+import { getAdminAllCompetitionTeams, getCompetitionByName } from '~/api/generated'
 import { Team } from '~/api/generated'
 
 import { useToast } from '~/hooks/use-toast'
@@ -11,6 +11,7 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 
 import { RegisteredTeamList } from '~/app/components/registered-teamlist/teamlist'
 import Loading from '~/app/components/Loading'
+import { AxiosError } from 'axios'
 
 interface Pagination {
   currentPage: number
@@ -64,7 +65,7 @@ function AdminCompetitionDashboard() {
       setIsCompetitionFound(true)
       setCurrentCompetitionId(competitions.data[0].id)
 
-      const response = await getCompetitionParticipant({
+      const response = await getAdminAllCompetitionTeams({
         client: authAxios,
         path: { competitionId: competitions.data[0].id },
         query: { page: page.toString(), limit: limit }
@@ -91,8 +92,13 @@ function AdminCompetitionDashboard() {
           prev: null
         })
       }
-    } catch (error) {
-      console.error('Error fetching teams:', error)
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      toast({
+        title: 'Failed to fetch teams',
+        description: error.message,
+        variant: 'destructive'
+      })
     } finally {
       setIsLoading(false)
     }
@@ -136,12 +142,17 @@ function AdminCompetitionDashboard() {
           No competition found with the name "${params.competition}"
         </h1>
       ) : (
-        <RegisteredTeamList
+        currentCompetitionId === null ? 
+        (<div className='font-belanosima text-2xl text-whitemd:text-3xl'>
+          Competition ID not valid
+        </div>) 
+        :
+        (<RegisteredTeamList
           teamData={teamData}
           pagination={pagination}
-          competitionId={currentCompetitionId ?? null}
+          competitionId={currentCompetitionId}
           onPageChange={handlePageChange}
-        />
+        />)
       )}
     </>
   )

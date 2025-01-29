@@ -21,7 +21,6 @@ import { Input } from './../ui/input'
 import { Search, Pencil } from 'lucide-react'
 import { Team } from '~/api/generated'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { capitalizeFirstLetter } from '~/lib/utils'
 
 interface Pagination {
@@ -35,7 +34,7 @@ interface Pagination {
 interface RegisteredTeamListProps {
   teamData: Team[]
   pagination: Pagination
-  competitionId: string | null
+  competitionId: string | 'null'
   onPageChange: (newPage: number) => void // Callback for handling page changes
 }
 
@@ -56,34 +55,23 @@ const getPaginationRange = (current: number, total: number, delta = 2) => {
   return range
 }
 
+//! HARDCODED
 // Function to get team status
 export const getTeamStatus = (team: Team) => {
-  if (!team.document?.[0]) {
-    return 'Payment Not Submitted'
-  } else if (team.document?.[0].isVerified) {
-    return 'Verified'
-  } else if (team.document?.[0].verificationError) {
-    return 'Rejected'
-  } else if (!team.document?.[0].isVerified) {
-    return 'Not Verified'
-  } else {
-    return ''
-  }
+  return team.verificationStatus
 }
 
-export type TeamStatus =
-  | 'Verified'
-  | 'Rejected'
-  | 'Not Verified'
-  | 'Payment Not Submitted'
-  | ''
-export const possibleTeamStatus: Array<TeamStatus> = [
-  'Verified',
-  'Rejected',
-  'Not Verified',
-  'Payment Not Submitted'
+export type TeamStatus = Team['verificationStatus']
+
+//! HARDCODED
+export const possibleTeamStatus: Array<NonNullable<TeamStatus>> = [
+  'VERIFIED',
+  'DENIED',
+  'WAITING',
+  'CHANGED'
 ]
 
+//! HARDCODED
 // Map status to their tag color
 export const mapStatusTag: Record<
   string,
@@ -97,12 +85,16 @@ export const mapStatusTag: Record<
   | 'blue'
   | 'neutral'
 > = {
-  Verified: 'success',
-  Rejected: 'warning',
-  'Not Verified': 'danger',
-  'Payment Not Submitted': 'blue'
+  VERIFIED: 'success',
+  DENIED: 'danger',
+  WAITING: 'warning',
+  CHANGED: 'blue',
+  'NO STATUS YET': 'neutral'
 }
 
+export type TeamStage = Team['stage']
+
+//! HARDCODED
 export const mapStageTag: Record<
   string,
   | 'success'
@@ -115,11 +107,16 @@ export const mapStageTag: Record<
   | 'blue'
   | 'neutral'
 > = {
-  'Pre-eliminary': 'danger',
-  Final: 'success'
+  'pre-eliminary': 'danger',
+  final: 'success',
+  verification: 'warning'
 }
 
-export const possibleCompetitionStatus = ['pre-eliminary', 'final']
+export const possibleCompetitionStatus: Array<TeamStage> = [
+  'pre-eliminary',
+  'final',
+  'verification'
+]
 
 export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   teamData,
@@ -155,7 +152,6 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
       // Check if CompetitionStatusFilter is not set or matches the verification status
       const matchesCompetitionStatus =
         !CompetitionStatusFilter || team.stage === CompetitionStatusFilter.toLowerCase()
-      // TODO: add field untuk menampilkan stage tim
 
       // Check if the team name or team ID contains the search term (case-insensitive)
       const matchesSearchTerm =
@@ -276,14 +272,16 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                     <TableCell>{team.name}</TableCell>
                     <TableCell>
                       <Tag
-                        text={getTeamStatus(team)}
-                        variant={mapStatusTag[getTeamStatus(team)]}
+                        text={getTeamStatus(team) || 'No Status Yet'}
+                        variant={mapStatusTag[getTeamStatus(team) || 'NO STATUS YET']}
+                        className="capitalize"
                       />
                     </TableCell>
                     <TableCell>
                       <Tag
                         text={capitalizeFirstLetter(team.stage)}
-                        variant={mapStageTag[capitalizeFirstLetter(team.stage)]}
+                        variant={mapStageTag[team.stage]}
+                        className="capitalize"
                       />
                     </TableCell>
                     <TableCell>
