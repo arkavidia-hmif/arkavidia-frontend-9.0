@@ -120,6 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           appDispatch(setAdmin())
         }
         res.ok = true
+        await sessionCheck()
         setTimeout(() => {
           if (!hasFilledInfo) {
             router.replace('/register/personal-data')
@@ -137,7 +138,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         logout,
-        basicLogin
+        basicLogin,
+        sessionCheck
       }}>
       {children}
     </AuthContext.Provider>
