@@ -1,4 +1,5 @@
 'use client'
+'use client'
 
 import { Tab } from '~/app/components/Tab'
 import TeamInfo from '~/app/components/team-lists/detail/TeamInfo'
