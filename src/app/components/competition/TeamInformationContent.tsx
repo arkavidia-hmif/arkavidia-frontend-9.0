@@ -6,7 +6,9 @@ import {
   getTeamMembers,
   putChangeTeamName,
   getUser,
-  deleteTeamMember
+  deleteTeamMember,
+  getTeamById,
+  TeamMember
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import Image from 'next/image'
@@ -15,6 +17,7 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import Loading from '../Loading'
 import { DangerDialog } from '../DangerDialog'
+import VerificationBox, { VerificationBoxMessage } from './VerificationBox'
 
 // ProfileData Component
 const capitalizeFirstLetter = (str: string) => {
@@ -169,7 +172,7 @@ export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
 
   return (
     <div className="flex w-full flex-row">
-      <div className="flex w-full flex-row justify-between text-white">
+      <div className="flex w-full flex-row text-white">
         <div className="flex w-full flex-col gap-0">
           <div className="relative">
             {/* Display Value Section */}
@@ -250,9 +253,28 @@ export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
   )
 }
 
+const checkMemberVerification = (member: TeamMember) => {
+  let verified = true
+  if (!member.document || member.document.length === 0) {
+    verified = false
+  }
+
+  member.document?.forEach(doc => {
+    if (!doc.isVerified) {
+      verified = false
+    }
+  })
+
+  return verified
+}
+
 const TeamInformationContent = ({ compeName }: { compeName: string }) => {
   const [teamName, setTeamName] = useState<string>('')
   const [teamId, setTeamId] = useState<string>('')
+  const [isTeamVerified, setIsTeamVerified] = useState<boolean>(false)
+  const [verificationErrors, setVerificationErrors] = useState<
+    VerificationBoxMessage[] | null
+  >(null)
   const [currentUserId, setCurrentUserId] = useState<string>('')
   const [userRole, setUserRole] = useState<string>('Member')
   const [members, setMembers] = useState<
@@ -279,19 +301,61 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
             setTeamName(selectedTeam.name)
             setTeamId(selectedTeam.id)
 
-            const membersResponse = await getTeamMembers({
+            const teamDataResponse = await getTeamById({
               client: authAxios,
-              path: { teamId: selectedTeam.id }
+              path: {
+                teamId: selectedTeam.id
+              }
             })
 
-            const transformedMembers = Array.isArray(membersResponse.data)
-              ? membersResponse.data.map(member => {
+            const teamData = teamDataResponse.data?.verificationStatus
+            setIsTeamVerified(teamData === 'VERIFIED')
+            const teamMembers = teamDataResponse.data?.teamMembers
+            setVerificationErrors(null)
+
+            if (teamDataResponse.data?.document?.[0].verificationError) {
+              const verif = {
+                username: 'Team',
+                type: 'Bukti Pembayaran',
+                message: teamDataResponse.data?.document?.[0].verificationError
+              }
+              setVerificationErrors(prev => (prev ? [...prev, verif] : [verif]))
+            }
+
+            const transformedMembers = Array.isArray(teamMembers)
+              ? teamMembers.map(member => {
                   if (member.userId === userId) {
                     setUserRole(member.role)
                   }
+
+                  if (
+                    member.user?.document?.[0].verificationError &&
+                    member.user?.document?.[0].verificationError.length
+                  ) {
+                    const userIdentityCardError = {
+                      username: member.user?.fullName || 'No name data',
+                      type: 'Kartu identitas',
+                      message: member.user?.document?.[0].verificationError
+                    }
+                    setVerificationErrors(prev =>
+                      prev ? [...prev, userIdentityCardError] : [userIdentityCardError]
+                    )
+                  }
+
+                  member.document?.forEach(doc => {
+                    if (doc.verificationError && doc.verificationError.length) {
+                      const verif = {
+                        username: member.user?.fullName || 'No name data',
+                        type: doc.type,
+                        message: doc.verificationError
+                      }
+                      setVerificationErrors(prev => (prev ? [...prev, verif] : [verif]))
+                    }
+                  })
+
                   return {
                     name: member.user?.fullName || 'No Name',
-                    verified: member.document?.isVerified || false,
+                    verified: checkMemberVerification(member) || false,
                     title: member.role || 'Member',
                     id: member.userId || 'null'
                   }
@@ -329,7 +393,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
   }
 
   return (
-    <div className="flex flex-col justify-between gap-8 rounded-lg border border-[rgba(255,255,255,0.80)] bg-[linear-gradient(93deg,rgba(2,2,2,0.30)_7.52%,rgba(113,56,192,0.60)_104.77%)] px-10 pb-72 pt-20 shadow-lg md:flex-row md:gap-36">
+    <div className="flex flex-col justify-between gap-8 rounded-lg border border-[rgba(255,255,255,0.80)] bg-[linear-gradient(93deg,rgba(2,2,2,0.30)_7.52%,rgba(113,56,192,0.60)_104.77%)] px-10 py-20 shadow-lg md:flex-row md:gap-12 lg:gap-16">
       <div className="flex w-1/2 flex-col gap-8">
         <TeamData name={teamName} title="Team Name" teamId={teamId} userRole={userRole} />
         {members.map((member, index) => (
@@ -345,6 +409,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
           />
         ))}
       </div>
+      <VerificationBox verifications={verificationErrors} />
     </div>
   )
 }

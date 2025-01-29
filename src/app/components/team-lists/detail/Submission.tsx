@@ -3,7 +3,7 @@
 import { TeamStatus } from './TeamInfo'
 import MessageBox from './MessageBox'
 import { useEffect, useState } from 'react'
-import { getCompetitionSubmissionTeam } from '~/api/generated'
+import { getTeamSubmission } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useParams } from 'next/navigation'
 import SubmissionTable, { SubmissionDoc } from './SubmissionTable'
@@ -121,7 +121,7 @@ export default function Submission() {
   useEffect(() => {
     const fetchData = async () => {
       if (teamId && typeof teamId === 'string') {
-        const response = await getCompetitionSubmissionTeam({
+        const response = await getTeamSubmission({
           client: axiosAuth,
           path: { teamId: teamId }
         }).then(res => res.data)
@@ -157,7 +157,7 @@ export default function Submission() {
               }
             ]
 
-            if (submission.media) {
+            if (submission.submission?.media) {
               const mediaIndex = defaultDocs.findIndex(doc =>
                 doc.title.toLowerCase().includes(submission.requirement.typeName)
               )
@@ -165,8 +165,8 @@ export default function Submission() {
               if (mediaIndex !== -1) {
                 defaultDocs[mediaIndex] = {
                   ...defaultDocs[mediaIndex],
-                  file_name: submission.media.name,
-                  file_url: submission.media.url,
+                  file_name: submission.submission.media.name,
+                  file_url: submission.submission.media.url,
                   status: 'Submitted'
                 }
               }
@@ -190,7 +190,7 @@ export default function Submission() {
               stageSuccess,
               stageFailed,
               submissionDocs: defaultDocs,
-              feedback: submission.competition_submission?.judgeResponse || undefined
+              feedback: submission.submission?.judgeResponse || undefined
             }
           }) || []
 

@@ -6,10 +6,9 @@ import {
   Team,
   getUser,
   getCompetitionTimelineWithCompetitionId,
-  getCompetitionSubmissionRequirement,
-  getAdminCompAnnouncement,
   GetCompetitionTimelineWithCompetitionIdResponse,
-  GetCompetitionTimelineWithCompetitionIdData
+  GetCompetitionTimelineWithCompetitionIdData,
+  getTeamSubmission
 } from '~/api/generated'
 import { toast } from '~/hooks/use-toast'
 import { useRouter } from 'next/navigation'
@@ -121,7 +120,7 @@ const getNearestDeadline = (data: GetCompetitionTimelineWithCompetitionIdRespons
       date: new Date(item.endDate || item.startDate),
       stageName: item.title
     }))
-    .sort((a, b) => a.date.getTime() - b.date.getTime());
+    .sort((a, b) => a.date.getTime() - b.date.getTime())
 
   if (deadlines.length === 0) {
     return null
@@ -252,7 +251,7 @@ function UserDashboard() {
   useEffect(() => {
     async function fetchSubmission() {
       if (currentTeam) {
-        const submissionData = await getCompetitionSubmissionRequirement({
+        const submissionData = await getTeamSubmission({
           client: axiosAuth,
           path: { teamId: currentTeam.id }
         })
@@ -312,10 +311,12 @@ function UserDashboard() {
 
   const events = []
   if (competitionTimeline) {
-    team_stage = currentTeam?.stage ? (currentTeam.stage.charAt(0).toUpperCase() + currentTeam.stage.slice(1)) : 'placeholder-stage'
+    team_stage = currentTeam?.stage
+      ? currentTeam.stage.charAt(0).toUpperCase() + currentTeam.stage.slice(1)
+      : 'placeholder-stage'
     const event_stage = getNearestDeadline(competitionTimeline)
     stage_deadline = event_stage?.date
-    stage_name = event_stage?.stageName || 'placeholder-stage';
+    stage_name = event_stage?.stageName || 'placeholder-stage'
     const transformedData = transformEventData(competitionTimeline)
     events.push(...transformedData)
   }

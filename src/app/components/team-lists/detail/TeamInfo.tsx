@@ -181,7 +181,7 @@ function FileRequirements({
             {/* Document Status */}
             <div className="inline-block h-fit w-full break-words text-right">
               <p
-                className={`text-sm font-medium ${file?.isVerified ? 'text-green-300' : 'text-purple-100'}`}>
+                className={`pt-1 text-sm font-medium lg:text-[20px] ${file?.isVerified ? 'text-green-300' : 'text-purple-100'}`}>
                 {file?.isVerified ? 'Verified' : 'Not Verified'}
               </p>
               {file?.verificationError && (
@@ -203,8 +203,8 @@ function FileRequirements({
           </div>
 
           {/* "Ganti Status" and Buttons */}
-          <div className="flex flex-col gap-3">
-            <p className="text-white">Ganti Status</p>
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
+            <p className="text-white lg:text-[20px]">Ganti Status</p>
             {editable && !isFeedback && (
               <div className="flex gap-3">
                 <Button variant="outline" size="sm" onClick={() => setIsFeedback(true)}>

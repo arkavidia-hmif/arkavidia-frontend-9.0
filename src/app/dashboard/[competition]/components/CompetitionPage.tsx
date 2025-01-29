@@ -11,14 +11,11 @@ import { Button } from '../../../components/ui/button'
 import { Tab } from '../../../components/Tab'
 import { ChevronLeft } from 'lucide-react'
 import {
-  getCompetitionSubmissionRequirement,
-  GetCompetitionSubmissionRequirementResponse,
-  GetPresignedLinkData,
   getTeamById,
-  getTeamMemberById,
   getTeams,
   GetTeamsResponse,
-  getUser,
+  getTeamSubmission,
+  GetTeamSubmissionResponse,
   postTeamDocument,
   self,
   Team,
@@ -51,9 +48,10 @@ interface Verification {
   id: string
   isVerified: boolean
   type: 'bukti-pembayaran' | 'poster' | 'twibbon'
-  status: 'unsubmitted' | 'submitted' | 'verified'
+  status: 'unsubmitted' | 'submitted' | 'verified' | 'rejected'
   mediaLink?: string
   mediaName?: string
+  rejectionMessage?: string
 }
 
 interface TeamVerification extends Verification {
@@ -126,7 +124,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           const currentUserData = await self({ client: axiosInstance })
           setCurrentUserId(currentUserData.data?.id ?? '')
 
-          const requirementsResponse = await getCompetitionSubmissionRequirement({
+          const requirementsResponse = await getTeamSubmission({
             client: axiosInstance,
             path: { teamId }
           })
@@ -150,11 +148,18 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             }
           } else {
             const isVerified = teamVerifData?.data?.document?.[0].isVerified ?? false
+            const verificationError = teamVerifData?.data?.document?.[0].verificationError
+            const isRejected =
+              verificationError !== '' ||
+              verificationError !== null ||
+              verificationError !== undefined
             teamVerification = {
               id: 'team-0',
               teamId: teamId,
               type: 'bukti-pembayaran',
-              status: isVerified ? 'verified' : 'submitted',
+              status: isVerified ? 'verified' : isRejected ? 'rejected' : 'submitted',
+              rejectionMessage:
+                teamVerifData?.data?.document?.[0].verificationError ?? '',
               isVerified: isVerified,
               mediaLink: teamVerifData.data?.document?.[0].media.url,
               mediaName: teamVerifData.data?.document?.[0].media.name
@@ -188,12 +193,18 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               })
             } else {
               const isVerified = memberDoc.isVerified ?? false
+              const verificationError = memberDoc.verificationError
+              const isRejected =
+                verificationError !== '' ||
+                verificationError !== null ||
+                verificationError !== undefined
               memberVerifications.push({
                 id: `member-${index}`,
                 userId: currentUserData.data?.id,
                 type: docType as 'poster' | 'twibbon',
                 isVerified: isVerified,
-                status: isVerified ? 'verified' : 'submitted',
+                rejectionMessage: memberDoc.verificationError ?? '',
+                status: isVerified ? 'verified' : isRejected ? 'rejected' : 'submitted',
                 mediaLink: memberDoc.media.url,
                 mediaName: memberDoc.media.name
               })
@@ -248,16 +259,14 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
   }, [])
 
   const getStatusTask = (
-    data: GetCompetitionSubmissionRequirementResponse extends (infer ElementType)[]
-      ? ElementType
-      : never
+    data: GetTeamSubmissionResponse extends (infer ElementType)[] ? ElementType : never
   ) => {
     const isDeadline = Date.now() > new Date(data.requirement.deadline ?? '').getTime()
-    if (data.media == null && !isDeadline) {
+    if (data.submission?.media === null && !isDeadline) {
       return 'notopened'
-    } else if (data.media !== null && !isDeadline) {
+    } else if (data.submission?.media !== null && !isDeadline) {
       return 'ongoing'
-    } else if (data.media !== null && isDeadline) {
+    } else if (data.submission?.media !== null && isDeadline) {
       return 'complete'
     }
     return 'notopened'
@@ -268,6 +277,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
       return 'bg-gradient-to-r from-white/20 to-[#FACCCCCC]/80'
     if (status === 'submitted') return 'bg-gradient-to-r from-white/20 to-[#FFCC00CC]/80'
     if (status === 'verified') return 'bg-gradient-to-r from-white/20 to-[#4D06B0CC]/80'
+    if (status === 'rejected') return 'bg-gradient-to-r from-white/20 to-[#E50000]/80'
     return 'bg-gradient-to-r from-white/20 to-[#FACCCCCC]/80'
   }
 
@@ -290,6 +300,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     if (status === 'unsubmitted') return 'border-[#FACCCCCC] text-[#FACCCCCC]'
     if (status === 'submitted') return 'border-[#FFCC00CC] text-[#FFCC00CC]'
     if (status === 'verified') return 'border-[#c8a5f9] text-[#c8a5f9]'
+    if (status === 'rejected') return 'border-[#E50000] text-[#E50000]'
     return 'border-[#E50000] text-[#E50000]'
   }
 
@@ -309,6 +320,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     if (status === 'unsubmitted') return 'Unsubmitted'
     if (status === 'submitted') return 'Submitted'
     if (status === 'verified') return 'Verified'
+    if (status === 'rejected') return 'Rejected'
     return 'Unsubmitted'
   }
 
@@ -464,7 +476,9 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               <AccordionContent className="-mt-2 rounded-lg border border-white px-5 py-7">
                 <p
                   className="text-base md:text-lg"
-                  dangerouslySetInnerHTML={{ __html: task.description.replace(/\n/g, '<br />') }}
+                  dangerouslySetInnerHTML={{
+                    __html: task.description.replace(/\n/g, '<br />')
+                  }}
                 />
                 <div className="mt-5 flex w-full items-center gap-3 md:justify-end">
                   <p
@@ -571,6 +585,14 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                   name={verif.mediaName}
                 />
                 {/* End of File URL Preview */}
+                {verif.status === 'rejected' && (
+                  <div className="pt-2">
+                    <p className="font-teachers text-xl font-bold">Alasan penolakan</p>
+                    <p className="font-dmsans text-[1rem] text-lg font-normal">
+                      {capitalizeFirstLetter(verif.rejectionMessage!)}
+                    </p>
+                  </div>
+                )}
                 <div className="mt-5 flex w-full items-center gap-3 md:justify-end">
                   <p
                     className={`flex h-10 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getVerifStatusColor(verif.status)}`}>
