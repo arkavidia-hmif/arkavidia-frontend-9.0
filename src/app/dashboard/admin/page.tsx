@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '~/hooks/use-toast'
 import { useAppSelector } from '~/redux/store'
 import { getTeamStatistic, GetTeamStatisticResponse } from '~/api/generated'
+import FrameInfoSkeleton from '~/app/components/admin-dashboard/FrameInfoSkeleton'
 
 const AdminDashboardPage = () => {
   const isAuthenticated = useAppSelector(state => state.auth.accessToken !== null)
@@ -33,22 +34,35 @@ const AdminDashboardPage = () => {
   const IMAGE = '/images/sidebar/item.svg'
   const axiosInstance = useAxiosAuth()
   const [overallStats, setOverallStats] = React.useState({
-    unverified: -1,
-    registered: -1
+    unverified: 0,
+    registered: 0
   })
   const [stats, setStats] = React.useState<GetTeamStatisticResponse>()
 
   useEffect(() => {
     ;(async () => {
-      const statsResponse = await getTeamStatistic({ client: axiosInstance })
-      setStats(statsResponse.data)
-      const registered = statsResponse.data?.totalVerifiedTeam || -1 // -1 if null / undefined
-      const unverified =
-        statsResponse.data?.totalTeam && statsResponse.data?.totalVerifiedTeam
-          ? statsResponse.data.totalTeam - statsResponse.data.totalVerifiedTeam
-          : -1
-      setOverallStats({ unverified, registered })
-      setIsLoading(false)
+      try {
+        const statsResponse = await getTeamStatistic({ client: axiosInstance })
+        const data = statsResponse.data
+
+        const totalVerified = data?.totalVerifiedTeam ?? 0
+        const totalTeam = data?.totalTeam ?? 0
+
+        setOverallStats({
+          registered: totalVerified,
+          unverified: totalTeam - totalVerified
+        })
+
+        setStats(data)
+        setIsLoading(false)
+      } catch (error) {
+        toast({
+          title: 'Error',
+          description: `Failed to fetch statistics: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          variant: 'destructive'
+        })
+        setIsLoading(false)
+      }
     })()
   }, [])
 
@@ -81,16 +95,25 @@ const AdminDashboardPage = () => {
 
       {/* Overall Participant */}
       <div className="my-4 flex flex-col items-center justify-between gap-4 md:my-8 md:flex-row md:gap-10">
-        <FrameInfo
-          number={overallStats.registered}
-          helperText={'Overall Registered Participants'}
-          imgSrc={'/images/admin-dashboard/supervisor-acc.svg'}
-        />
-        <FrameInfo
-          number={overallStats.unverified}
-          helperText={'Overall Unverified Participants'}
-          imgSrc={'/images/admin-dashboard/unverified-acc.svg'}
-        />
+        {isLoading ? (
+          <>
+            <FrameInfoSkeleton />
+            <FrameInfoSkeleton />
+          </>
+        ) : (
+          <>
+            <FrameInfo
+              number={overallStats.registered}
+              helperText={'Overall Registered Participants'}
+              imgSrc={'/images/admin-dashboard/supervisor-acc.svg'}
+            />
+            <FrameInfo
+              number={overallStats.unverified}
+              helperText={'Overall Unverified Participants'}
+              imgSrc={'/images/admin-dashboard/unverified-acc.svg'}
+            />
+          </>
+        )}
       </div>
 
       {/* break line */}

@@ -10,6 +10,7 @@ import {
   GetTeamStatisticResponse
 } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
+import FrameInfoSkeleton from './FrameInfoSkeleton'
 
 const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
   const axiosInstance = useAxiosAuth()
@@ -92,16 +93,25 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
 
       {/* Competition Participants */}
       <div className="my-4 flex flex-col items-center justify-between gap-4 md:my-8 md:flex-row md:gap-10">
-        <FrameInfo
-          number={CompNumber.registered}
-          helperText={'Registered Participants'}
-          imgSrc={'/images/admin-dashboard/supervisor-acc.svg'}
-        />
-        <FrameInfo
-          number={CompNumber.unverified}
-          helperText={'Unverified Participants'}
-          imgSrc={'/images/admin-dashboard/unverified-acc.svg'}
-        />
+        {isLoading ? (
+          <>
+            <FrameInfoSkeleton />
+            <FrameInfoSkeleton />
+          </>
+        ) : (
+          <>
+            <FrameInfo
+              number={CompNumber.registered}
+              helperText={'Registered Participants'}
+              imgSrc={'/images/admin-dashboard/supervisor-acc.svg'}
+            />
+            <FrameInfo
+              number={CompNumber.unverified}
+              helperText={'Unverified Participants'}
+              imgSrc={'/images/admin-dashboard/unverified-acc.svg'}
+            />
+          </>
+        )}
       </div>
 
       {/* Submissions */}
