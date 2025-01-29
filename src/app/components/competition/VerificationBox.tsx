@@ -44,6 +44,10 @@ function VerificationBox({ verifications }: VerificationBoxProps) {
     setShowArrow(scrollTop + clientHeight < scrollHeight)
   }
 
+  if (!verifications || verifications?.length === 0) {
+    return null
+  }
+
   return (
     <div className="relative flex flex-col gap-2 md:min-w-[300px] lg:w-[40%] lg:min-w-[350px]">
       <p className="font-teachers text-[24px] font-bold">Verification Error</p>

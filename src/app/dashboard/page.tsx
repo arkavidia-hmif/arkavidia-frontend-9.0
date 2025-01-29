@@ -449,15 +449,11 @@ function UserDashboard() {
                         </span>
                         <Tag
                           variant={
-                            currentTeam?.document?.every(doc => doc.isVerified)
+                            currentTeam?.verificationStatus === 'VERIFIED'
                               ? 'success'
                               : 'warning'
                           }
-                          text={
-                            currentTeam?.document?.every(doc => doc.isVerified)
-                              ? 'Verified'
-                              : 'Unverified'
-                          }
+                          text={currentTeam?.verificationStatus ?? 'No data'}
                           className="w-[116px] xl:w-40"
                         />
                       </div>

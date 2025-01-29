@@ -9,7 +9,8 @@ import {
   getUser,
   getTeams,
   User,
-  getTeamMemberById
+  getTeamMemberById,
+  getTeamById
 } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
 import { expandCompetitionName } from '~/lib/utils'
@@ -85,6 +86,17 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
             )
             setActiveTeamId(activeTeamData?.id || '')
 
+            const isTeamVerified =
+              (
+                await getTeamById({
+                  client: authAxios,
+                  path: {
+                    teamId: activeTeamData?.id || ''
+                  }
+                })
+              ).data?.verificationStatus === 'VERIFIED'
+            console.log(isTeamVerified)
+
             // Check if user is team leader in current shown team
             if (activeTeamData) {
               // Get the team members
@@ -107,7 +119,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
               team: activeTeamData?.name || '',
               teamId: activeTeamData?.id || '',
               joinCode: activeTeamData?.joinCode || '',
-              isVerified: activeTeamData?.document?.every(doc => doc.isVerified) || false
+              isVerified: isTeamVerified
             })
           }
         }
