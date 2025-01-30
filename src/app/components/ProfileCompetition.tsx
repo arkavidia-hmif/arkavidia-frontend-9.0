@@ -61,7 +61,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
     name: '',
     team: '',
     joinCode: '',
-    isVerified: false,
+    isVerified: '',
     teamId: ''
   })
   const [copySuccess, setCopySuccess] = useState(false)
@@ -86,16 +86,14 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
             )
             setActiveTeamId(activeTeamData?.id || '')
 
-            const isTeamVerified =
-              (
-                await getTeamById({
-                  client: authAxios,
-                  path: {
-                    teamId: activeTeamData?.id || ''
-                  }
-                })
-              ).data?.verificationStatus === 'VERIFIED'
-            console.log(isTeamVerified)
+            const teamVerification = (
+              await getTeamById({
+                client: authAxios,
+                path: {
+                  teamId: activeTeamData?.id || ''
+                }
+              })
+            ).data?.verificationStatus
 
             // Check if user is team leader in current shown team
             if (activeTeamData) {
@@ -119,7 +117,7 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
               team: activeTeamData?.name || '',
               teamId: activeTeamData?.id || '',
               joinCode: activeTeamData?.joinCode || '',
-              isVerified: isTeamVerified
+              isVerified: teamVerification || 'Not verified'
             })
           }
         }
@@ -162,12 +160,22 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
             setIsUserTeamLeader(false)
           }
         }
+
+        const teamVerification = (
+          await getTeamById({
+            client: authAxios,
+            path: {
+              teamId: activeTeamData?.id || ''
+            }
+          })
+        ).data?.verificationStatus
+
         setProfileData({
           name: userData?.fullName || '',
           team: activeTeamData?.name || '',
           teamId: activeTeamData?.id || '',
           joinCode: activeTeamData?.joinCode || '',
-          isVerified: activeTeamData?.document?.every(doc => doc.isVerified) || false
+          isVerified: teamVerification || 'Not verified'
         })
         setTimeout(() => setIsLoading(false), 500)
       } catch (error) {
@@ -233,6 +241,21 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
     }
   }
 
+  function getVerifyStatusColor(status: string | null | undefined) {
+    switch (status) {
+      case 'VERIFIED':
+        return 'text-green-200'
+      case 'NOT_VERIFIED':
+        return 'text-red-200'
+      case 'WAITING':
+        return 'text-yellow-200'
+      case 'DENIED':
+        return 'text-red-200'
+      default:
+        return 'text-lilac-200'
+    }
+  }
+
   if (isLoading) {
     return (
       <>
@@ -261,8 +284,8 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
               {profileData.team}
             </h3> */}
             <h3
-              className={`text-sm md:text-xl ${profileData.isVerified ? 'text-green-200' : 'text-red-200'}`}>
-              {profileData.isVerified ? 'Verified' : 'Not Verified'}
+              className={`text-sm md:text-xl ${getVerifyStatusColor(profileData.isVerified)} capitalize`}>
+              {profileData.isVerified.toLowerCase()}
             </h3>
           </div>
 

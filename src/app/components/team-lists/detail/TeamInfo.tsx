@@ -2,6 +2,7 @@ import { Check, ExternalLink, Pencil, SendHorizonal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import {
+  putAdminCompetitionTeamStatus,
   putAdminCompetitionTeamVerification,
   PutAdminCompetitionTeamVerificationData,
   TeamDocument,
@@ -173,7 +174,7 @@ function FileRequirements({
             <Link href={`https://${file.media.url}`} target="_blank">
               <div className="flex items-center gap-4">
                 <ExternalLink size={30} />
-                <p className="text-lg font-semibold text-white hover:underline">
+                <p className="text-lg font-semibold text-white underline underline-offset-1 hover:underline">
                   {fileType[file.type]}
                 </p>
               </div>
@@ -181,7 +182,7 @@ function FileRequirements({
             {/* Document Status */}
             <div className="inline-block h-fit w-full break-words text-right">
               <p
-                className={`pt-1 text-sm font-medium lg:text-[20px] ${file?.isVerified ? 'text-green-300' : 'text-purple-100'}`}>
+                className={`pt-1 text-sm font-medium lg:text-[20px] ${file?.isVerified ? 'text-green-300' : 'text-red-200'}`}>
                 {file?.isVerified ? 'Verified' : 'Not Verified'}
               </p>
               {file?.verificationError && (
@@ -204,7 +205,7 @@ function FileRequirements({
 
           {/* "Ganti Status" and Buttons */}
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
-            <p className="text-white lg:text-[20px]">Ganti Status</p>
+            <p className="text-white lg:text-[20px] xl:w-[70px]">Ganti Status</p>
             {editable && !isFeedback && (
               <div className="flex gap-3">
                 <Button variant="outline" size="sm" onClick={() => setIsFeedback(true)}>
@@ -216,26 +217,33 @@ function FileRequirements({
               </div>
             )}
             {isFeedback && (
-              <div className="flex flex-wrap items-center gap-2">
-                <Input
-                  placeholder="Send what's wrong"
-                  className="max-w-[250px]"
-                  value={feedback}
-                  onChange={e => setFeedback(e.target.value)}
-                />
-                <Button
-                  className={cn(loading ? 'cursor-not-allowed' : '')}
-                  size="sm"
-                  onClick={() => !loading && submitHandler(false)}>
-                  {loading ? (
-                    <MoonLoader color="#fff" size={15} />
-                  ) : (
-                    <SendHorizonal size={15} strokeWidth={3} />
-                  )}
-                </Button>
-                <Button variant="outline" size="xs" onClick={() => setIsFeedback(false)}>
-                  <X size={10} className="text-white" strokeWidth={3} />
-                </Button>
+              <div className="flex flex-wrap items-center gap-2 xl:w-full xl:flex-col xl:flex-nowrap xl:items-start">
+                <div className="xl:w-full">
+                  <Input
+                    placeholder="Send what's wrong"
+                    className="w-full md:w-[300px] lg:w-[500px] xl:w-full xl:grow-[2]"
+                    value={feedback}
+                    onChange={e => setFeedback(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-x-1">
+                  <Button
+                    className={cn(loading ? 'cursor-not-allowed' : '')}
+                    size="sm"
+                    onClick={() => !loading && submitHandler(false)}>
+                    {loading ? (
+                      <MoonLoader color="#fff" size={15} />
+                    ) : (
+                      <SendHorizonal size={15} strokeWidth={3} />
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    onClick={() => setIsFeedback(false)}>
+                    <X size={10} className="text-white" strokeWidth={3} />
+                  </Button>
+                </div>
               </div>
             )}
           </div>
@@ -336,20 +344,36 @@ export function TeamStatus({
   qualifications,
   stageWin,
   stageSuccess,
-  stageFailed
+  stageFailed,
+  teamID,
+  competitionID,
+  qual
 }: {
   stage: 'Pre-eliminary' | 'Final'
   qualifications: MenuItem[]
   stageWin?: string[]
-  stageSuccess: string[]
+  stageSuccess?: string[]
   stageFailed?: string[]
+  teamID: string
+  competitionID: string
+  qual: string
 }) {
+  const currentQualifications = qualifications.find(option => {
+    return option.option === qual
+  })
+  const [initialQualification, setInitialQualification] = useState<MenuItem | null>(
+    currentQualifications ?? null
+  )
   const [hidden, setHidden] = useState<boolean>(false)
-  const [qualification, setQualification] = useState<MenuItem | null>(null)
+  const [qualification, setQualification] = useState<MenuItem | null>(
+    currentQualifications ?? null
+  )
+  const { toast } = useToast()
+  const authAxios = useAxiosAuth()
 
   const isWin = qualification?.option ? stageWin?.includes(qualification.option) : false
   const isSuccess = qualification?.option
-    ? stageSuccess.includes(qualification.option)
+    ? stageSuccess?.includes(qualification.option)
     : false
   const isFailed = qualification?.option
     ? stageFailed?.includes(qualification.option)
@@ -361,6 +385,83 @@ export function TeamStatus({
       : isFailed
         ? 'danger'
         : 'warning'
+
+  const handleSaveQualification = async () => {
+    if (stage === 'Final') {
+      const resp = await putAdminCompetitionTeamStatus({
+        client: authAxios,
+        body: {
+          finalStatus: qualification?.option as
+            | 'On Review'
+            | 'Not Pass'
+            | 'Juara 1'
+            | 'Juara 2'
+            | 'Juara 3'
+            | undefined
+        },
+        path: {
+          teamId: teamID,
+          competitionId: competitionID
+        }
+      })
+
+      if (resp.error) {
+        // console.log('Failed to save Final Stage')
+        toast({
+          title: 'Failed to save Final Stage',
+          description: 'Please try again later',
+          variant: 'destructive'
+        })
+      } else {
+        // console.log('Successfully saved Final Stage')
+        toast({
+          title: 'Successfully saved Final Stage',
+          description: 'The final stage has been set to ' + qualification?.option,
+          variant: 'success'
+        })
+        setInitialQualification(qualification)
+        setQualification(qualification)
+      }
+
+      setHidden(false)
+    } else {
+      const resp = await putAdminCompetitionTeamStatus({
+        client: authAxios,
+        body: {
+          preeliminaryStatus: qualification?.option as
+            | 'Pass'
+            | 'Not Pass'
+            | 'On Review'
+            | undefined
+        },
+        path: {
+          teamId: teamID,
+          competitionId: competitionID
+        }
+      })
+
+      if (resp.error) {
+        // console.log('Failed to save Prelim Stage')
+        toast({
+          title: 'Failed to save Pre-eliminary Stage',
+          description: 'Please try again later',
+          variant: 'destructive'
+        })
+      } else {
+        // console.log('Successfully saved Prelim Stage')
+        toast({
+          title: 'Successfully saved Pre-eliminary Stage',
+          description: 'The pre-eliminary stage has been set to ' + qualification?.option,
+          variant: 'success'
+        })
+        setInitialQualification(qualification)
+        setQualification(qualification)
+      }
+
+      setHidden(false)
+    }
+    setHidden(false)
+  }
 
   return (
     <div
@@ -375,7 +476,7 @@ export function TeamStatus({
         <div className="flex items-center gap-3">
           <Tag
             variant={qualificationStatus}
-            text={qualification?.option ? qualification?.option : 'On Review'}
+            text={qualification?.option ? qualification?.option : qual}
             className="w-fit px-6"
           />
           <Pencil
@@ -402,15 +503,12 @@ export function TeamStatus({
               variant={'outline'}
               size={'sm'}
               onClick={() => {
+                setQualification(initialQualification)
                 setHidden(false)
               }}>
               <X size={10} className="text-white" strokeWidth={3} />
             </Button>
-            <Button
-              size={'sm'}
-              onClick={() => {
-                setHidden(false)
-              }}>
+            <Button size={'sm'} onClick={handleSaveQualification}>
               <Check size={10} strokeWidth={3} />
             </Button>
           </div>
@@ -427,8 +525,12 @@ export default function TeamInfo({
   existsSubmission,
   paymentProof,
   competitionID,
+  prelim,
+  final,
   onRefetch
-}: GetTeamDetailResponse) {
+}: GetTeamDetailResponse & { competitionID: string } & {
+  prelim: string
+} & { final: string }) {
   if (members?.length === 0) {
     return (
       <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-[2rem] py-[1rem] shadow-lg">
@@ -490,19 +592,26 @@ export default function TeamInfo({
       {!existsSubmission && (
         <>
           <TeamStatus
+            qual={final}
+            teamID={teamID}
+            competitionID={competitionID}
             stage="Final"
             qualifications={[
               { id: 1, option: 'Juara 1' },
               { id: 2, option: 'Juara 2' },
               { id: 3, option: 'Juara 3' },
-              { id: 4, option: 'Juara Harapan 1' },
-              { id: 5, option: 'Juara Harapan 2' },
-              { id: 6, option: 'Juara Harapan 3' }
+              // { id: 4, option: 'Juara Harapan 1' },
+              // { id: 5, option: 'Juara Harapan 2' },
+              // { id: 6, option: 'Juara Harapan 3' },
+              { id: 7, option: 'On Review' }
             ]}
             stageWin={['Juara 1', 'Juara 2', 'Juara 3']}
             stageSuccess={['Juara Harapan 1', 'Juara Harapan 2', 'Juara Harapan 3']}
           />
           <TeamStatus
+            qual={prelim}
+            teamID={teamID}
+            competitionID={competitionID}
             stage="Pre-eliminary"
             qualifications={[
               { id: 1, option: 'Pass' },

@@ -313,7 +313,11 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
             const teamMembers = teamDataResponse.data?.teamMembers
             setVerificationErrors(null)
 
-            if (teamDataResponse.data?.document?.[0].verificationError) {
+            if (
+              teamDataResponse.data?.document &&
+              teamDataResponse.data.document.length > 0 &&
+              teamDataResponse.data.document[0].verificationError
+            ) {
               const verif = {
                 username: 'Team',
                 type: 'Bukti Pembayaran',
@@ -329,6 +333,7 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
                   }
 
                   if (
+                    member.user?.document &&
                     member.user?.document?.[0].verificationError &&
                     member.user?.document?.[0].verificationError.length
                   ) {
@@ -367,8 +372,6 @@ const TeamInformationContent = ({ compeName }: { compeName: string }) => {
         } else {
           console.warn('No teams found for the user.')
         }
-      } catch (error) {
-        console.error('Error fetching data:', error)
       } finally {
         setTimeout(() => {
           setLoading(false)

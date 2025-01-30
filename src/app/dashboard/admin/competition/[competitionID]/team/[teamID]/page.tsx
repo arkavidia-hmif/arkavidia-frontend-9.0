@@ -208,11 +208,13 @@ function TeamDetails() {
         teamStage={teamData.stage}
       />
       {competition &&
-        (competition === 'UXvidia' || competition === 'Datavidia' ? (
+        (competition === 'UXvidia' || competition === 'Hackvidia' ? (
           <Tab
             contentType={['Team Information', 'Submission']}
             content={[
               <TeamInfo
+                final={teamData.finalStatus}
+                prelim={teamData.preeliminaryStatus}
                 key="team-info"
                 competitionID={competitionID}
                 members={teamData?.teamMembers}
@@ -222,7 +224,7 @@ function TeamDetails() {
                 existsSubmission
                 onRefetch={handleRefetch}
               />,
-              <Submission key="submission" />
+              <Submission key="submission" teamData={teamData} />
             ]}
           />
         ) : (
@@ -230,6 +232,8 @@ function TeamDetails() {
             contentType={['Team Information']}
             content={[
               <TeamInfo
+                final={teamData.finalStatus}
+                prelim={teamData.preeliminaryStatus}
                 key="team-info"
                 competitionID={competitionID}
                 members={teamData?.teamMembers}

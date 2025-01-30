@@ -141,18 +141,17 @@ function AdminCompetitionDashboard() {
         <h1 className="font-belanosima text-3xl text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.7)] md:text-5xl">
           No competition found with the name "${params.competition}"
         </h1>
-      ) : (
-        currentCompetitionId === null ? 
-        (<div className='font-belanosima text-2xl text-whitemd:text-3xl'>
+      ) : currentCompetitionId === null ? (
+        <div className="text-whitemd:text-3xl font-belanosima text-2xl">
           Competition ID not valid
-        </div>) 
-        :
-        (<RegisteredTeamList
+        </div>
+      ) : (
+        <RegisteredTeamList
           teamData={teamData}
           pagination={pagination}
           competitionId={currentCompetitionId}
           onPageChange={handlePageChange}
-        />)
+        />
       )}
     </>
   )
