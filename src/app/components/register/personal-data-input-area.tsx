@@ -317,7 +317,7 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
               Isi Nanti <FaArrowRight size={16} />
             </p>
           </Link>
-          <h1 className="w-full text-center font-teachers text-3xl font-bold text-lilac-200">
+          <h1 className="w-full text-center font-teachers text-[36px] font-bold text-lilac-200">
             Lengkapi Data Dirimu!
           </h1>
           <div className="flex flex-col gap-5">
@@ -548,12 +548,13 @@ export const PersonalDataForm = (props: PersonalDataProps) => {
                     <div>
                       <Checkbox
                         text={
-                          <div className='max-w-[650px]'>
+                          <div className="max-w-[650px]">
                             <span className="max-md:text-xs md:text-sm">
                               Dengan ini, saya memberikan persetujuan kepada Arkavidia 9.0
-                              untuk menggunakan data pribadi saya di atas secara bertanggung
-                              jawab untuk mendukung keberlangsungan kegiatan Arkavidia 9.0
-                              serta untuk kepentingan perusahaan mitra Arkavidia 9.0
+                              untuk menggunakan data pribadi saya di atas secara
+                              bertanggung jawab untuk mendukung keberlangsungan kegiatan
+                              Arkavidia 9.0 serta untuk kepentingan perusahaan mitra
+                              Arkavidia 9.0
                             </span>
                           </div>
                         }

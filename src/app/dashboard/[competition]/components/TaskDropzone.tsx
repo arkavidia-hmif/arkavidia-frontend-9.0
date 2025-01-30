@@ -12,6 +12,7 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 interface TaskDropzoneProps {
   bucket: GetPresignedLinkData['query']['bucket']
   onSubmitMedia: (mediaId: string, bucket: string, type: string) => Promise<void>
+  submissionTypeId?: string
 }
 
 const fileTypeAssets = {
@@ -22,7 +23,11 @@ const fileTypeAssets = {
   default: 'TXT'
 }
 
-const TaskDropzone: React.FC<TaskDropzoneProps> = ({ bucket, onSubmitMedia }) => {
+const TaskDropzone: React.FC<TaskDropzoneProps> = ({
+  bucket,
+  submissionTypeId,
+  onSubmitMedia
+}) => {
   const axiosAuth = useAxiosAuth()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -88,7 +93,7 @@ const TaskDropzone: React.FC<TaskDropzoneProps> = ({ bucket, onSubmitMedia }) =>
         headers: { 'Content-Type': selectedFile.type }
       })
 
-      await onSubmitMedia(mediaId, bucket, bucket)
+      await onSubmitMedia(mediaId, bucket, submissionTypeId || '')
       setSelectedFile(null)
     } catch {
       setError('An error occurred during upload. Please try again.')

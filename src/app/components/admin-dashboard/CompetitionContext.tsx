@@ -7,15 +7,23 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import {
   getCompetitionByName,
   GetCompetitionByNameData,
-  GetTeamStatisticResponse
+  GetCompetitionStatisticResponse
 } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
+import FrameInfoSkeleton from './FrameInfoSkeleton'
 
-const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
+const CompetitionContext = ({
+  competitionsData
+}: {
+  competitionsData?: GetCompetitionStatisticResponse
+}) => {
   const axiosInstance = useAxiosAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = React.useState(true)
   const [CompNumber, setCompNumber] = React.useState({ unverified: 0, registered: 0 })
+
+  type competitionStatisticSelectors =
+    keyof GetCompetitionStatisticResponse['competition']
 
   const DROPDOWN_DATA: MenuItem[] = [
     { id: 2, option: 'CP' },
@@ -24,9 +32,26 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
     { id: 5, option: 'Arkalogica' },
     { id: 6, option: 'Datavidia' },
     { id: 7, option: 'Hackvidia' }
-    // { id: 8, option: 'ArkavX' },
-    // { id: 9, option: 'Academya' }
   ]
+
+  function getStatisticSelector(
+    compeName: 'CP' | 'CTF' | 'UXvidia' | 'Arkalogica' | 'Datavidia' | 'Hackvidia'
+  ) {
+    switch (compeName) {
+      case 'CP':
+        return 'competitiveProgramming' as competitionStatisticSelectors
+      case 'CTF':
+        return 'captureTheFlag' as competitionStatisticSelectors
+      case 'UXvidia':
+        return compeName.toLowerCase() as competitionStatisticSelectors
+      case 'Arkalogica':
+        return compeName.toLowerCase() as competitionStatisticSelectors
+      case 'Datavidia':
+        return compeName.toLowerCase() as competitionStatisticSelectors
+      case 'Hackvidia':
+        return compeName.toLowerCase() as competitionStatisticSelectors
+    }
+  }
 
   const [selectedCompetition, setSelectedCompetition] = React.useState<MenuItem | null>(
     DROPDOWN_DATA[0]
@@ -49,9 +74,20 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
         const competitionId = (res.data as Array<{ id: string }>)[0].id
         setSelectedCompetitionId(competitionId)
 
-        const data = result.filter(item => item.competitionId === competitionId)[0]
-        const total = data?.totalTeam || 0
-        const verified = data?.totalVerifiedTeam || 0
+        const data =
+          competitionsData?.competition[
+            getStatisticSelector(
+              option as
+                | 'CP'
+                | 'CTF'
+                | 'UXvidia'
+                | 'Arkalogica'
+                | 'Datavidia'
+                | 'Hackvidia'
+            )
+          ]
+        const total = data?.count || 0
+        const verified = data?.verifiedCount || 0
 
         setCompNumber({
           unverified: total - verified,
@@ -64,7 +100,6 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
           variant: 'warning'
         })
         setCompNumber({ unverified: 0, registered: 0 })
-        setSelectedCompetitionId('')
       } finally {
         setIsLoading(false)
       }
@@ -73,7 +108,7 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
     if (selectedCompetition?.option) {
       fetchCompetitionSubmission(selectedCompetition.option)
     }
-  }, [selectedCompetition, result])
+  }, [selectedCompetition, competitionsData])
 
   return (
     <>
@@ -92,25 +127,34 @@ const CompetitionContext = ({ result }: GetTeamStatisticResponse) => {
 
       {/* Competition Participants */}
       <div className="my-4 flex flex-col items-center justify-between gap-4 md:my-8 md:flex-row md:gap-10">
-        <FrameInfo
-          number={CompNumber.registered}
-          helperText={'Registered Participants'}
-          imgSrc={'/images/admin-dashboard/supervisor-acc.svg'}
-        />
-        <FrameInfo
-          number={CompNumber.unverified}
-          helperText={'Unverified Participants'}
-          imgSrc={'/images/admin-dashboard/unverified-acc.svg'}
-        />
+        {isLoading ? (
+          <>
+            <FrameInfoSkeleton />
+            <FrameInfoSkeleton />
+          </>
+        ) : (
+          <>
+            <FrameInfo
+              number={CompNumber.registered}
+              helperText={'Registered Participants'}
+              imgSrc={'/images/admin-dashboard/supervisor-acc.svg'}
+            />
+            <FrameInfo
+              number={CompNumber.unverified}
+              helperText={'Unverified Participants'}
+              imgSrc={'/images/admin-dashboard/unverified-acc.svg'}
+            />
+          </>
+        )}
       </div>
 
       {/* Submissions */}
-      {!isLoading && selectedCompetitionId && (
+      {/* {!isLoading && selectedCompetitionId && (
         <FrameSubmissions
           compe_id={selectedCompetitionId}
           totalTeam={CompNumber.registered}
         />
-      )}
+      )} */}
     </>
   )
 }

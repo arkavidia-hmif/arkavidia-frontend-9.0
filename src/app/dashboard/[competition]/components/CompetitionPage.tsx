@@ -11,22 +11,22 @@ import { Button } from '../../../components/ui/button'
 import { Tab } from '../../../components/Tab'
 import { ChevronLeft } from 'lucide-react'
 import {
-  getCompetitionSubmissionRequirement,
-  GetCompetitionSubmissionRequirementResponse,
   GetPresignedLinkData,
   getTeamById,
-  getTeamMemberById,
   getTeams,
   GetTeamsResponse,
-  getUser,
+  getTeamSubmission,
+  GetTeamSubmissionResponse,
+  Media,
   postTeamDocument,
+  putTeamSubmission,
   self,
   Team,
   updateTeamMemberDocument
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import ProfileCompetition from '~/app/components/ProfileCompetition'
 import TaskDropzone from './TaskDropzone'
 import TeamInformationContent from '~/app/components/competition/TeamInformationContent'
@@ -42,8 +42,18 @@ interface Task {
   id: string
   title: string
   description: string
-  status: 'notopened' | 'ongoing' | 'complete'
+  status: 'notopened' | 'ongoing' | 'completed' | 'past due'
   dueDate: Date
+  competitionName?: string
+  submission: {
+    teamId: string
+    typeId: string
+    mediaId: string | null
+    judgeResponse: string | null
+    createdAt: string | null
+    updatedAt: string | null
+    media: Media
+  }
 }
 
 // Verif interface
@@ -51,9 +61,10 @@ interface Verification {
   id: string
   isVerified: boolean
   type: 'bukti-pembayaran' | 'poster' | 'twibbon'
-  status: 'unsubmitted' | 'submitted' | 'verified'
+  status: 'unsubmitted' | 'submitted' | 'verified' | 'rejected'
   mediaLink?: string
   mediaName?: string
+  rejectionMessage?: string
 }
 
 interface TeamVerification extends Verification {
@@ -126,12 +137,14 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           const currentUserData = await self({ client: axiosInstance })
           setCurrentUserId(currentUserData.data?.id ?? '')
 
-          const requirementsResponse = await getCompetitionSubmissionRequirement({
+          const requirementsResponse = await getTeamSubmission({
             client: axiosInstance,
             path: { teamId }
           })
 
           const newTasks: Task[] = []
+
+          // Verifications
           let teamVerification: TeamVerification | null
           const memberVerifications: MemberVerification[] = []
 
@@ -150,11 +163,18 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             }
           } else {
             const isVerified = teamVerifData?.data?.document?.[0].isVerified ?? false
+            const verificationError = teamVerifData?.data?.document?.[0].verificationError
+            const isRejected =
+              verificationError !== '' ||
+              verificationError !== null ||
+              verificationError !== undefined
             teamVerification = {
               id: 'team-0',
               teamId: teamId,
               type: 'bukti-pembayaran',
-              status: isVerified ? 'verified' : 'submitted',
+              status: isVerified ? 'verified' : isRejected ? 'rejected' : 'submitted',
+              rejectionMessage:
+                teamVerifData?.data?.document?.[0].verificationError ?? '',
               isVerified: isVerified,
               mediaLink: teamVerifData.data?.document?.[0].media.url,
               mediaName: teamVerifData.data?.document?.[0].media.name
@@ -188,12 +208,18 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               })
             } else {
               const isVerified = memberDoc.isVerified ?? false
+              const verificationError = memberDoc.verificationError
+              const isRejected =
+                verificationError !== '' ||
+                verificationError !== null ||
+                verificationError !== undefined
               memberVerifications.push({
                 id: `member-${index}`,
                 userId: currentUserData.data?.id,
                 type: docType as 'poster' | 'twibbon',
                 isVerified: isVerified,
-                status: isVerified ? 'verified' : 'submitted',
+                rejectionMessage: memberDoc.verificationError ?? '',
+                status: isVerified ? 'verified' : isRejected ? 'rejected' : 'submitted',
                 mediaLink: memberDoc.media.url,
                 mediaName: memberDoc.media.name
               })
@@ -205,13 +231,16 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           }
           setVerifications(prev => [...prev, ...memberVerifications])
 
+          // Submissions
           requirementsResponse.data?.forEach(data => {
             const item = {
               id: data.requirement.typeId,
               title: data.requirement.typeName,
               description: data.requirement.description,
               dueDate: new Date(data.requirement.deadline ?? ''),
-              status: getStatusTask(data) ?? 'notopened'
+              status: getStatusTask(data) ?? 'notopened',
+              competitionName: compeName.toLowerCase(),
+              submission: data.submission
             }
 
             if (data.requirement.stage === 'verification') {
@@ -248,19 +277,26 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
   }, [])
 
   const getStatusTask = (
-    data: GetCompetitionSubmissionRequirementResponse extends (infer ElementType)[]
-      ? ElementType
-      : never
+    data: GetTeamSubmissionResponse extends (infer ElementType)[] ? ElementType : never
   ) => {
     const isDeadline = Date.now() > new Date(data.requirement.deadline ?? '').getTime()
-    if (data.media == null && !isDeadline) {
-      return 'notopened'
-    } else if (data.media !== null && !isDeadline) {
-      return 'ongoing'
-    } else if (data.media !== null && isDeadline) {
-      return 'complete'
+    // No submission yet
+    if (!data.submission || data.submission?.media === null) {
+      if (isDeadline) {
+        return 'past due'
+      } else {
+        return 'ongoing'
+      }
+    } else if (data.submission) {
+      // Have a submission then marked as complete
+      return 'completed'
     }
-    return 'notopened'
+    // } else if (data.submission?.media !== null && !isDeadline) {
+    //   return 'ongoing'
+    // } else if (data.submission?.media !== null && isDeadline) {
+    //   return 'complete'
+    // }
+    // return 'notopened'
   }
 
   const getVerifTriggerColor = (status: string): string => {
@@ -268,19 +304,28 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
       return 'bg-gradient-to-r from-white/20 to-[#FACCCCCC]/80'
     if (status === 'submitted') return 'bg-gradient-to-r from-white/20 to-[#FFCC00CC]/80'
     if (status === 'verified') return 'bg-gradient-to-r from-white/20 to-[#4D06B0CC]/80'
+    if (status === 'rejected') return 'bg-gradient-to-r from-white/20 to-[#E50000]/80'
     return 'bg-gradient-to-r from-white/20 to-[#FACCCCCC]/80'
   }
 
   const getTriggerColor = (item: Task): string => {
     const today = new Date()
-    const isPastDue = today > item.dueDate && item.status !== 'complete'
+    const isPastDue = today > item.dueDate && item.status !== 'completed'
 
-    if (isPastDue) return 'bg-gradient-to-r from-white/20 to-[#E50000]/80' // Past due date and not complete
+    if (
+      item.submission &&
+      item.submission.judgeResponse &&
+      item.submission.judgeResponse.length
+    ) {
+      return 'bg-gradient-to-r from-white/20 to-[#E50000]/80'
+    }
+    if (isPastDue || item.status === 'past due')
+      return 'bg-gradient-to-r from-white/20 to-[#E50000]/80' // Past due date and not complete
     if (item.status === 'notopened')
       return 'bg-gradient-to-r from-white/20 to-[#FACCCCCC]/80'
     if (item.status === 'ongoing')
       return 'bg-gradient-to-r from-white/20 to-[#FFCC00CC]/80'
-    if (item.status === 'complete')
+    if (item.status === 'completed')
       return 'bg-gradient-to-r from-white/20 to-[#4D06B0CC]/80'
 
     return 'bg-gradient-to-r from-white/20 to-[#FACCCCCC]/80'
@@ -290,17 +335,25 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     if (status === 'unsubmitted') return 'border-[#FACCCCCC] text-[#FACCCCCC]'
     if (status === 'submitted') return 'border-[#FFCC00CC] text-[#FFCC00CC]'
     if (status === 'verified') return 'border-[#c8a5f9] text-[#c8a5f9]'
+    if (status === 'rejected') return 'border-[#E50000] text-[#E50000]'
     return 'border-[#E50000] text-[#E50000]'
   }
 
   const getStatusColor = (item: Task): string => {
     const today = new Date()
-    const isPastDue = today > item.dueDate && item.status !== 'complete'
+    const isPastDue = today > item.dueDate && item.status !== 'completed'
 
-    if (isPastDue) return 'border-[#fd7777] text-[#fd7777]' // Past due date and not complete
+    if (
+      item.submission &&
+      item.submission.judgeResponse &&
+      item.submission.judgeResponse.length
+    ) {
+      return 'border-[#E50000] text-[#E50000]'
+    }
+    if (isPastDue || item.status === 'past due') return 'border-[#fd7777] text-[#fd7777]' // Past due date and not complete
     if (item.status === 'notopened') return 'border-[#FACCCCCC] text-[#FACCCCCC]'
     if (item.status === 'ongoing') return 'border-[#FFCC00CC] text-[#FFCC00CC]'
-    if (item.status === 'complete') return 'border-[#c8a5f9] text-[#c8a5f9]'
+    if (item.status === 'completed') return 'border-[#c8a5f9] text-[#c8a5f9]'
 
     return 'border-[#E50000] text-[#E50000]'
   }
@@ -309,17 +362,84 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     if (status === 'unsubmitted') return 'Unsubmitted'
     if (status === 'submitted') return 'Submitted'
     if (status === 'verified') return 'Verified'
+    if (status === 'rejected') return 'Rejected'
     return 'Unsubmitted'
   }
 
   const getStatus = (item: Task): string => {
     const today = new Date()
-    const isPastDue = today > item.dueDate && item.status !== 'complete'
-    if (isPastDue) return 'Past Due'
+    const isPastDue = today > item.dueDate && item.status !== 'completed'
+    if (isPastDue || item.status === 'past due') return 'Past Due'
     if (item.status === 'notopened') return 'Not Opened'
     if (item.status === 'ongoing') return 'Ongoing'
-    if (item.status === 'complete') return 'Complete'
+    if (item.status === 'completed') return 'Completed'
     return ''
+  }
+
+  const handleSubmissionSubmit = async (
+    mediaId: string,
+    bucket: string,
+    typeId: string
+  ) => {
+    const teamID = currentTeamId
+    if (!teamID) {
+      toast({
+        title: 'Error',
+        description: 'Invalid team ID',
+        variant: 'destructive',
+        duration: 5000
+      })
+      return
+    }
+
+    try {
+      const submitReq = await putTeamSubmission({
+        client: axiosInstance,
+        path: {
+          teamId: teamID
+        },
+        body: {
+          typeId: typeId,
+          mediaId: mediaId
+        }
+      })
+
+      if (submitReq.error) {
+        toast({
+          title: 'Error',
+          description: 'Failed to submit document',
+          variant: 'destructive',
+          duration: 5000
+        })
+      }
+
+      if (submitReq.data) {
+        const updatedTasks = tasks.map(task => {
+          if (task.id === typeId) {
+            return {
+              ...task,
+              status: 'completed' as 'completed'
+            }
+          }
+          return task
+        })
+        setTasks(updatedTasks)
+        setSelectedTask(null)
+        toast({
+          title: 'Success',
+          description: 'Document submitted successfully',
+          variant: 'success',
+          duration: 5000
+        })
+      }
+    } catch (err: unknown) {
+      toast({
+        title: 'Error',
+        description: 'Failed to submit document',
+        variant: 'destructive',
+        duration: 5000
+      })
+    }
   }
 
   const handleMediaSubmit = async (mediaId: string, type: string) => {
@@ -439,10 +559,13 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           </div>
           <p className="mt-10">{selectedTask.description}</p>
           {/* Task Dropzone */}
-          {/*<TaskDropzone
-            bucket="competition-registration"
-            onSubmitMedia={handleMediaSubmit}
-          /> */}
+          <TaskDropzone
+            bucket={
+              `submission-${selectedTask.competitionName}` as GetPresignedLinkData['query']['bucket']
+            }
+            onSubmitMedia={handleSubmissionSubmit}
+            submissionTypeId={selectedTask.id}
+          />
         </div>
       ) : (
         // Task List
@@ -464,16 +587,33 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               <AccordionContent className="-mt-2 rounded-lg border border-white px-5 py-7">
                 <p
                   className="text-base md:text-lg"
-                  dangerouslySetInnerHTML={{ __html: task.description.replace(/\n/g, '<br />') }}
+                  dangerouslySetInnerHTML={{
+                    __html: task.description.replace(/\n/g, '<br />')
+                  }}
                 />
+                <FilePreview
+                  fileURL={task.submission?.media.url ?? undefined}
+                  name={task.submission?.media.name ?? undefined}
+                />
+                {task.submission && task.submission.judgeResponse?.length && (
+                  <div className="pt-2">
+                    <p className="font-teachers text-xl font-bold text-yellow-400">
+                      Feedback
+                    </p>
+                    <p className="font-dmsans text-[1rem] text-lg font-normal">
+                      {capitalizeFirstLetter(task.submission.judgeResponse)}
+                    </p>
+                  </div>
+                )}
                 <div className="mt-5 flex w-full items-center gap-3 md:justify-end">
                   <p
                     className={`flex h-10 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getStatusColor(task)}`}>
                     {getStatus(task)}
                   </p>
                   <Button
-                    onClick={() => setSelectedTask(task)} //TODO: Add trigger to change status of task to ongoing
+                    onClick={() => setSelectedTask(task)}
                     size="lg"
+                    disabled={new Date() > task.dueDate}
                     className={`w-[60%] text-center text-sm md:w-auto md:text-base ${task.status === 'notopened' ? 'border-2 border-[#cccccc] bg-transparent text-[#cccccc] hover:text-[#4D06B0CC]' : 'bg-gradient-to-br from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white'}`}>
                     Submit Task
                   </Button>
@@ -571,6 +711,16 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                   name={verif.mediaName}
                 />
                 {/* End of File URL Preview */}
+                {verif.status === 'rejected' && (
+                  <div className="pt-2">
+                    <p className="font-teachers text-xl font-bold text-red-400">
+                      Alasan penolakan
+                    </p>
+                    <p className="font-dmsans text-[1rem] text-lg font-normal">
+                      {capitalizeFirstLetter(verif.rejectionMessage!)}
+                    </p>
+                  </div>
+                )}
                 <div className="mt-5 flex w-full items-center gap-3 md:justify-end">
                   <p
                     className={`flex h-10 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getVerifStatusColor(verif.status)}`}>

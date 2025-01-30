@@ -9,6 +9,7 @@ export interface AuthReducerState {
   isLoggedIn: boolean
   hasFilledInfo: boolean
   username: string
+  adminRole: string | null
 }
 
 const initialState = {
@@ -16,7 +17,8 @@ const initialState = {
   isAdmin: false,
   isLoggedIn: false,
   hasFilledInfo: false,
-  username: ''
+  username: '',
+  adminRole: null
 } as AuthReducerState
 
 const authSlice = createSlice({
@@ -41,6 +43,9 @@ const authSlice = createSlice({
     setNotAdmin(state) {
       state.isAdmin = false
     },
+    setAdminRole(state, action: PayloadAction<string>) {
+      state.adminRole = action.payload
+    },
     setFilledInfo(state, action: PayloadAction<boolean>) {
       state.hasFilledInfo = action.payload
     },
@@ -56,6 +61,7 @@ export const {
   setAdmin,
   setNotAdmin,
   setFilledInfo,
-  setUsername
+  setUsername,
+  setAdminRole
 } = authSlice.actions
 export default authSlice.reducer

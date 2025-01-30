@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector, StoreType } from '~/redux/store'
 import { useToast } from '~/hooks/use-toast'
 import {
   setAdmin,
+  setAdminRole,
   setFilledInfo,
   setNotAdmin,
   setUsername,
@@ -52,11 +53,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: 'Please login again',
           variant: 'info'
         })
-        router.push('/login');
+        router.push('/login')
       }
 
       if (selfReq.data) {
-        const isAdmin = selfReq.data.role === 'admin'
+        const isAdmin = selfReq.data.role.includes('admin')
         const userReq = await getUser({ client: authAxios })
         if (userReq.data) {
           const hasFilledInfo = userReq.data.isRegistrationComplete
@@ -69,6 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (isAdmin) {
             appDispatch(setAdmin())
+            if (userReq.data.role) appDispatch(setAdminRole(userReq.data.role))
           }
         }
       }
