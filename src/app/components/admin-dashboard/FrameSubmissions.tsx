@@ -67,8 +67,8 @@ const FrameSubmissions = ({ compe_id, totalTeam }: FrameSubmissionsProps) => {
 
         {/* List Tugas */}
         <div className="mt-4 flex flex-col gap-4">
-          {competitionSubmissions
-            .filter(item => item.competitionId === compe_id)
+          {/* {competitionSubmissions
+            .filter(item => item. === compe_id)
             .map((item, _index) =>
               item.submissions.map((submission, _subidx) => (
                 <FrameTugas
@@ -79,7 +79,7 @@ const FrameSubmissions = ({ compe_id, totalTeam }: FrameSubmissionsProps) => {
                   total={totalTeam}
                 />
               ))
-            )}
+            )} */}
         </div>
       </div>
     </div>
