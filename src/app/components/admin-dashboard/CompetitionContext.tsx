@@ -12,11 +12,18 @@ import {
 import { useToast } from '~/hooks/use-toast'
 import FrameInfoSkeleton from './FrameInfoSkeleton'
 
-const CompetitionContext = ({ result }: GetCompetitionStatisticResponse) => {
+const CompetitionContext = ({
+  competitionsData
+}: {
+  competitionsData?: GetCompetitionStatisticResponse
+}) => {
   const axiosInstance = useAxiosAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = React.useState(true)
   const [CompNumber, setCompNumber] = React.useState({ unverified: 0, registered: 0 })
+
+  type competitionStatisticSelectors =
+    keyof GetCompetitionStatisticResponse['competition']
 
   const DROPDOWN_DATA: MenuItem[] = [
     { id: 2, option: 'CP' },
@@ -26,6 +33,25 @@ const CompetitionContext = ({ result }: GetCompetitionStatisticResponse) => {
     { id: 6, option: 'Datavidia' },
     { id: 7, option: 'Hackvidia' }
   ]
+
+  function getStatisticSelector(
+    compeName: 'CP' | 'CTF' | 'UXvidia' | 'Arkalogica' | 'Datavidia' | 'Hackvidia'
+  ) {
+    switch (compeName) {
+      case 'CP':
+        return 'competitiveProgramming' as competitionStatisticSelectors
+      case 'CTF':
+        return 'captureTheFlag' as competitionStatisticSelectors
+      case 'UXvidia':
+        return compeName.toLowerCase() as competitionStatisticSelectors
+      case 'Arkalogica':
+        return compeName.toLowerCase() as competitionStatisticSelectors
+      case 'Datavidia':
+        return compeName.toLowerCase() as competitionStatisticSelectors
+      case 'Hackvidia':
+        return compeName.toLowerCase() as competitionStatisticSelectors
+    }
+  }
 
   const [selectedCompetition, setSelectedCompetition] = React.useState<MenuItem | null>(
     DROPDOWN_DATA[0]
@@ -42,15 +68,26 @@ const CompetitionContext = ({ result }: GetCompetitionStatisticResponse) => {
         } as GetCompetitionByNameData)
 
         if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {
-          // throw new Error('Competition not found')
+          throw new Error('Competition not found')
         }
 
         const competitionId = (res.data as Array<{ id: string }>)[0].id
         setSelectedCompetitionId(competitionId)
 
-        const data = result.filter(item => item.competitionId === competitionId)[0]
-        const total = data?.totalTeam || 0
-        const verified = data?.totalVerifiedTeam || 0
+        const data =
+          competitionsData?.competition[
+            getStatisticSelector(
+              option as
+                | 'CP'
+                | 'CTF'
+                | 'UXvidia'
+                | 'Arkalogica'
+                | 'Datavidia'
+                | 'Hackvidia'
+            )
+          ]
+        const total = data?.count || 0
+        const verified = data?.verifiedCount || 0
 
         setCompNumber({
           unverified: total - verified,
@@ -71,7 +108,7 @@ const CompetitionContext = ({ result }: GetCompetitionStatisticResponse) => {
     if (selectedCompetition?.option) {
       fetchCompetitionSubmission(selectedCompetition.option)
     }
-  }, [selectedCompetition, result])
+  }, [selectedCompetition, competitionsData])
 
   return (
     <>

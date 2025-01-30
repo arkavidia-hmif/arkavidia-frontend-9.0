@@ -120,11 +120,8 @@ const AdminDashboardPage = () => {
       <div className="my-3 h-1 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] drop-shadow-[0_0_6px_rgba(255,255,255,0.5)] md:my-4" />
 
       {/* Competition */}
-      <CompetitionContext
-        count={stats?.count ?? 0}
-        verifiedCount={stats?.verifiedCount ?? 0}
-        result={stats?.result || []}
-      />
+
+      <CompetitionContext competitionsData={stats} />
     </>
   )
 }
