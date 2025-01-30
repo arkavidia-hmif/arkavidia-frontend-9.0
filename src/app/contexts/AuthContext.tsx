@@ -120,6 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (isAdmin) {
           appDispatch(setAdmin())
+          appDispatch(setAdminRole(selfReq.data.role))
         }
         res.ok = true
         await sessionCheck()
