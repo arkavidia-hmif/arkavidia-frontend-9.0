@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import TextArea from '../../TextArea'
-import { updateSubmissionFeedback } from '~/api/generated'
 import { Button } from '../../Button'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
@@ -25,16 +24,16 @@ const MessageBox = ({ typeId, feedback = '' }: MessageBoxProps) => {
         throw new Error('Invalid team ID')
       }
 
-      await updateSubmissionFeedback({
-        client: axiosAuth,
-        path: {
-          teamId: params.teamId,
-          typeId
-        },
-        body: {
-          feedback: message
-        }
-      })
+      // await updateSubmissionFeedback({
+      //   client: axiosAuth,
+      //   path: {
+      //     teamId: params.teamId,
+      //     typeId
+      //   },
+      //   body: {
+      //     feedback: message
+      //   }
+      // })
 
       toast({
         title: 'Feedback sent',
