@@ -9,7 +9,6 @@ import Countdown from '~/app/components/event/Academya/Countdown'
 async function EventPage({ params }: { params: { eventName: string } }) {
   const { eventName } = params
 
-  // Validate eventName
   const validEvents = ['ds', 'pm', 'softeng', 'uiux']
   if (!validEvents.includes(eventName)) {
     throw new Error('Invalid event name')
@@ -18,33 +17,33 @@ async function EventPage({ params }: { params: { eventName: string } }) {
   const events = [
     {
       title: 'Registration',
-      timeStart: new Date('2023-09-01T00:00:00'),
-      timeEnd: new Date('2023-09-15T23:59:59')
+      timeStart: new Date('2025-02-01T00:00:00'),
+      timeEnd: new Date('2025-02-15T23:59:59')
     },
     {
       title: 'Extended Registration',
-      timeStart: new Date('2023-09-16T00:00:00'),
-      timeEnd: new Date('2023-09-22T23:59:59')
+      timeStart: new Date('2025-02-16T00:00:00'),
+      timeEnd: new Date('2025-02-22T23:59:59')
     },
     {
       title: 'Announcement Phase 1',
-      timeStart: new Date('2023-09-25T12:00:00'),
-      timeEnd: new Date('2023-09-25T23:59:59')
+      timeStart: new Date('2025-02-25T12:00:00'),
+      timeEnd: new Date('2025-02-25T23:59:59')
     },
     {
       title: 'Announcement Phase 2',
-      timeStart: new Date('2023-09-28T12:00:00'),
-      timeEnd: new Date('2023-09-28T23:59:59')
+      timeStart: new Date('2025-02-28T12:00:00'),
+      timeEnd: new Date('2025-02-28T23:59:59')
     },
     {
       title: 'Academya Session',
-      timeStart: new Date('2023-10-01T09:00:00'),
-      timeEnd: new Date('2023-10-05T17:00:00')
+      timeStart: new Date('2025-02-01T09:00:00'),
+      timeEnd: new Date('2025-02-05T17:00:00')
     }
   ]
 
   return (
-    <div className="relative flex h-full min-h-screen w-full flex-col items-center justify-center gap-32 py-32">
+    <div className="relative flex h-full min-h-screen w-full flex-col items-center justify-center gap-32 pb-32 pt-52">
       {/* Hero Section */}
       <Hero type={eventName.toUpperCase() as 'UIUX' | 'PM' | 'DS' | 'SOFTENG'} />
 

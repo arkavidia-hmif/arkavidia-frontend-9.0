@@ -1,10 +1,11 @@
-import Footer from '../../../components/Footer'
-import Navbar from '../../../components/Navbar'
+import Footer from '~/app/components/Footer'
+import Navbar from '~/app/components/Navbar'
 import Image from 'next/image'
 
 export default function EventPageLayout({ children }: { children: React.ReactNode }) {
   return (
     <section className="relative h-full min-h-screen w-full">
+      {/* Kalo udah jadi harusnya bg nya bakalan keliatan full  */}
       <Image
         src="/images/event/event-bg.png"
         alt="Event Background"
