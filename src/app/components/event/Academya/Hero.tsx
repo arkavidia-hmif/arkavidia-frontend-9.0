@@ -16,7 +16,7 @@ const AcademyaHeroSection = ({ type }: { type: 'UIUX' | 'PM' | 'DS' | 'SOFTENG' 
     <section className="m-0 flex max-w-[1200px] flex-row items-center justify-center gap-6">
       <Image src={imageSrc} alt={type + ' Academya Logo'} width={502} height={363} />
       <div className="flex max-w-[540px] flex-col gap-6">
-        <h1 className="text-wrap font-belanosima text-5xl text-white">
+        <h1 className="text-wrap font-belanosima text-5xl uppercase text-white">
           ACADEMYA &ndash; {title}
         </h1>
         <p className="text-balance font-dmsans text-base text-white">
