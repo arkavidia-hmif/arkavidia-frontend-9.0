@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { ChevronUp, LogOut, Menu } from 'lucide-react'
 import {
   DropdownMenu,
@@ -31,7 +31,6 @@ interface SidebarLink {
 
 function Sidebar({ announcement = false }: SidebarProps) {
   const username = useAppSelector(state => state.auth.username)
-  const [isLoading, setIsLoading] = React.useState(true)
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
   const [sidebarLinks, setSidebarLinks] = React.useState<Array<SidebarLink>>([])
