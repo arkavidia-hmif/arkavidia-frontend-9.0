@@ -11,6 +11,7 @@ const AcademyaHeroSection = ({ type }: { type: 'UIUX' | 'PM' | 'DS' | 'SOFTENG' 
         : type === 'UIUX'
           ? 'UI/UX'
           : 'Software Engineering'
+
   return (
     <section className="m-0 flex max-w-[1200px] flex-row items-center justify-center gap-6">
       <Image src={imageSrc} alt={type + ' Academya Logo'} width={502} height={363} />
