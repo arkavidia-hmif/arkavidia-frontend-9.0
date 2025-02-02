@@ -138,11 +138,8 @@ function EventPage() {
       {/* Event Timeline */}
       <section className="flex flex-col items-center justify-center gap-28">
         <h1 className="font-belanosima text-6xl uppercase">EVENT TIMELINE</h1>
-        {eventTimeline.length === 0 ? (
-          <p className="font-dmsans text-base">No timeline available</p>
-        ) : (
-          <Timeline events={eventTimeline} variant={'horizontal'} />
-        )}
+        {/* <Timeline events={eventTimeline} variant={'horizontal'} /> */}
+        <Timeline events={MOCK_EVENTS_DATA} variant={'horizontal'} />
       </section>
 
       {/* FAQ */}
