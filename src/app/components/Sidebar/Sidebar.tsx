@@ -36,7 +36,7 @@ const CollapsibleSection = ({
         onClick={() => setIsOpen(!isOpen)}
         className="flex w-full items-center justify-between px-2 py-2 text-white hover:bg-white/10 rounded-lg"
       >
-        <span className="text-sm font-semibold">{title}</span>
+        <span className="text-base font-bold font-teachers lg:text-lg">{title}</span>
         <ChevronUp
           className={`h-4 w-4 transition-transform duration-300 ${
             isOpen ? 'rotate-0' : 'rotate-180'
@@ -176,6 +176,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
       fetchUserCompetitions()
       fetchUserEvents()
     } else {
+      // TODO: handle admin links for events
       setSidebarLinks(getAdminLinks())
     }
 
@@ -241,7 +242,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
               />
             </Link>
             <div className="flex h-full flex-col justify-between">
-              <div className="mt-4 flex w-full grow flex-col overflow-y-auto px-2 lg:mt-7 lg:px-[10px]">
+              <div className="mt-4 flex w-full gap-5 grow flex-col overflow-y-auto px-2 lg:mt-7 lg:px-[10px]">
                 {sidebarLinks.length ? (
                   <>
                     {/* Dashboard Links */}
