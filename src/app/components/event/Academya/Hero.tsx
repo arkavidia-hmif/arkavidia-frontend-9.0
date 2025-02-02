@@ -1,34 +1,27 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import Image from 'next/image'
-import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
-import { useParams } from 'next/navigation'
-import { getEventById } from '~/api/generated'
-import { GetEventByIdResponse } from '~/api/generated'
 
-const AcademyaHeroSection = () => {
-  const { eventId } = useParams()
-  const [eventTitle, setEventTitle] = useState('')
-  const [eventDescription, setEventDescription] = useState('')
-  const [imageSrc, setImageSrc] = useState(`/images/event/academya/`)
+const AcademyaHeroSection = ({
+  eventTitle,
+  eventDescription
+}: {
+  eventTitle: string | undefined
+  eventDescription: string | undefined
+}) => {
+  const imageSrc = `/images/event/academya/` + eventTitle + `.svg`
 
-  const axiosInstance = useAxiosAuth()
-
-  useEffect(() => {
-    const fetchEventById = async (eventId: string) => {
-      const res: GetEventByIdResponse = await getEventById({
-        client: axiosInstance,
-        path: { eventId: eventId }
-      }).then(res => res.data ?? [])
-
-      if ('title' in res && 'description' in res) {
-        setEventTitle(res.title as string)
-        setEventDescription(res.description as string)
-        setImageSrc(`/images/event/academya/${res.title}.svg`)
-      }
-    }
-
-    if (eventId && typeof eventId === 'string') fetchEventById(eventId)
-  }, [eventId])
+  if (!eventTitle || !eventDescription) {
+    return (
+      <section className="m-0 flex max-w-[1200px] flex-row items-center justify-center gap-6">
+        <div className="h-[363px] w-[502px] animate-pulse rounded-lg bg-gray-700" />
+        <div className="flex max-w-[540px] flex-col gap-6">
+          <div className="h-14 w-96 animate-pulse rounded bg-gray-700" />
+          <div className="h-24 w-full animate-pulse rounded bg-gray-700" />
+          <div className="h-8 w-80 animate-pulse rounded bg-gray-700" />
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="m-0 flex max-w-[1200px] flex-row items-center justify-center gap-6">
