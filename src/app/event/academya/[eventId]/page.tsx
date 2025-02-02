@@ -6,7 +6,7 @@ import Timeline from '~/app/components/Timeline'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import Countdown from '~/app/components/event/Academya/Countdown'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import {
   Event,
   EventTimeline,
@@ -15,6 +15,7 @@ import {
   getEventTimelineById
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { useToast } from '~/hooks/use-toast'
 
 interface eventTimeline {
   title: string
@@ -24,6 +25,8 @@ interface eventTimeline {
 
 function EventPage() {
   const { eventId } = useParams()
+  const { toast } = useToast()
+  const router = useRouter()
   const [event, setEvent] = useState<Event>()
   const [eventTimeline, setEventTimeline] = useState<eventTimeline[]>([])
   const axiosInstance = useAxiosAuth()
@@ -58,13 +61,30 @@ function EventPage() {
 
   useEffect(() => {
     const fetchEventById = async (eventId: string) => {
-      const res: GetEventByIdResponse = await getEventById({
-        client: axiosInstance,
-        path: { eventId: eventId }
-      }).then(res => res.data ?? [])
+      try {
+        const res = await getEventById({
+          client: axiosInstance,
+          path: { eventId: eventId }
+        }).then(res => res.data)
 
-      if ('title' in res && 'description' in res) {
-        setEvent(res as unknown as Event)
+        if (!res) {
+          throw new Error('Event not found')
+        }
+
+        if (res && typeof res === 'object' && 'title' in res && 'description' in res) {
+          setEvent(res as unknown as Event)
+        } else {
+          throw new Error('Invalid event data')
+        }
+      } catch (error) {
+        toast({
+          title: 'Failed to fetch event',
+          description: 'Please try again later',
+          variant: 'destructive',
+          duration: 5000
+        })
+
+        router.push('/event/academya')
       }
     }
 
@@ -82,6 +102,13 @@ function EventPage() {
           timeEnd: timeline.endDate ? new Date(timeline.endDate) : undefined
         }))
         setEventTimeline(mappedEvents)
+      } else {
+        toast({
+          title: 'Failed to fetch event timeline',
+          description: 'Please try again later',
+          variant: 'destructive',
+          duration: 5000
+        })
       }
     }
 
@@ -141,7 +168,6 @@ function EventPage() {
         {eventTimeline.length === 0 ? (
           <>
             <Timeline events={MOCK_EVENTS_DATA} variant={'horizontal'} />
-            <p>no timeline data</p>
           </>
         ) : (
           <Timeline events={eventTimeline} variant={'horizontal'} />
