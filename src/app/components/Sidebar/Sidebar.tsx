@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { ChevronUp, LogOut, Menu } from 'lucide-react'
 import {
   DropdownMenu,
@@ -10,14 +10,57 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '../ui/dropdown-menu'
-import { getTeams, GetTeamsResponse } from '~/api/generated'
+import { getTeams, GetTeamsResponse, getEventTeam, GetEventTeamResponse, getEventById, GetEventByIdResponse } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
 import { useToast } from '~/hooks/use-toast'
 import { useAuth } from '../../contexts/AuthContext'
-import { expandCompetitionName } from '~/lib/utils'
+import { expandCompetitionName, expandEventName } from '~/lib/utils'
 import SidebarItem from './SidebarItems'
 import { getAdminLinks, getSidebarURL } from './SidebarLinks'
+
+const CollapsibleSection = ({ 
+  title, 
+  links, 
+  defaultOpen = true 
+}: { 
+  title: string; 
+  links: SidebarLink[];
+  defaultOpen?: boolean;
+}) => {
+  const [isOpen, setIsOpen] = React.useState(defaultOpen);
+
+  return (
+    <div className="w-full">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex w-full items-center justify-between px-2 py-2 text-white hover:bg-white/10 rounded-lg"
+      >
+        <span className="text-sm font-semibold">{title}</span>
+        <ChevronUp
+          className={`h-4 w-4 transition-transform duration-300 ${
+            isOpen ? 'rotate-0' : 'rotate-180'
+          }`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          isOpen ? 'max-h-96' : 'max-h-0'
+        }`}
+      >
+        {links.map((item, index) => (
+          <SidebarItem
+            key={index}
+            name={item.name}
+            link={item.link}
+            image={item.image}
+            className="mt-3 pl-4"
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export interface SidebarProps {
   announcement?: boolean
@@ -27,11 +70,11 @@ interface SidebarLink {
   name: string
   link: string
   image?: string
+  type?: 'competition' | 'event' | null
 }
 
 function Sidebar({ announcement = false }: SidebarProps) {
   const username = useAppSelector(state => state.auth.username)
-  const [isLoading, setIsLoading] = React.useState(true)
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false)
   const [sidebarLinks, setSidebarLinks] = React.useState<Array<SidebarLink>>([])
@@ -61,7 +104,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
             name: 'Dashboard',
             link: '/dashboard'
           }
-        ]) //
+        ])
         const competitionList = JSON.parse(JSON.stringify(req.data)) as GetTeamsResponse
 
         if (competitionList.length > 0) {
@@ -73,11 +116,51 @@ function Sidebar({ announcement = false }: SidebarProps) {
                 link: getSidebarURL({
                   isAdmin,
                   competitionName: competition.competition!.title
-                })
+                }),
+                type: 'competition',
               }
             ])
           })
         }
+      }
+    }
+
+    async function fetchUserEvents() {
+      const req = await getEventTeam({client: authAxios})
+
+      if (req.error || req.status !== 200) {
+        toast({
+          title: 'Failed getting data',
+          description: 'Failed to get user events',
+          variant: 'destructive'
+        })
+      }
+
+      const eventList = JSON.parse(JSON.stringify(req.data)) as GetEventTeamResponse
+      const sidebarLinksTemps = sidebarLinks
+
+      for (const event of eventList) {
+        const res = await getEventById({client: authAxios, path: {eventId: event.eventId}})
+        
+        if (res.error || res.status !== 200) {
+          toast({
+            title: 'Failed getting data',
+            description: 'No event with this type',
+            variant: 'destructive'
+          })
+        }
+
+        const eventData = JSON.parse(JSON.stringify(res.data)) as GetEventByIdResponse
+
+        sidebarLinksTemps.push({
+          name: expandEventName(eventData[0].title),
+          link: getSidebarURL(
+            {isAdmin,
+              eventName: eventData[0].title
+            }
+          ),
+          type: 'event',
+        })
       }
     }
 
@@ -91,9 +174,11 @@ function Sidebar({ announcement = false }: SidebarProps) {
 
     if (!isAdmin) {
       fetchUserCompetitions()
+      fetchUserEvents()
     } else {
       setSidebarLinks(getAdminLinks())
     }
+
 
     window.addEventListener('scroll', handleScroll)
 
@@ -116,6 +201,11 @@ function Sidebar({ announcement = false }: SidebarProps) {
     }, 1000)
   }
 
+  // Group links by type
+  const dashboardLinks = sidebarLinks.filter(link => !link.type)
+  const competitionLinks = sidebarLinks.filter(link => link.type === 'competition')
+  const eventLinks = sidebarLinks.filter(link => link.type === 'event')
+
   return (
     <>
       <div
@@ -130,7 +220,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
           />
         </Link>
         <div
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)} // Toggle sidebar visibility
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="mr-2 size-fit cursor-pointer rounded-lg bg-gradient-to-b from-[#2E046A] to-[#0B1936] p-2">
           <Menu className="h-6 w-6 text-white" />
         </div>
@@ -153,15 +243,34 @@ function Sidebar({ announcement = false }: SidebarProps) {
             <div className="flex h-full flex-col justify-between">
               <div className="mt-4 flex w-full grow flex-col overflow-y-auto px-2 lg:mt-7 lg:px-[10px]">
                 {sidebarLinks.length ? (
-                  sidebarLinks.map((item, index) => (
-                    <SidebarItem
-                      key={index}
-                      name={item.name}
-                      link={item.link}
-                      image={item.image}
-                      className="mt-3"
-                    />
-                  ))
+                  <>
+                    {/* Dashboard Links */}
+                    {dashboardLinks.map((item, index) => (
+                      <SidebarItem
+                        key={index}
+                        name={item.name}
+                        link={item.link}
+                        image={item.image}
+                        className="mt-3"
+                      />
+                    ))}
+                    
+                    {/* Competition Section */}
+                    {competitionLinks.length > 0 && (
+                      <CollapsibleSection
+                        title="Competitions"
+                        links={competitionLinks}
+                      />
+                    )}
+                    
+                    {/* Event Section */}
+                    {eventLinks.length > 0 && (
+                      <CollapsibleSection
+                        title="Events"
+                        links={eventLinks}
+                      />
+                    )}
+                  </>
                 ) : (
                   <div className="px-2 text-center">No competitions joined!</div>
                 )}
@@ -176,7 +285,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
                     className="my-6 flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
                     <div className="flex flex-1 items-center gap-2 text-left">
                       <Image
-                        src="/profileLogo.svg" // bisa diganti dengan foto profile user
+                        src="/profileLogo.svg"
                         alt="Profile Logo"
                         width={20}
                         height={20}
