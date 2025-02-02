@@ -8,7 +8,7 @@ interface CountdownProps {
 }
 
 export default function Countdown({ targetDate }: CountdownProps) {
-  const { days, hours, minutes, isComplete } = useCountdown(targetDate)
+  const { days, hours, minutes } = useCountdown(targetDate)
 
   return (
     <div className="flex flex-col items-center gap-4 md:flex-row">
