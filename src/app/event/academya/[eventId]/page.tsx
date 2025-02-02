@@ -1,18 +1,16 @@
-import React from 'react'
+'use client'
+import React, { useEffect } from 'react'
 import Hero from '~/app/components/event/Academya/Hero'
 import { Button } from '~/app/components/Button'
 import Timeline from '~/app/components/Timeline'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import Countdown from '~/app/components/event/Academya/Countdown'
+import { getEventById } from '~/api/generated'
+import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 
-async function EventPage({ params }: { params: { eventName: string } }) {
-  const { eventName } = params
-
-  const validEvents = ['ds', 'pm', 'softeng', 'uiux']
-  if (!validEvents.includes(eventName)) {
-    throw new Error('Invalid event name')
-  }
+function EventPage() {
+  const [eventName, setEventName] = React.useState('')
 
   const events = [
     {
@@ -45,7 +43,7 @@ async function EventPage({ params }: { params: { eventName: string } }) {
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col items-center justify-center gap-32 pb-32 pt-52">
       {/* Hero Section */}
-      <Hero type={eventName.toUpperCase() as 'UIUX' | 'PM' | 'DS' | 'SOFTENG'} />
+      <Hero />
 
       {/* Countdown & Register */}
       <section className="flex flex-col items-center justify-center gap-16">
