@@ -87,83 +87,86 @@ function Sidebar({ announcement = false }: SidebarProps) {
   const authAxios = useAxiosAuth()
 
   useEffect(() => {
-    async function fetchUserCompetitions() {
-      const req = await getTeams({ client: authAxios })
-
-      if (req.error) {
+    async function fetchSidebarLinks() {
+      // Initialize with the dashboard link
+      const links: Array<SidebarLink> = [
+        {
+          name: 'Dashboard',
+          link: '/dashboard'
+        }
+      ]
+  
+      // Fetch Competitions
+      const teamsRes = await getTeams({ client: authAxios })
+  
+      if (teamsRes.error) {
         toast({
           title: 'Failed getting data',
           description: 'Failed to get user competitions',
           variant: 'destructive'
         })
-      }
-
-      if (req.data) {
-        setSidebarLinks([
-          {
-            name: 'Dashboard',
-            link: '/dashboard'
-          }
-        ])
-        const competitionList = JSON.parse(JSON.stringify(req.data)) as GetTeamsResponse
-
-        if (competitionList.length > 0) {
-          competitionList.forEach(competition => {
-            setSidebarLinks(prev => [
-              ...prev,
-              {
-                name: expandCompetitionName(competition.competition!.title),
-                link: getSidebarURL({
-                  isAdmin,
-                  competitionName: competition.competition!.title
-                }),
-                type: 'competition',
-              }
-            ])
+      } else if (teamsRes.data) {
+        const competitionList = JSON.parse(JSON.stringify(teamsRes.data)) as GetTeamsResponse
+  
+        competitionList.forEach(competition => {
+          links.push({
+            name: expandCompetitionName(competition.competition!.title),
+            link: getSidebarURL({
+              isAdmin,
+              competitionName: competition.competition!.title
+            }),
+            type: 'competition'
           })
-        }
+        })
       }
-    }
-
-    async function fetchUserEvents() {
-      const req = await getEventTeam({client: authAxios})
-
-      if (req.error || req.status !== 200) {
+  
+      // Fetch Events
+      const eventTeamRes = await getEventTeam({ client: authAxios })
+  
+      if (eventTeamRes.error || eventTeamRes.status !== 200) {
         toast({
           title: 'Failed getting data',
           description: 'Failed to get user events',
           variant: 'destructive'
         })
-      }
-
-      const eventList = JSON.parse(JSON.stringify(req.data)) as GetEventTeamResponse
-      const sidebarLinksTemps = sidebarLinks
-
-      for (const event of eventList) {
-        const res = await getEventById({client: authAxios, path: {eventId: event.eventId}})
-        
-        if (res.error || res.status !== 200) {
-          toast({
-            title: 'Failed getting data',
-            description: 'No event with this type',
-            variant: 'destructive'
+      } else {
+        const eventList = JSON.parse(JSON.stringify(eventTeamRes.data)) as GetEventTeamResponse
+  
+        for (const event of eventList) {
+          const eventRes = await getEventById({
+            client: authAxios,
+            path: { eventId: event.eventId }
           })
+  
+          if (eventRes.error || eventRes.status !== 200) {
+            toast({
+              title: 'Failed getting data',
+              description: 'No event with this type',
+              variant: 'destructive'
+            })
+          } else {
+            const eventData = JSON.parse(JSON.stringify(eventRes.data)) as GetEventByIdResponse
+  
+            links.push({
+              name: expandEventName(eventData[0].title),
+              link: getSidebarURL({ isAdmin, eventName: eventData[0].title }),
+              type: 'event'
+            })
+          }
         }
-
-        const eventData = JSON.parse(JSON.stringify(res.data)) as GetEventByIdResponse
-
-        sidebarLinksTemps.push({
-          name: expandEventName(eventData[0].title),
-          link: getSidebarURL(
-            {isAdmin,
-              eventName: eventData[0].title
-            }
-          ),
-          type: 'event',
-        })
+  
+        // Dummy event link
+        // const dummyTitle = 'Akademya - Software Engineering'
+        // links.push({
+        //   name: expandEventName(dummyTitle),
+        //   link: getSidebarURL({ isAdmin, eventName: dummyTitle }),
+        //   type: 'event'
+        // })
       }
+  
+      setSidebarLinks(links)
     }
-
+  
     function handleScroll() {
       if (window.scrollY > 0) {
         setHasScrolled(true)
@@ -171,18 +174,16 @@ function Sidebar({ announcement = false }: SidebarProps) {
         setHasScrolled(false)
       }
     }
-
+  
     if (!isAdmin) {
-      fetchUserCompetitions()
-      fetchUserEvents()
+      fetchSidebarLinks()
     } else {
       // TODO: handle admin links for events
       setSidebarLinks(getAdminLinks())
     }
-
-
+  
     window.addEventListener('scroll', handleScroll)
-
+  
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
