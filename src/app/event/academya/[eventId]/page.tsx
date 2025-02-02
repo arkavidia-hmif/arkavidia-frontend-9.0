@@ -29,6 +29,7 @@ function EventPage() {
   const router = useRouter()
   const [event, setEvent] = useState<Event>()
   const [eventTimeline, setEventTimeline] = useState<eventTimeline[]>([])
+  const [registrationCloseDate, setRegistrationCloseDate] = useState<string>('')
   const axiosInstance = useAxiosAuth()
 
   const MOCK_EVENTS_DATA = [
@@ -73,6 +74,20 @@ function EventPage() {
 
         if (res && typeof res === 'object' && 'title' in res && 'description' in res) {
           setEvent(res as unknown as Event)
+
+          const registrationEvent = MOCK_EVENTS_DATA.find(event =>
+            event.title.toLowerCase().includes('registration')
+          )
+          if (registrationEvent?.timeEnd) {
+            setRegistrationCloseDate(
+              registrationEvent.timeEnd.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })
+            )
+          }
         } else {
           throw new Error('Invalid event data')
         }
@@ -121,7 +136,11 @@ function EventPage() {
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col items-center justify-center gap-8 px-4 pb-32 pt-28 md:gap-16 md:pt-52 lg:gap-32">
       {/* Hero Section */}
-      <Hero eventTitle={event?.title} eventDescription={event?.description} />
+      <Hero
+        eventTitle={event?.title}
+        eventDescription={event?.description}
+        registrationCloseDate={registrationCloseDate}
+      />
 
       {/* Countdown & Register */}
       <section className="flex flex-col items-center justify-center gap-16">
