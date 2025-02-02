@@ -1,17 +1,13 @@
 'use client'
-import React, { useEffect } from 'react'
+import React from 'react'
 import Hero from '~/app/components/event/Academya/Hero'
 import { Button } from '~/app/components/Button'
 import Timeline from '~/app/components/Timeline'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import Countdown from '~/app/components/event/Academya/Countdown'
-import { getEventById } from '~/api/generated'
-import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 
 function EventPage() {
-  const [eventName, setEventName] = React.useState('')
-
   const events = [
     {
       title: 'Registration',
