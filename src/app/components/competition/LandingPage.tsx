@@ -355,8 +355,8 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               </div>
               <div className="flex w-full flex-col flex-wrap gap-4 sm:gap-2 md:flex-row">
                 {props.contactPerson?.map(contact => (
-                  <Link key={contact.contact} href={contact.contact || '#'} className="w-full sm:w-auto">
-                    <Button variant="outline" className='w-full'>
+                  <Link key={contact.contact} href={contact.contact || '#'}>
+                    <Button variant="outline" className="w-full sm:w-auto">
                       <div className="flex flex-row items-center justify-center gap-2 px-4">
                         <Image
                           src={contactLogo[contact.type] || ''}
@@ -376,10 +376,9 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
       </div>
       <Image
         src={'/images/competition/landing-page.png'}
-        // width={1920}
-        // height={1080}
-        fill
-        className="absolute top-0 z-[-1] object-cover"
+        width={1920}
+        height={1080}
+        className="absolute top-0 z-[-1]"
         alt="Landing Background"
       />
     </div>
