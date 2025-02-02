@@ -28,6 +28,34 @@ function EventPage() {
   const [eventTimeline, setEventTimeline] = useState<eventTimeline[]>([])
   const axiosInstance = useAxiosAuth()
 
+  const MOCK_EVENTS_DATA = [
+    {
+      title: 'Registration',
+      timeStart: new Date('2025-02-01T00:00:00'),
+      timeEnd: new Date('2025-02-15T23:59:59')
+    },
+    {
+      title: 'Extended Registration',
+      timeStart: new Date('2025-02-16T00:00:00'),
+      timeEnd: new Date('2025-02-22T23:59:59')
+    },
+    {
+      title: 'Announcement Phase 1',
+      timeStart: new Date('2025-02-25T12:00:00'),
+      timeEnd: new Date('2025-02-25T23:59:59')
+    },
+    {
+      title: 'Announcement Phase 2',
+      timeStart: new Date('2025-02-28T12:00:00'),
+      timeEnd: new Date('2025-02-28T23:59:59')
+    },
+    {
+      title: 'Academya Session',
+      timeStart: new Date('2025-02-01T09:00:00'),
+      timeEnd: new Date('2025-02-05T17:00:00')
+    }
+  ]
+
   useEffect(() => {
     const fetchEventById = async (eventId: string) => {
       const res: GetEventByIdResponse = await getEventById({
@@ -71,7 +99,15 @@ function EventPage() {
       {/* Countdown & Register */}
       <section className="flex flex-col items-center justify-center gap-16">
         <div className="p-10">
-          <Countdown targetDate={new Date('2025-02-04T00:00:00')} />
+          <Countdown
+            targetDate={
+              eventTimeline.length > 0
+                ? eventTimeline.reduce((latest, current) =>
+                    latest.timeStart > current.timeStart ? latest : current
+                  ).timeStart
+                : new Date('2025-02-07T00:00:00')
+            }
+          />
         </div>
 
         <div className="flex items-center justify-center gap-4">
