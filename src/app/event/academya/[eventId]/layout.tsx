@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 export default function EventPageLayout({ children }: { children: React.ReactNode }) {
   return (
-    <section className="relative h-full min-h-screen w-full">
+    <section className="relative h-full min-h-screen w-full px-4">
       {/* Kalo udah jadi harusnya bg nya bakalan keliatan full  */}
       <Image
         src="/images/event/event-bg.png"

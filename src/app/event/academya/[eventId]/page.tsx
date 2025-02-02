@@ -64,7 +64,7 @@ function EventPage() {
   }, [eventId])
 
   return (
-    <div className="relative flex h-full min-h-screen w-full flex-col items-center justify-center gap-32 pb-32 pt-52">
+    <div className="relative flex h-full min-h-screen w-full flex-col items-center justify-center gap-8 px-4 pb-32 pt-28 md:gap-16 md:pt-52 lg:gap-32">
       {/* Hero Section */}
       <Hero eventTitle={event?.title} eventDescription={event?.description} />
 
