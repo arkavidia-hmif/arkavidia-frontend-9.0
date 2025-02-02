@@ -7,13 +7,7 @@ import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import Countdown from '~/app/components/event/Academya/Countdown'
 import { useParams, useRouter } from 'next/navigation'
-import {
-  Event,
-  EventTimeline,
-  getEventById,
-  GetEventByIdResponse,
-  getEventTimelineById
-} from '~/api/generated'
+import { Event, EventTimeline, getEventById, getEventTimelineById } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
 
@@ -74,27 +68,13 @@ function EventPage() {
 
         if (res && typeof res === 'object' && 'title' in res && 'description' in res) {
           setEvent(res as unknown as Event)
-
-          const registrationEvent = MOCK_EVENTS_DATA.find(event =>
-            event.title.toLowerCase().includes('registration')
-          )
-          if (registrationEvent?.timeEnd) {
-            setRegistrationCloseDate(
-              registrationEvent.timeEnd.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })
-            )
-          }
         } else {
           throw new Error('Invalid event data')
         }
       } catch (error) {
         toast({
           title: 'Failed to fetch event',
-          description: 'Please try again later',
+          description: error instanceof Error ? error.message : 'Please try again later',
           variant: 'destructive',
           duration: 5000
         })
@@ -116,6 +96,7 @@ function EventPage() {
           timeStart: new Date(timeline.startDate),
           timeEnd: timeline.endDate ? new Date(timeline.endDate) : undefined
         }))
+
         setEventTimeline(mappedEvents)
       } else {
         toast({
@@ -132,6 +113,23 @@ function EventPage() {
       fetchEventTimeline(eventId)
     }
   }, [eventId])
+
+  useEffect(() => {
+    const registrationEvent =
+      eventTimeline.length > 0
+        ? eventTimeline.find(event => event.title.toLowerCase().includes('regist'))
+        : MOCK_EVENTS_DATA.find(event => event.title.toLowerCase().includes('regist')) // pake mock data kalo ga ada data timeline
+    if (registrationEvent?.timeEnd) {
+      setRegistrationCloseDate(
+        registrationEvent.timeEnd.toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      )
+    }
+  }, [eventTimeline])
 
   return (
     <div className="relative flex h-full min-h-screen w-full flex-col items-center justify-center gap-8 px-4 pb-32 pt-28 md:gap-16 md:pt-52 lg:gap-32">
