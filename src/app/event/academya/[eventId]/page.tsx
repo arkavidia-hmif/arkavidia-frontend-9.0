@@ -83,7 +83,7 @@ function EventPage() {
       }
     }
 
-    // ! masih perlu diuji karena belum ada data timeline
+    // TODO: masih perlu diuji karena belum ada data timeline
     const fetchEventTimeline = async (eventId: string) => {
       const res = await getEventTimelineById({
         client: axiosInstance,
@@ -191,8 +191,9 @@ function EventPage() {
         )}
       </section>
 
-      {/* FAQ */}
-      {/* Sponsors */}
+      {/* TODO: FAQ */}
+      {/* TODO: Sponsors */}
+      
     </div>
   )
 }
