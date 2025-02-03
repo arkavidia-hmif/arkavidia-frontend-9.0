@@ -16,7 +16,11 @@ import {
   getEventTeam,
   GetEventTeamResponse,
   getEventById,
-  GetEventByIdResponse
+  GetEventByIdResponse,
+  getAdminCompetitions,
+  GetAdminCompetitionsResponse,
+  getEvent,
+  GetEventResponse
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
@@ -153,7 +157,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
             })
           } else {
             const eventData = JSON.parse(JSON.stringify(eventRes.data)) as GetEventByIdResponse
-
+            
             links.push({
               name: expandEventName(eventData[0].title),
               link: getSidebarURL({ isAdmin, eventName: eventData[0].title }),
@@ -161,7 +165,76 @@ function Sidebar({ announcement = false }: SidebarProps) {
             })
           }
         }
+        const tempName = 'Akademya - Software Engineering'
+        links.push({
+          name: expandEventName(tempName),
+          link: getSidebarURL({
+            isAdmin, eventName: tempName
+          }),
+          type: 'event'
+        })
       }
+      
+      setSidebarLinks(links)
+    }
+
+    
+    async function fetchSidebarLinksAdmin() {
+      const links: Array<SidebarLink> = [
+        {
+          name: 'Dashboard',
+          link: '/dashboard'
+        }
+      ]
+
+      // Fetch competition
+      const resComp = await getAdminCompetitions({client: authAxios})
+      
+      if (resComp.error || resComp.status !== 200) {
+        toast({
+          title: 'Failed getting data',
+          description: 'Failed to get competitions',
+          variant: 'destructive'
+        })
+      }
+      
+      const competitionList = JSON.parse(JSON.stringify(resComp.data)) as GetAdminCompetitionsResponse
+      
+      // Add competition to sidebar
+      competitionList.forEach(competition => {
+        links.push({
+          name: expandCompetitionName(competition.title),
+          link: getSidebarURL({
+            isAdmin: true,
+            competitionName: competition.title
+          }),
+          type: 'competition'
+        })
+      })
+      
+      // Fetch all events
+      const resEvents = await getEvent({client: authAxios})
+      
+      if (resEvents.error || resEvents.status !== 200) {
+        toast({
+          title: 'Failed getting data',
+          description: 'Failed to get events',
+          variant: 'destructive'
+        })
+      }
+
+      const eventList = JSON.parse(JSON.stringify(resEvents.data)) as GetEventResponse
+
+      eventList.forEach(event => {
+        links.push({
+          name: expandEventName(event.title),
+          link: getSidebarURL({
+            isAdmin: true,
+            eventName: event.title
+          }),
+          type: 'event'
+        })
+      })
 
       setSidebarLinks(links)
     }
@@ -173,12 +246,12 @@ function Sidebar({ announcement = false }: SidebarProps) {
         setHasScrolled(false)
       }
     }
-
+    
     if (!isAdmin) {
       fetchSidebarLinks()
     } else {
-      // TODO: handle admin links for events
-      setSidebarLinks(getAdminLinks())
+      // setSidebarLinks(getAdminLinks(authAxios))
+      fetchSidebarLinksAdmin()
     }
 
     window.addEventListener('scroll', handleScroll)
