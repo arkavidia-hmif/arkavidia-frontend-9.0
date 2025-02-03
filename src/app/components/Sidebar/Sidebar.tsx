@@ -165,14 +165,6 @@ function Sidebar({ announcement = false }: SidebarProps) {
             })
           }
         }
-        const tempName = 'Akademya - Software Engineering'
-        links.push({
-          name: expandEventName(tempName),
-          link: getSidebarURL({
-            isAdmin, eventName: tempName
-          }),
-          type: 'event'
-        })
       }
       
       setSidebarLinks(links)
