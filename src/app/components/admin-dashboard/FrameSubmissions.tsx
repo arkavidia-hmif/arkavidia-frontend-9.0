@@ -1,12 +1,16 @@
 'use client'
 import React, { useEffect } from 'react'
 import FrameTugas from './FrameTugas'
-import { getCompetitionStatistic, GetCompetitionStatisticResponse } from '~/api/generated'
+import {
+  getAdminAllCompetitionTeams,
+  getCompetitionStatistic,
+  GetCompetitionStatisticResponse
+} from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
 
 interface FrameSubmissionsProps {
-  compe_id?: string
+  compe_id: string
   totalTeam: number
 }
 
@@ -22,8 +26,11 @@ const FrameSubmissions = ({ compe_id, totalTeam }: FrameSubmissionsProps) => {
     async function fetchCompetitionSubmission() {
       // fetch competition submission
       try {
-        const res = await getCompetitionStatistic({
-          client: axiosInstance
+        const res = await getAdminAllCompetitionTeams({
+          client: axiosInstance,
+          path: {
+            competitionId: compe_id
+          }
         })
 
         if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {
@@ -60,8 +67,8 @@ const FrameSubmissions = ({ compe_id, totalTeam }: FrameSubmissionsProps) => {
 
         {/* List Tugas */}
         <div className="mt-4 flex flex-col gap-4">
-          {competitionSubmissions
-            .filter(item => item.competitionId === compe_id)
+          {/* {competitionSubmissions
+            .filter(item => item. === compe_id)
             .map((item, _index) =>
               item.submissions.map((submission, _subidx) => (
                 <FrameTugas
@@ -72,7 +79,7 @@ const FrameSubmissions = ({ compe_id, totalTeam }: FrameSubmissionsProps) => {
                   total={totalTeam}
                 />
               ))
-            )}
+            )} */}
         </div>
       </div>
     </div>

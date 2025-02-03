@@ -35,7 +35,7 @@ function getTagStyling(variant: string) {
     case 'blue':
       return 'bg-blue-100 text-blue-500 border-blue-300'
     case 'neutral':
-      return 'bg-neutral-100 text-650-800 border-neutral-300'
+      return 'bg-neutral-100 border-neutral-300 text-black'
   }
 }
 

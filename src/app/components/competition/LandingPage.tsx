@@ -268,19 +268,20 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
           {/* Buttons */}
           <div className="flex flex-col items-center justify-center gap-4 md:flex-row md:gap-8 lg:gap-12">
-            <Button variant="outline" className="w-full sm:w-auto">
-              <a
-                href={props.handbookLink === '#' ? '#' : props.handbookLink}
-                target={
-                  props.handbookLink === '#' || props.handbookLink === '' ? '' : '_blank'
-                }
-                rel="noopener noreferrer">
-                <div className="flex flex-row items-center justify-center gap-2">
-                  <IoMdDownload className="text-[#48E6FF]" />
-                  <span>Download Handbook</span>
-                </div>
-              </a>
-            </Button>
+            <Link
+              href={props.handbookLink === '#' ? '#' : props.handbookLink}
+              target={
+                props.handbookLink === '#' || props.handbookLink === '' ? '' : '_blank'
+              }
+              rel="noopener noreferrer"
+            >
+              <Button variant="outline" className="w-full sm:w-auto">
+                  <div className="flex flex-row items-center justify-center gap-2">
+                    <IoMdDownload className="text-[#48E6FF]" />
+                    <span>Download Handbook</span>
+                  </div>
+              </Button>
+            </Link>
             <CompetitionRegistration
               competitionID={props.competitionCode}
               competitionAbbreviation={props.competitionAbbr}
@@ -354,8 +355,8 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               </div>
               <div className="flex w-full flex-col flex-wrap gap-4 sm:gap-2 md:flex-row">
                 {props.contactPerson?.map(contact => (
-                  <Link key={contact.contact} href={contact.contact || '#'}>
-                    <Button variant="outline" className="w-full sm:w-auto">
+                  <Link key={contact.contact} href={contact.contact || '#'} className="w-full sm:w-auto">
+                    <Button variant="outline" className='w-full'>
                       <div className="flex flex-row items-center justify-center gap-2 px-4">
                         <Image
                           src={contactLogo[contact.type] || ''}
@@ -375,9 +376,10 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
       </div>
       <Image
         src={'/images/competition/landing-page.png'}
-        width={1920}
-        height={1080}
-        className="absolute top-0 z-[-1]"
+        // width={1920}
+        // height={1080}
+        fill
+        className="absolute top-0 z-[-1] object-cover"
         alt="Landing Background"
       />
     </div>
