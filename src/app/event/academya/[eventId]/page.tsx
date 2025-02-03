@@ -10,12 +10,31 @@ import { useParams, useRouter } from 'next/navigation'
 import { Event, EventTimeline, getEventById, getEventTimelineById } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
+import Link from 'next/link'
 
 interface eventTimeline {
   title: string
   timeStart: Date
   timeEnd?: Date
 }
+
+const SPONSORS_EXAMPLE = [
+  {
+    name: 'Gojek',
+    logo: '/images/event/academya/sponsors/gojek.png',
+    link: 'https://gojek.com'
+  },
+  {
+    name: 'Paragon',
+    logo: '/images/event/academya/sponsors/paragon.png',
+    link: 'https://facebook.com'
+  },
+  {
+    name: 'Shopee',
+    logo: '/images/event/academya/sponsors/shopee.png',
+    link: 'https://shopee.com'
+  }
+]
 
 function EventPage() {
   const { eventId } = useParams()
@@ -163,7 +182,7 @@ function EventPage() {
               }
             }}>
             <Image
-              src={'/images/event/download-icon.svg'}
+              src={'/images/event/download.svg'}
               alt={'Download Handbook Icon'}
               width={16}
               height={16}
@@ -192,8 +211,33 @@ function EventPage() {
       </section>
 
       {/* TODO: FAQ */}
+      <section>
+        <h1 className="font-belanosima text-6xl uppercase">FAQ</h1>
+      </section>
       {/* TODO: Sponsors */}
-      
+      <section>
+        <h1 className="text-center font-belanosima text-6xl">Sponsors</h1>
+        <div className="mt-8 rounded-xl border-2 border-none bg-gradient-to-b from-[rgba(206,106,255,0.2)] to-[rgba(72,230,255,0.2)] px-6 py-4 shadow-[0_0_33.1px_0_#EFD3D3] backdrop-blur-[20px]">
+          <div className="flex flex-wrap justify-center gap-8">
+            {SPONSORS_EXAMPLE.map(sponsor => (
+              <Link
+                key={sponsor.name}
+                href={sponsor.link}
+                target="_blank"
+                rel="noreferrer">
+                <Image
+                  src={sponsor.logo}
+                  alt={sponsor.name}
+                  width={200}
+                  height={200}
+                  className="h-[156px] w-auto"
+                  style={{ width: 'auto' }}
+                />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
