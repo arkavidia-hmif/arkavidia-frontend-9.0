@@ -21,6 +21,7 @@ import { getTeamStatus } from '~/app/components/registered-teamlist/teamlist'
 type Competition = 'CP' | 'CTF' | 'Hackvidia' | 'UXvidia' | 'Datavidia'
 
 type submissionsTypeID = {
+  id: string
   name: string
   studentCard: UserDocument | null
   poster: TeamMemberDocument | null
@@ -96,7 +97,6 @@ function TeamDetails() {
       router.replace('/404')
       return
     }
-
     setTeamData(resp.data)
   }, [axiosAuth, params.competitionID, params.teamID, router, toast])
 
@@ -133,6 +133,7 @@ function TeamDetails() {
         }
 
         tempTeamSubmission.push({
+          id: member.userId,
           name: member.user?.fullName || '',
           studentCard:
             member.user?.document?.find(
