@@ -28,7 +28,7 @@ import { useToast } from '~/hooks/use-toast'
 import { useAuth } from '../../contexts/AuthContext'
 import { expandCompetitionName, expandEventName } from '~/lib/utils'
 import SidebarItem from './SidebarItems'
-import { getAdminLinks, getSidebarURL } from './SidebarLinks'
+import { getSidebarURL } from './SidebarLinks'
 
 const CollapsibleSection = ({
   title,
