@@ -34,6 +34,7 @@ type GetTeamDetailResponse = {
   onRefetch: () => Promise<void>
   submissionsTypeID:
     | {
+        id: string,
         name: string
         studentCard: UserDocument | null
         poster: TeamMemberDocument | null
@@ -564,7 +565,7 @@ export default function TeamInfo({
           submissionsTypeID &&
           members.map((member, index) => {
             const data = submissionsTypeID.find(
-              data => data.name === member.user?.fullName
+              data => data.id === member.user?.id
             )
             return (
               <MemberCard
