@@ -249,6 +249,8 @@ function ProfileCompetition({ competitionName }: ProfileCompetitionProps) {
         return 'text-red-200'
       case 'WAITING':
         return 'text-yellow-200'
+      case 'ON REVIEW':
+        return 'text-yellow-200'
       case 'DENIED':
         return 'text-red-200'
       default:
