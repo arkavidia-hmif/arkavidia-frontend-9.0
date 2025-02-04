@@ -88,6 +88,7 @@ export const mapStatusTag: Record<
   VERIFIED: 'success',
   DENIED: 'danger',
   WAITING: 'warning',
+  'ON REVIEW': 'warning',
   CHANGED: 'blue',
   'NO STATUS YET': 'neutral'
 }
