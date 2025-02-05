@@ -19,7 +19,7 @@ interface MaterialCategory {
 const materialsData: MaterialCategory[] = [
   {
     id: 1,
-    title: 'Buku Besar Materi dan Metode XXXXXXXX',
+    title: 'PLACEHOLDER Buku Besar Materi dan Metode XXXXXXXX',
     description:
       '"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua..."',
     files: [
@@ -28,19 +28,19 @@ const materialsData: MaterialCategory[] = [
   },
   {
     id: 2,
-    title: 'Introduction to Software Engineering',
+    title: 'PLACEHOLDER Introduction to Software Engineering',
     description: '',
     files: [],
   },
   {
     id: 3,
-    title: 'Object-Oriented Programming',
+    title: 'PLACEHOLDER Object-Oriented Programming',
     description: '',
     files: [],
   },
 ];
 
-function Materials() {
+function Materials({data = materialsData} : {data?: MaterialCategory[]}) {
   const [expandedId, setExpandedId] = useState<number | null>(null)
 
   const toggleExpandedId = (id: number) => {
