@@ -16,6 +16,16 @@ export function expandCompetitionName(competitionName: string) {
   }
 }
 
+export function expandEventName(eventName: string) {
+  //! HARDCODED, event name not corresponding to 
+  switch (eventName) {
+    case 'gala-dinner':
+      return 'Gala Dinner';
+    default:
+      return capitalizeFirstLetter(eventName);
+  }
+}
+
 export function getFormattedBirthDate(date: Date) {
   const year = date.getFullYear()
   const month = date.getMonth() + 1
