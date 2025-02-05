@@ -63,7 +63,7 @@ function Materials() {
               {category.files.length > 0 ? (
                 category.files.map((file) => (
                     <div key={file.id} className="flex flex-col gap-3">
-                        <div className='h-15 max-w-max border border-[#E8C1FC] border-[0.9px] p-3 rounded-lg flex items-center'>
+                        <div className='h-15 max-w-max border-[#E8C1FC] border-[0.9px] p-3 rounded-lg flex items-center'>
                             <div className="flex items-center gap-2">
                             <img src="/icons/fileinputassets/PDF.svg" alt="PDF" className="w-7 h-7" />
                             <p className='text-sm'>{file.name}</p>
