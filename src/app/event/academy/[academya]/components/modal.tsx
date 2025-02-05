@@ -11,26 +11,20 @@ import {
   getUser,
   joinTeamByCode
 } from '~/api/generated'
-import { SuccessCreateModal, SuccessJoinModal } from './success'
+import { SuccessCreateModal, SuccessJoinModal } from './success-modal'
 import { useToast } from '~/hooks/use-toast'
-import { Input } from '~/app/components/Input'
+import InitialModal from './initial-modal'
+import CreateTeamModal from './create-team-modal'
+import JoinTeamModal from './join-team-modal'
 
 export default function ModalPopup({
   eventType
-}: // eqpginai | Academya - Software Engineer
-// oajbedpk | Academya - Data Science
-// oqgjwbra | Academya - UI UX
-// ogqnrwas | Academya - Project Manager
-{
+}: {
   eventType: 'eqpginai' | 'oajbedpk' | 'oqgjwbra' | 'ogqnrwas'
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [joinCode, setJoinCode] = useState<string>()
   const { toast } = useToast()
-  const openModal = () => setIsModalOpen(true)
-  const closeModal = () => {
-    setIsModalOpen(false)
-    setModalState('initial')
-  }
   const useAuth = useAxiosAuth()
   const dashboardUrl = '/dashboard/event'
   const eventMap: Map<string, string> = new Map([
@@ -39,12 +33,19 @@ export default function ModalPopup({
     ['oqgjwbra', 'UI/UX'],
     ['ogqnrwas', 'Project Manager']
   ])
+  const openModal = () => setIsModalOpen(true)
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setModalState('initial')
+  }
 
-  const [userName, setUsername] = useState('')
+  const [teamName, setTeamName] = useState<string>()
+  const [userName, setUserName] = useState<string>()
+  const [teamCode, setTeamCode] = useState<string>()
   const [modalState, setModalState] = useState('initial')
   const [joinedEvent, setJoinedEvent] = useState<string[]>([])
 
-  //   Ngefetch event yang dah di ikutin
+  //   Fetching event yang udah diikutin
   useEffect(() => {
     const getEventTeamData = async () => {
       const res = await getEventTeam({ client: useAuth })
@@ -66,12 +67,11 @@ export default function ModalPopup({
     getEventTeamData()
   }, [])
 
-  //   Ngefetch user data
+  //   Fetching user data
   useEffect(() => {
     const getSelf = async () => {
       const res = await getUser({ client: useAuth })
-      //   console.log(JSON.stringify(res))
-
+      console.log('User Data \n' + JSON.stringify(res))
       if (res.error) {
         toast({
           title: 'Error',
@@ -81,7 +81,7 @@ export default function ModalPopup({
       }
 
       if (res.data) {
-        setUsername(res.fullName ?? '')
+        setUserName(res.data.fullName)
       }
     }
 
@@ -115,31 +115,32 @@ export default function ModalPopup({
     } else {
       toast({
         title: 'Register Succcess',
-        description:
-          'You are now registered to Academya UI/UX Event ' +
-          eventMap.get(eventType)?.toUpperCase() +
-          ' Event',
+        description: 'You are now registered to ' + eventMap.get(eventType) + ' Academy',
         variant: 'success'
       })
       setJoinedEvent([...joinedEvent, eventType])
+      window.location.href = dashboardUrl
     }
   }
 
   const registerTeam = async (team_name: string) => {
-    // if (joinedEvent.includes(eventType)) {
-    //   toast({
-    //     title: 'Already Registered',
-    //     description: 'You have already registered for this event',
-    //     variant: 'destructive'
-    //   })
-    //   return
-    // }
+    if (joinedEvent.includes(eventType)) {
+      toast({
+        title: 'Already Registered',
+        description:
+          'You have already registered ' + eventMap.get(eventType) + ' Academy',
+        variant: 'destructive'
+      })
+      return
+    }
 
     const resp = await postCreateEventTeam({
       client: useAuth,
       path: { eventId: eventType },
       body: { name: team_name }
     })
+
+    console.log(JSON.stringify(resp))
 
     if (resp.error) {
       toast({
@@ -153,6 +154,7 @@ export default function ModalPopup({
       })
       setJoinedEvent([...joinedEvent, eventType])
       setModalState('success create')
+      setJoinCode(resp.data?.event_team.joinCode)
     }
   }
 
@@ -189,18 +191,16 @@ export default function ModalPopup({
         variant: 'success'
       })
       setJoinedEvent([...joinedEvent, eventType])
+      setModalState('success join')
     }
-    setModalState('success join')
   }
 
-  const title = 'Software Engineering'
   return (
     <div className="p-4">
       <Button
         onClick={openModal}
-        className="flex gap-2"
-        // disabled={joinedEvent.includes(eventType)}
-      >
+        className="flex gap-2 rounded-xl"
+        disabled={joinedEvent.includes(eventType) || teamName === undefined}>
         Register Now
         <Image
           src="/icons/events/arrow_forward.svg"
@@ -225,8 +225,8 @@ export default function ModalPopup({
                 </h2>
               </div>
               <p className="mb-[65px] text-center">
-                If you’re sure about registering for the Academya{' '}
-                {eventMap.get(eventType)} Event, you’ll be redirected to your dashboard
+                If you're sure about registering for the Academya{' '}
+                {eventMap.get(eventType)} Event, you'll be redirected to your dashboard
               </p>
               <Button onClick={registerSolo} className="w-[100%]">
                 Register
@@ -244,161 +244,36 @@ export default function ModalPopup({
 
               {/* Content */}
               {modalState === 'initial' ? (
-                <>
-                  {/* Header */}
-                  <div className="mb-3 flex flex-col items-center gap-0">
-                    <h2 className="break-words text-center font-teachers text-base font-bold text-[#F5E1FF] drop-shadow-[0_0_13.1px_#CE6AFF] md:text-[32px]">
-                      Academya{' '}
-                      <span className="text-teal-300">{eventMap.get(eventType)}</span>{' '}
-                      Registration
-                    </h2>
-                  </div>
-                  <p className="mb-16 text-center text-[14px] md:text-base">
-                    Build your team or join forces with others
-                  </p>
-
-                  {/* Button Create*/}
-                  <div className="flex items-center justify-center gap-4 md:gap-[88px]">
-                    <div className="flex flex-col items-center gap-3">
-                      <Image
-                        src="/icons/events/person_add_alt_1.svg"
-                        alt="Arrow Down"
-                        width={64}
-                        height={64}
-                        className="h-8 w-8 md:h-16 md:w-16"
-                      />
-                      <Button
-                        onClick={() => setModalState('create')}
-                        className="flex w-[166px] gap-2 rounded-xl">
-                        Create Team
-                        <Image
-                          src="/icons/events/arrow_forward.svg"
-                          alt="Arrow Down"
-                          width={24}
-                          height={24}
-                        />
-                      </Button>
-                    </div>
-
-                    {/* Button Join */}
-                    <div className="flex flex-col items-center gap-3">
-                      <Image
-                        src="/icons/events/person_search.svg"
-                        alt="Arrow Down"
-                        width={64}
-                        height={64}
-                        className="h-8 w-8 md:h-16 md:w-16"
-                      />
-                      <Button
-                        onClick={() => setModalState('join')}
-                        className="flex w-[166px] gap-2 rounded-xl">
-                        Join Team
-                        <Image
-                          src="/icons/events/arrow_forward.svg"
-                          alt="Arrow Down"
-                          width={24}
-                          height={24}
-                        />
-                      </Button>
-                    </div>
-                  </div>
-                </>
+                <InitialModal
+                  eventType={eventType}
+                  eventMap={eventMap}
+                  setModalState={setModalState}
+                />
               ) : modalState === 'create' ? (
-                <>
-                  <div className="flex flex-col items-start gap-4 md:flex-row">
-                    <div
-                      className="cursor-pointer transition duration-200 ease-in-out hover:drop-shadow-[0_0_10px_#C8A2C8]"
-                      onClick={() => setModalState('initial')}>
-                      <Image
-                        src="/icons/events/arrow_forward.svg"
-                        alt="Arrow Down"
-                        width={32}
-                        height={32}
-                        style={{ transform: 'rotate(180deg)' }}
-                      />
-                    </div>
-                    <div>
-                      <h2 className="break-words px-2 text-center font-teachers text-[16px] font-bold text-[#F5E1FF] drop-shadow-[0_0_13.1px_#CE6AFF] md:px-0 md:text-start md:text-[20px]">
-                        Create Team for Academya Data Science
-                      </h2>
-                      <p className="mb-16 px-2 text-center text-[14px] md:px-0 md:text-start md:text-base">
-                        Once you create a team name you can invite others.
-                      </p>
-
-                      <div className="flex flex-col gap-1 px-4 md:px-0">
-                        <div className="mb-6 flex flex-col gap-2">
-                          <p className="text-lilac-200">
-                            Team Name
-                            <span className="text-red-500"> *</span>
-                          </p>
-                          <div className="md:w-[556px]">
-                            <Input
-                              className="w-full"
-                              placeholder="Enter your team name"
-                              value={userName}
-                              onChange={e => setUsername(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                        <Button
-                          className="w-[100%] rounded-xl"
-                          onClick={() => registerTeam(userName)}>
-                          Submit
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </>
+                <CreateTeamModal
+                  eventType={eventType}
+                  eventMap={eventMap}
+                  setModalState={setModalState}
+                  teamName={teamName}
+                  setTeamName={setTeamName}
+                  registerTeam={registerTeam}
+                />
               ) : modalState === 'join' ? (
-                <>
-                  <div className="flex flex-col items-start gap-4 md:flex-row">
-                    <div
-                      className="cursor-pointer transition duration-200 ease-in-out hover:drop-shadow-[0_0_10px_#C8A2C8]"
-                      onClick={() => setModalState('initial')}>
-                      <Image
-                        src="/icons/events/arrow_forward.svg"
-                        alt="Arrow Down"
-                        width={32}
-                        height={32}
-                        style={{ transform: 'rotate(180deg)' }}
-                      />
-                    </div>
-                    <div>
-                      <h2 className="break-words px-2 text-center font-teachers text-[16px] font-bold text-[#F5E1FF] drop-shadow-[0_0_13.1px_#CE6AFF] md:px-0 md:text-start md:text-[20px]">
-                        Join Team for Academya Data Science
-                      </h2>
-                      <p className="mb-16 px-2 text-center text-[14px] md:px-0 md:text-start md:text-base">
-                        Enter your team code to join
-                      </p>
-
-                      <div className="flex flex-col gap-1 px-4 md:px-0">
-                        <div className="mb-6 flex flex-col gap-2">
-                          <p className="text-lilac-200">
-                            Team Code
-                            <span className="text-red-500"> *</span>
-                          </p>
-                          <div className="md:w-[556px]">
-                            <Input
-                              className="w-full"
-                              placeholder="Enter your team code"
-                              value={userName}
-                              onChange={e => setUsername(e.target.value)}
-                            />
-                          </div>
-                        </div>
-                        <Button
-                          className="w-[100%] rounded-xl"
-                          onClick={() => joinTeam(userName)}>
-                          Submit
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </>
+                <JoinTeamModal
+                  eventType={eventType}
+                  eventMap={eventMap}
+                  setModalState={setModalState}
+                  teamCode={teamCode}
+                  setTeamCode={setTeamCode}
+                  joinTeam={joinTeam}
+                />
               ) : modalState === 'success create' ? (
-                <SuccessCreateModal dashboardUrl={dashboardUrl} code="ABC123" />
+                <SuccessCreateModal dashboardUrl={dashboardUrl} code={joinCode} />
               ) : modalState === 'success join' ? (
-                <SuccessJoinModal dashboardUrl={dashboardUrl} teamName="Data Science" />
+                <SuccessJoinModal
+                  dashboardUrl={dashboardUrl}
+                  teamName={eventMap.get(eventType)}
+                />
               ) : null}
             </div>
           )}

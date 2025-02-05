@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { Button } from '~/app/components/Button'
-import CodeBox from './code'
+import CodeBox from './code-box'
 
 export function SuccessCreateModal({
   dashboardUrl,
