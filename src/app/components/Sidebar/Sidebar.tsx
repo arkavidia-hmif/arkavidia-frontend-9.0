@@ -316,8 +316,8 @@ function Sidebar({ announcement = false }: SidebarProps) {
                 height={100}
               />
             </Link>
-            <div className="flex h-full flex-col justify-between">
-              <div className="mt-4 flex w-full gap-5 grow flex-col overflow-y-auto px-2 lg:mt-7 lg:px-[10px]">
+            <div className="flex h-full flex-col justify-between overflow-y-auto">
+              <div className="mt-4 flex w-full gap-5 grow flex-col px-2 lg:mt-7 lg:px-[10px]">
                 {sidebarLinks.length ? (
                   <>
                     {/* Dashboard Links */}
