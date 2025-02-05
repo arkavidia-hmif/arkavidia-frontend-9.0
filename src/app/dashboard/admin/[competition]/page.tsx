@@ -28,12 +28,13 @@ function AdminCompetitionDashboard() {
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
-
-  const currentPage = Number(searchParams.get('page')) || 1
-  const limit = searchParams.get('limit') ?? '10'
+  const limit = '1'
 
   const [isCompetitionFound, setIsCompetitionFound] = useState(true)
   const [currentCompetitionId, setCurrentCompetitionId] = useState<string | null>(null)
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1)
   const [teamData, setTeamData] = useState<Team[]>([])
   const [pagination, setPagination] = useState<Pagination>({
     currentPage: currentPage,
@@ -42,6 +43,15 @@ function AdminCompetitionDashboard() {
     next: null,
     prev: null
   })
+
+  // Filter & search states
+  const [teamStatusFilter, setTeamStatusFilter] = useState<
+    Exclude<Team['verificationStatus'], null> | undefined
+  >(undefined)
+  const [teamStageFilter, setTeamStageFilter] = useState<Team['stage'] | undefined>(
+    undefined
+  )
+  const [searchFilter, setSearchFilter] = useState<string>('')
 
   const fetchTeams = async (page: number) => {
     try {
@@ -68,7 +78,13 @@ function AdminCompetitionDashboard() {
       const response = await getAdminAllCompetitionTeams({
         client: authAxios,
         path: { competitionId: competitions.data[0].id },
-        query: { page: page.toString(), limit: limit }
+        query: {
+          page: page.toString(),
+          search: searchFilter,
+          stage: teamStageFilter,
+          verifStatus: teamStatusFilter,
+          limit: limit
+        }
       })
 
       if (response.data) {
@@ -116,20 +132,20 @@ function AdminCompetitionDashboard() {
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return
+    setCurrentPage(newPage)
 
     // Update URL with new page query parameter
     router.push(`?${createQueryString('page', newPage.toString())}`)
-
-    fetchTeams(newPage)
-    setPagination(prev => ({
-      ...prev,
-      currentPage: newPage
-    }))
   }
 
+  // Effect for updating data when page or filter changes
   useEffect(() => {
     fetchTeams(currentPage)
-  }, [currentPage])
+  }, [currentPage, teamStatusFilter, teamStageFilter])
+
+  function onSearchClick() {
+    fetchTeams(currentPage)
+  }
 
   return (
     <>
@@ -147,10 +163,19 @@ function AdminCompetitionDashboard() {
         </div>
       ) : (
         <RegisteredTeamList
+          itemsPerPage={limit}
           teamData={teamData}
           pagination={pagination}
           competitionId={currentCompetitionId}
+          currentSearchFilter={searchFilter}
+          currentPage={currentPage}
+          filterStates={{ teamStatusFilter, teamStageFilter }}
           onPageChange={handlePageChange}
+          setCurrentPage={setCurrentPage}
+          setSearchFilter={setSearchFilter}
+          setTeamStatusFilter={setTeamStatusFilter}
+          setTeamStageFilter={setTeamStageFilter}
+          onSearchClick={onSearchClick}
         />
       )}
     </>
