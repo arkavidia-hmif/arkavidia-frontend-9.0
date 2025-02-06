@@ -43,16 +43,14 @@ function getSidebarURL({
      * 'akademya-software-engineering'
      *  */
 
-    url += `/${eventName
+    url += `/event/${eventName
       .replace(' - ', '-') // Replace " - " with "-"
       .replace(/\s+/g, '-') // Convert spaces to hyphens
-      .toLowerCase()
-    }`
+      .toLowerCase()}`
   }
 
   return url
 }
-
 
 const getAdminLinks = () => {
   const list = ['CP', 'CTF', 'UXvidia', 'Arkalogica', 'Datavidia', 'Hackvidia']
