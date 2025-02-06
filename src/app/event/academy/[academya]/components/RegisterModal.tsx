@@ -59,7 +59,7 @@ export default function ModalPopup({
       } else {
         //   console.log('Event Team \n' + JSON.stringify(res.data))
         const eventIds = [...new Set(res.data?.map(item => item.event_team.eventId))]
-        console.log('Event Ids \n' + JSON.stringify(eventIds))
+        // console.log('Event Ids \n' + JSON.stringify(eventIds))
         setJoinedEvent(eventIds)
       }
     }
@@ -71,7 +71,7 @@ export default function ModalPopup({
   useEffect(() => {
     const getSelf = async () => {
       const res = await getUser({ client: useAuth })
-      console.log('User Data \n' + JSON.stringify(res))
+    //   console.log('User Data \n' + JSON.stringify(res))
       if (res.error) {
         toast({
           title: 'Error',
@@ -140,7 +140,7 @@ export default function ModalPopup({
       body: { name: team_name }
     })
 
-    console.log(JSON.stringify(resp))
+    // console.log(JSON.stringify(resp))
 
     if (resp.error) {
       toast({
@@ -173,7 +173,7 @@ export default function ModalPopup({
       body: { teamCode: team_code }
     })
 
-    console.log(JSON.stringify(resp))
+    // console.log(JSON.stringify(resp))
 
     if (resp.error) {
       toast({

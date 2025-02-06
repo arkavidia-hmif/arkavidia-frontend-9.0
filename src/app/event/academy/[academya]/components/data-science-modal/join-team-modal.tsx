@@ -60,7 +60,7 @@ export default function JoinTeamModal({
               className="w-[100%] rounded-xl"
               onClick={() => {
                 joinTeam(teamCode)
-                console.log(teamCode)
+                // console.log(teamCode)
               }}>
               Submit
             </Button>
