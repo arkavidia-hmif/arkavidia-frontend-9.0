@@ -11,11 +11,11 @@ import {
   getUser,
   joinTeamByCode
 } from '~/api/generated'
-import { SuccessCreateModal, SuccessJoinModal } from './success-modal'
+import { SuccessCreateModal, SuccessJoinModal } from './data-science-modal/success-modal'
 import { useToast } from '~/hooks/use-toast'
-import InitialModal from './initial-modal'
-import CreateTeamModal from './create-team-modal'
-import JoinTeamModal from './join-team-modal'
+import InitialModal from './data-science-modal/initial-modal'
+import CreateTeamModal from './data-science-modal/create-team-modal'
+import JoinTeamModal from './data-science-modal/join-team-modal'
 
 export default function ModalPopup({
   eventType
