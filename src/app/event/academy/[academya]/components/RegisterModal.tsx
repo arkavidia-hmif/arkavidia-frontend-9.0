@@ -9,7 +9,7 @@ import {
   postCreateEventTeamSolo,
   getEventTeam,
   getUser,
-  joinTeamByCode
+  joinEventTeamByCode
 } from '~/api/generated'
 import { SuccessCreateModal, SuccessJoinModal } from './data-science-modal/success-modal'
 import { useToast } from '~/hooks/use-toast'
@@ -71,7 +71,7 @@ export default function ModalPopup({
   useEffect(() => {
     const getSelf = async () => {
       const res = await getUser({ client: useAuth })
-    //   console.log('User Data \n' + JSON.stringify(res))
+      //   console.log('User Data \n' + JSON.stringify(res))
       if (res.error) {
         toast({
           title: 'Error',
@@ -168,7 +168,7 @@ export default function ModalPopup({
       return
     }
 
-    const resp = await joinTeamByCode({
+    const resp = await joinEventTeamByCode({
       client: useAuth,
       body: { teamCode: team_code }
     })
