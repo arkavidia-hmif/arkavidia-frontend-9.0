@@ -143,8 +143,8 @@ export const JoinTeamPopup: React.FC<{
     const getTeamInfo = await getTeamById({
       client: axiosAuth,
       path: {
-        // @ts-ignore
-        teamId: resp.data.id
+        // @ts-expect-error - teamId doesn't exists on response definition
+        teamId: resp.data.teamId
       }
     })
 
