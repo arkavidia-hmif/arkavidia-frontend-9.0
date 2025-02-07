@@ -199,14 +199,14 @@ function EventPage() {
       </section>
 
       {/* Event Timeline */}
-      <section className="flex flex-col items-center justify-center gap-28">
-        <h1 className="font-belanosima text-6xl uppercase">EVENT TIMELINE</h1>
+      <section className="flex flex-col items-center justify-center gap-12 lg:gap-28">
+        <h1 className="text-center font-belanosima text-6xl uppercase">EVENT TIMELINE</h1>
         {eventTimeline.length === 0 ? (
           <>
-            <Timeline events={MOCK_EVENTS_DATA} variant={'horizontal'} />
+            <Timeline events={MOCK_EVENTS_DATA} variant={'vertical'} />
           </>
         ) : (
-          <Timeline events={eventTimeline} variant={'horizontal'} />
+          <Timeline events={eventTimeline} variant={'vertical'} />
         )}
       </section>
 
