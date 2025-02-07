@@ -8,4 +8,16 @@ interface EventVerification {
   rejectionMessage?: string
 }
 
-export { type EventVerification }
+interface MemberEventVerification extends EventVerification {
+  userId: string
+}
+
+interface TeamEventVerification extends EventVerification {
+  teamId: string
+}
+
+export {
+  type EventVerification,
+  type MemberEventVerification,
+  type TeamEventVerification
+}

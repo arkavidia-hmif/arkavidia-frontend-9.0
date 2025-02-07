@@ -4,7 +4,11 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 
 // Type imports
-import { type EventVerification } from './event-dashboard-types'
+import {
+  MemberEventVerification,
+  TeamEventVerification,
+  type EventVerification
+} from './event-dashboard-types'
 
 // Component imports
 import { Button } from '~/app/components/Button'
@@ -26,10 +30,27 @@ import { useToast } from '~/hooks/use-toast'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { DummyVerification } from './dummy'
 import FilePreview from '../../../[competition]/components/FilePreview'
+import {
+  GetEventTeamByTeamIdResponse,
+  getEventTeamMemberById,
+  updateEventTeamMemberDocument,
+  User
+} from '~/api/generated'
 
-function EventVerification() {
-  const [selectedVerif, setSelectedVerif] = useState<EventVerification | null>(null)
-  const [verifications, setVerifications] = useState<EventVerification[]>([])
+type EventVerificationAll =
+  | EventVerification
+  | MemberEventVerification
+  | TeamEventVerification
+
+function EventVerification({
+  activeTeamData,
+  user
+}: {
+  activeTeamData?: GetEventTeamByTeamIdResponse
+  user?: User
+}) {
+  const [selectedVerif, setSelectedVerif] = useState<EventVerificationAll | null>(null)
+  const [verifications, setVerifications] = useState<EventVerificationAll[]>([])
 
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
@@ -37,7 +58,110 @@ function EventVerification() {
   // ADD Verifications API Integration HERE
   async function fetchVerifications() {
     try {
-      setVerifications(DummyVerification)
+      if (!activeTeamData || !user) {
+        toast({
+          title: 'Error',
+          description:
+            'Failed to fetch verifications.\n Error: Team data or user data not found',
+          variant: 'destructive'
+        })
+        return
+      }
+
+      const verificationTempStorage: EventVerificationAll[] = []
+
+      // Team document (if needed)
+      // const teamDocument = activeTeamData.document
+      // if (!teamDocument) {
+      //   throw new Error('Failed to get team document')
+      // }
+
+      // let teamVerification: TeamEventVerification | null = null
+      // if (teamDocument.length === 0) {
+      //   teamVerification = {
+      //     id: 'team-document',
+      //     teamId: activeTeamData.id,
+      //     type: 'bukti-pembayaran',
+      //     isVerified: false,
+      //     status: 'unsubmitted'
+      //   }
+      // } else {
+      //   // @ts-expect-error
+      //   const isVerified = teamDocument[0].isVerified ?? false
+      //   // @ts-expect-error
+      //   const verificationError = teamDocument[0].verificationError ?? ''
+      //   const isRejected =
+      //     verificationError !== '' &&
+      //     verificationError !== null &&
+      //     verificationError !== undefined
+      //   teamVerification = {
+      //     id: 'team-0',
+      //     teamId: activeTeamData.id,
+      //     type: 'bukti-pembayaran',
+      //     status: isVerified ? 'verified' : isRejected ? 'rejected' : 'submitted',
+      //     rejectionMessage: verificationError,
+      //     isVerified: isVerified,
+      //     // @ts-expect-error
+      //     mediaLink: teamDocument[0].media.url,
+      //     // @ts-expect-error
+      //     mediaName: teamDocument[0].media.name
+      //   }
+      // }
+      // verificationTempStorage.push(teamVerification)
+
+      // User member document
+      const res = await getEventTeamMemberById({
+        client: axiosAuth,
+        path: {
+          teamId: activeTeamData.id,
+          userId: user.id
+        }
+      })
+
+      if (!res.data) {
+        throw new Error('Failed to get team member data')
+      }
+
+      const userDocument = res.data.document
+      const documentRequirement = ['poster', 'twibbon'] as Array<'poster' | 'twibbon'>
+
+      // Check if user has submitted the required documents
+      documentRequirement.forEach(doc => {
+        const foundDocument = userDocument?.find(userDoc => userDoc.type === doc)
+        if (!foundDocument) {
+          verificationTempStorage.push({
+            id: `${doc}-verification`,
+            userId: user.id,
+            type: doc,
+            isVerified: false,
+            status: 'unsubmitted'
+          })
+        } else {
+          const isDocumentVerified = foundDocument.isVerified
+          const verificationError = foundDocument.verificationError
+          const isRejected =
+            verificationError !== '' &&
+            verificationError !== null &&
+            verificationError !== undefined
+
+          verificationTempStorage.push({
+            id: `${doc}-verification`,
+            userId: user.id,
+            type: doc,
+            isVerified: isDocumentVerified,
+            rejectionMessage: foundDocument.verificationError ?? '',
+            status: isDocumentVerified
+              ? 'verified'
+              : isRejected
+                ? 'rejected'
+                : 'submitted',
+            mediaLink: foundDocument.media.url,
+            mediaName: foundDocument.media.name
+          })
+        }
+      })
+
+      setVerifications(verificationTempStorage)
     } catch (err: unknown) {
       toast({
         title: 'Error',
@@ -49,10 +173,67 @@ function EventVerification() {
 
   async function handleMediaSubmit(mediaId: string, type: string) {
     // ADD Submit Verification Media Here
-    // Step 1: Get the Team ID
+    // Step 1: Get the Team ID && User ID
+    const teamID = activeTeamData?.id
+    const userID = user?.id
+    if (!teamID) {
+      toast({
+        title: 'Error',
+        description: 'Failed to submit verification.\n Error: Team ID not found',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    if (!userID) {
+      toast({
+        title: 'Error',
+        description: 'Failed to submit verification.\n Error: User ID not found',
+        variant: 'destructive'
+      })
+      return
+    }
+
     // Step 2: Upload document to server
-    // Step 3: If successful, update the verification status to 'submitted'
-    // Step 4: Update the verification status in the state and close the submission box
+    try {
+      const updateRes = await updateEventTeamMemberDocument({
+        client: axiosAuth,
+        path: {
+          teamId: teamID,
+          userId: userID
+        },
+        body: type === 'poster' ? { posterMediaId: mediaId } : { twibbonMediaId: mediaId }
+      })
+
+      if (updateRes.error) {
+        throw new Error('Failed uploading media to server')
+      }
+      // Step 3: If successful, update the verification status to 'submitted'
+      const updatedVerifications = verifications.map(verif => {
+        if (verif.type === type) {
+          return {
+            ...verif,
+            isVerified: false,
+            status: 'submitted'
+          }
+        }
+        return verif
+      })
+      // Step 4: Update the verification status in the state and close the submission box
+      setVerifications(updatedVerifications as MemberEventVerification[])
+      setSelectedVerif(null)
+      toast({
+        title: 'Berhasil',
+        description: 'Dokumen berhasil disimpan',
+        variant: 'success'
+      })
+    } catch (err: unknown) {
+      toast({
+        title: 'Error',
+        description: 'Failed to submit verification.\n Error: ' + err,
+        variant: 'destructive'
+      })
+    }
   }
 
   useEffect(() => {

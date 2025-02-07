@@ -90,6 +90,7 @@ function EventDashboard({ eventName }: { eventName: string }) {
         activeTeamData={activeTeamData}
       />
       <EventTeamInfo eventName={eventName} user={userData} teamData={activeTeamData} />
+      <EventVerification activeTeamData={activeTeamData} user={userData} />
     </div>
   )
 }
