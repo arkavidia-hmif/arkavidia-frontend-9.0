@@ -17,13 +17,19 @@ export function expandCompetitionName(competitionName: string) {
 }
 
 export function expandEventName(eventName: string) {
-  //! HARDCODED, event name not corresponding to 
+  //! HARDCODED, event name not corresponding to
+  // Based on sidebar links,
   switch (eventName) {
-    case 'gala-dinner':
-      return 'Gala Dinner';
     default:
-      return capitalizeFirstLetter(eventName);
+      return capitalizeFirstLetter(eventName)
   }
+}
+
+export function getBeautifulEventName(eventName: string) {
+  // Based on sidebar links, ex: academya-software-engineering
+  const split = eventName.split('-').map(s => s.toLowerCase())
+  split[0] = split[0].replace('academya', 'academya -')
+  return split.map(s => s.toUpperCase()).join(' ')
 }
 
 export function getFormattedBirthDate(date: Date) {

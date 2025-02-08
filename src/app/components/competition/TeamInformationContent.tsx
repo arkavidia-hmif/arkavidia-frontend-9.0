@@ -8,7 +8,9 @@ import {
   getUser,
   deleteTeamMember,
   getTeamById,
-  TeamMember
+  TeamMember,
+  putChangeEventTeamName,
+  deleteEventTeamMember
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import Image from 'next/image'
@@ -31,16 +33,18 @@ interface ProfileDataProps {
   teamId: string
   userId: string
   currentUserId: string
+  isEvent?: boolean
 }
 
-const ProfileData = ({
+export const ProfileData = ({
   verified,
   name,
   title,
   userRole,
   teamId,
   userId,
-  currentUserId
+  currentUserId,
+  isEvent = false
 }: ProfileDataProps) => {
   const authAxios = useAxiosAuth()
   const { toast } = useToast()
@@ -51,11 +55,19 @@ const ProfileData = ({
 
     try {
       setLoading(true)
-      await deleteTeamMember({
-        client: authAxios,
-        body: { userId },
-        path: { teamId }
-      })
+      if (!isEvent) {
+        await deleteTeamMember({
+          client: authAxios,
+          body: { userId },
+          path: { teamId }
+        })
+      } else {
+        await deleteEventTeamMember({
+          client: authAxios,
+          body: { userId },
+          path: { teamId }
+        })
+      }
 
       toast({
         title: 'Kick Success',
@@ -127,9 +139,18 @@ interface TeamDataProps {
   title: string
   teamId: string
   userRole: string
+  isEditable?: boolean
+  isEvent?: boolean
 }
 
-export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
+export const TeamData = ({
+  name,
+  title,
+  teamId,
+  userRole,
+  isEditable = true,
+  isEvent = false
+}: TeamDataProps) => {
   const [isEdit, setIsEdit] = useState(false)
   const [teamName, setTeamName] = useState(name)
   const [tempTeamName, setTempTeamName] = useState(name)
@@ -140,11 +161,23 @@ export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
   const handleSave = async () => {
     setLoading(true)
     try {
-      await putChangeTeamName({
-        client: authAxios,
-        body: { name: tempTeamName },
-        path: { teamId }
-      })
+      if (!isEvent) {
+        await putChangeTeamName({
+          client: authAxios,
+          body: { name: tempTeamName },
+          path: { teamId }
+        })
+      } else {
+        await putChangeEventTeamName({
+          client: authAxios,
+          path: {
+            teamId
+          },
+          body: {
+            name: tempTeamName
+          }
+        })
+      }
 
       toast({
         title: 'Sukses',
@@ -238,7 +271,7 @@ export const TeamData = ({ name, title, teamId, userRole }: TeamDataProps) => {
             )}
           </div>
         </div>
-        {userRole === 'leader' && !isEdit && (
+        {userRole === 'leader' && isEditable && !isEdit && (
           <Button variant={'ghost'} onClick={() => setIsEdit(true)}>
             <Image
               src={'/images/profile/edit.svg'}
