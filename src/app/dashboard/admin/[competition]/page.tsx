@@ -47,11 +47,17 @@ function AdminCompetitionDashboard() {
   // Filter & search states
   const [teamStatusFilter, setTeamStatusFilter] = useState<
     Exclude<Team['verificationStatus'], null> | undefined
-  >(undefined)
-  const [teamStageFilter, setTeamStageFilter] = useState<Team['stage'] | undefined>(
-    undefined
+  >(
+    (searchParams.get('status') as
+      | Exclude<Team['verificationStatus'], null>
+      | undefined) ?? undefined
   )
-  const [searchFilter, setSearchFilter] = useState<string>('')
+  const [teamStageFilter, setTeamStageFilter] = useState<Team['stage'] | undefined>(
+    (searchParams.get('stage') as Team['stage']) ?? undefined
+  )
+  const [searchFilter, setSearchFilter] = useState<string>(
+    searchParams.get('search') ?? ''
+  )
 
   const fetchTeams = async (page: number) => {
     try {
@@ -120,6 +126,40 @@ function AdminCompetitionDashboard() {
     }
   }
 
+  const generateAllQueryString = ({
+    page,
+    search,
+    stage,
+    status
+  }: {
+    page?: number
+    search?: string
+    stage?: typeof teamStageFilter
+    status?: typeof teamStatusFilter
+  }) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page ? page.toString() : currentPage.toString())
+    params.set('search', search ? search : searchFilter)
+
+    if (!stage) {
+      if (teamStageFilter) {
+        params.set('stage', teamStageFilter)
+      } else {
+        params.delete('stage')
+      }
+    }
+
+    if (!status) {
+      if (teamStatusFilter) {
+        params.set('status', teamStatusFilter)
+      } else {
+        params.delete('status')
+      }
+    }
+
+    return params.toString()
+  }
+
   const createQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString())
@@ -133,18 +173,17 @@ function AdminCompetitionDashboard() {
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return
     setCurrentPage(newPage)
-
-    // Update URL with new page query parameter
-    router.push(`?${createQueryString('page', newPage.toString())}`)
   }
 
   // Effect for updating data when page or filter changes
   useEffect(() => {
     fetchTeams(currentPage)
+    router.push(`?${generateAllQueryString({ search: searchFilter })}`)
   }, [currentPage, teamStatusFilter, teamStageFilter])
 
   function onSearchClick() {
     fetchTeams(currentPage)
+    router.push(`?${generateAllQueryString({ search: searchFilter })}`)
   }
 
   return (
