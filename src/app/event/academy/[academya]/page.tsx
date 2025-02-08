@@ -3,8 +3,8 @@ import ModalPopup from './components/RegisterModal'
 
 function EventPage() {
   return (
-    <div className="h-[100vh] bg-white flex items-center justify-center">
-      <ModalPopup eventType="oajbedpk" />
+    <div className="flex h-[100vh] items-center justify-center bg-black">
+      <ModalPopup eventType="eqpginai" />
     </div>
   )
 }

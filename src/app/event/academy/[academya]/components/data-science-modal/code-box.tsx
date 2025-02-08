@@ -5,7 +5,7 @@ import { useToast } from '~/hooks/use-toast'
 function CodeBox({ code }: { code: string }) {
   const { toast } = useToast()
   return (
-    <div className="grow w-[100%] max-w-[432px] font-base flex items-center justify-between overflow-hidden rounded-xl border border-lilac-200 pr-3 text-lilac-100">
+    <div className="font-base flex w-[100%] max-w-[432px] grow items-center justify-between overflow-hidden rounded-xl border border-lilac-200 pr-3 text-lilac-100">
       <div className="flex items-center gap-[14px]">
         <div className="h-[100%] rounded-r-[12px] bg-lilac-200 px-[18px] py-3 text-lilac-800">
           Code
@@ -22,7 +22,8 @@ function CodeBox({ code }: { code: string }) {
           height={24}
           onClick={() => {
             toast({
-              title: 'Succesfully copied to clipboard'
+              title: 'Succesfully copied to clipboard',
+              variant: 'success'
             })
           }}
         />

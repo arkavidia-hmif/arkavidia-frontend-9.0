@@ -35,7 +35,7 @@ export default function JoinTeamModal({
         </div>
         <div>
           <h2 className="break-words px-2 text-center font-teachers text-[16px] font-bold text-[#F5E1FF] drop-shadow-[0_0_13.1px_#CE6AFF] md:px-0 md:text-start md:text-[20px]">
-            Join Team for Academya {eventMap.get(eventType)}
+            Join Team for {eventMap.get(eventType)}
           </h2>
           <p className="mb-16 px-2 text-center text-[14px] md:px-0 md:text-start md:text-base">
             Enter your team code to join
