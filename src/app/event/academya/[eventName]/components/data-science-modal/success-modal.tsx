@@ -59,7 +59,8 @@ export function SuccessJoinModal({
           Successfully Join Team
         </h2>
         <p className="mb-16 text-center">
-          Welcome to {teamName}. You can now accesss the dashboard
+          Welcome to <span className="text-[#F5E1FF]">{teamName}</span>. You can now
+          accesss the dashboard
         </p>
         <div className="flex w-[100%] flex-col items-center gap-[49px]">
           <Button

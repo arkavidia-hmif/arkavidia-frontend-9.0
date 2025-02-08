@@ -11,7 +11,8 @@ import {
   getUser,
   joinEventTeamByCode,
   getEvent,
-  User
+  User,
+  getEventTeamByTeamId
 } from '~/api/generated'
 import { SuccessCreateModal, SuccessJoinModal } from './data-science-modal/success-modal'
 import { useToast } from '~/hooks/use-toast'
@@ -27,32 +28,37 @@ import {
 } from '~/app/components/ui/tooltip'
 import { useAppSelector } from '~/redux/store'
 import { useRouter } from 'next/navigation'
+import { getSidebarURL } from '~/app/components/Sidebar/SidebarLinks'
 
 export default function ModalPopup({
   eventType,
+  eventName,
   tooltip
 }: {
   eventType: string
+  eventName?: string
   tooltip?: string
 }) {
   const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [joinCode, setJoinCode] = useState<string>()
+  const [joinCode, setJoinCode] = useState<string>('')
 
   const [eventMap, setEventMap] = useState<Map<string, string>>(new Map())
-  const [teamName, setTeamName] = useState<string>()
-  const [userName, setUserName] = useState<string>()
-  const [teamCode, setTeamCode] = useState<string>()
+  const [teamName, setTeamName] = useState<string>('')
+  const [userName, setUserName] = useState<string>('')
+  const [teamCode, setTeamCode] = useState<string>('')
   const [modalState, setModalState] = useState('initial')
   const [joinedEvent, setJoinedEvent] = useState<string[]>([])
   const [isFetching, setIsFetching] = useState(false)
   const [userData, setUserData] = useState<User>()
+  const [dashboardURL] = useState(
+    eventName ? getSidebarURL({ isAdmin: false, eventName }) : '/dashboard'
+  )
 
   const { toast } = useToast()
   const useAuth = useAxiosAuth()
   const router = useRouter()
-  const dashboardUrl = '/dashboard'
   // const eventMap: Map<string, string> = new Map([
   //   ['eqpginai', 'Software Engineer'],
   //   ['oajbedpk', 'Data Science'],
@@ -109,6 +115,7 @@ export default function ModalPopup({
 
   // Function untuk fetching event yang udah diikutin user
   const getEventTeamData = async () => {
+    if (!isLoggedIn) return
     const res = await getEventTeam({ client: useAuth })
 
     if (res.error || !res.data) {
@@ -126,6 +133,7 @@ export default function ModalPopup({
   }
 
   const getSelf = async () => {
+    if (!isLoggedIn) return
     const res = await getUser({ client: useAuth })
     //   console.log('User Data \n' + JSON.stringify(res))
     if (res.error || !res.data) {
@@ -203,7 +211,7 @@ export default function ModalPopup({
         variant: 'success'
       })
       setJoinedEvent([...joinedEvent, eventType])
-      window.location.href = dashboardUrl
+      window.location.href = dashboardURL
     }
   }
 
@@ -285,12 +293,26 @@ export default function ModalPopup({
         variant: 'destructive'
       })
     } else {
-      toast({
-        title: 'Successfully joined team',
-        variant: 'success'
-      })
       setJoinedEvent([...joinedEvent, eventType])
-      setModalState('success join')
+
+      const teamRes = await getEventTeamByTeamId({
+        client: useAuth,
+        path: {
+          teamId: resp.data.teamId
+        }
+      })
+
+      if (teamRes.data) {
+        setTeamName(teamRes.data.name)
+      }
+
+      setTimeout(() => {
+        toast({
+          title: 'Successfully joined team',
+          variant: 'success'
+        })
+        setModalState('success join')
+      }, 200)
     }
   }
 
@@ -388,9 +410,9 @@ export default function ModalPopup({
                   joinTeam={joinTeam}
                 />
               ) : modalState === 'success create' ? (
-                <SuccessCreateModal dashboardUrl={dashboardUrl} code={joinCode ?? ''} />
+                <SuccessCreateModal dashboardUrl={dashboardURL} code={joinCode} />
               ) : modalState === 'success join' ? (
-                <SuccessJoinModal dashboardUrl={dashboardUrl} teamName={teamName ?? ''} />
+                <SuccessJoinModal dashboardUrl={dashboardURL} teamName={teamName} />
               ) : null}
             </div>
           )}

@@ -257,7 +257,7 @@ function EventPage() {
               <ArrowRight />
             </Button>
           ) : (
-            <ModalPopup eventType={event.id} />
+            <ModalPopup eventType={event.id} eventName={event.title} />
           )}
         </div>
       </section>
