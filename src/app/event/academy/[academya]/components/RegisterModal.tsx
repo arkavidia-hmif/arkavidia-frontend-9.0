@@ -10,7 +10,8 @@ import {
   getEventTeam,
   getUser,
   joinEventTeamByCode,
-  getEvent
+  getEvent,
+  User
 } from '~/api/generated'
 import { SuccessCreateModal, SuccessJoinModal } from './data-science-modal/success-modal'
 import { useToast } from '~/hooks/use-toast'
@@ -24,24 +25,14 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '~/app/components/ui/tooltip'
+import { useAppSelector } from '~/redux/store'
+import { useRouter } from 'next/navigation'
 
 export default function ModalPopup({ eventType }: { eventType: string }) {
+  const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [joinCode, setJoinCode] = useState<string>()
-  const { toast } = useToast()
-  const useAuth = useAxiosAuth()
-  const dashboardUrl = '/dashboard'
-  // const eventMap: Map<string, string> = new Map([
-  //   ['eqpginai', 'Software Engineer'],
-  //   ['oajbedpk', 'Data Science'],
-  //   ['oqgjwbra', 'UI/UX'],
-  //   ['ogqnrwas', 'Project Manager']
-  // ])
-  const openModal = () => setIsModalOpen(true)
-  const closeModal = () => {
-    setIsModalOpen(false)
-    setModalState('initial')
-  }
 
   const [eventMap, setEventMap] = useState<Map<string, string>>(new Map())
   const [teamName, setTeamName] = useState<string>()
@@ -50,6 +41,47 @@ export default function ModalPopup({ eventType }: { eventType: string }) {
   const [modalState, setModalState] = useState('initial')
   const [joinedEvent, setJoinedEvent] = useState<string[]>([])
   const [isFetching, setIsFetching] = useState(false)
+  const [userData, setUserData] = useState<User>()
+
+  const { toast } = useToast()
+  const useAuth = useAxiosAuth()
+  const router = useRouter()
+  const dashboardUrl = '/dashboard'
+  // const eventMap: Map<string, string> = new Map([
+  //   ['eqpginai', 'Software Engineer'],
+  //   ['oajbedpk', 'Data Science'],
+  //   ['oqgjwbra', 'UI/UX'],
+  //   ['ogqnrwas', 'Project Manager']
+  // ])
+  const openModal = async () => {
+    if (!isLoggedIn) {
+      toast({
+        variant: 'warning',
+        title: 'Anda belum login',
+        description: 'Silakan login terlebih dahulu untuk mendaftar.'
+      })
+      return
+    }
+
+    if (!userData?.isRegistrationComplete) {
+      toast({
+        variant: 'warning',
+        title: 'Anda belum menyelesaikan pendaftaran',
+        description: 'Mohon selesaikan proses pendaftaran dahulu'
+      })
+      setTimeout(() => {
+        router.push('/register/personal-data')
+      }, 800)
+    }
+
+    if (isLoggedIn && userData?.isRegistrationComplete) {
+      setIsModalOpen(true)
+    }
+  }
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setModalState('initial')
+  }
 
   // Function to get all event ids and titles to map
   const getEventData = async () => {
@@ -99,6 +131,7 @@ export default function ModalPopup({ eventType }: { eventType: string }) {
     }
 
     if (res.data) {
+      setUserData(res.data)
       setUserName(res.data.fullName ?? '')
     }
   }
@@ -267,7 +300,7 @@ export default function ModalPopup({ eventType }: { eventType: string }) {
     <div className="p-4">
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <div>
               <Button
                 onClick={openModal}
@@ -282,12 +315,10 @@ export default function ModalPopup({ eventType }: { eventType: string }) {
                 />
               </Button>
             </div>
-            <TooltipContent>
-              {joinedEvent.includes(eventType)
-                ? 'You have already registered'
-                : 'Register'}
-            </TooltipContent>
           </TooltipTrigger>
+          <TooltipContent>
+            {joinedEvent.includes(eventType) ? 'You have already registered' : 'Register'}
+          </TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
