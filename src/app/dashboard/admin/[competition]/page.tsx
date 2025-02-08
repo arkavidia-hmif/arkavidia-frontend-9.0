@@ -28,7 +28,7 @@ function AdminCompetitionDashboard() {
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
-  const limit = '1'
+  const limit = '10'
 
   const [isCompetitionFound, setIsCompetitionFound] = useState(true)
   const [currentCompetitionId, setCurrentCompetitionId] = useState<string | null>(null)
