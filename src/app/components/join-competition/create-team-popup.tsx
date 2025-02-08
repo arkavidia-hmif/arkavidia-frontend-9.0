@@ -167,7 +167,7 @@ export const CreateTeamPopup: React.FC<{
         }
       })
 
-      if (resp.error) {
+      if (resp.error || !resp.data) {
         // @ts-expect-error
         if (resp.error.error.startsWith('A team with the name')) {
           toast({
@@ -178,6 +178,7 @@ export const CreateTeamPopup: React.FC<{
         setError('Failed to create team.')
         return
       }
+
       toast({
         title: 'Team created successfully',
         variant: 'success',
