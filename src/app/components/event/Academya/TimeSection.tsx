@@ -12,7 +12,7 @@ export function TimeSection({ value, label }: TimeSectionProps) {
         <TimeCard digit={value[0]} />
         <TimeCard digit={value[1]} />
       </div>
-      <span className="font-teachers text-xl font-bold text-white">{label}</span>
+      <span className="font-teachers text-[18px] font-bold text-white">{label}</span>
     </div>
   )
 }

@@ -16,6 +16,34 @@ export function expandCompetitionName(competitionName: string) {
   }
 }
 
+export function getAcademyaEventName(eventName: string) {
+  if (eventName === 'softeng') {
+    return 'Academya - Software Engineer'
+  } else if (eventName === 'datascience') {
+    return 'Academya - Data Science'
+  } else if (eventName === 'pm') {
+    return 'Academya - Project Manager'
+  } else if (eventName === 'uiux') {
+    return 'Academya - UI UX'
+  } else {
+    return ''
+  }
+}
+
+export function getAcademyaEventType(eventName: string) {
+  if (eventName === 'softeng') {
+    return 'Software'
+  } else if (eventName === 'datascience') {
+    return 'Data'
+  } else if (eventName === 'pm') {
+    return 'Project'
+  } else if (eventName === 'uiux') {
+    return 'UI'
+  } else {
+    return ''
+  }
+}
+
 export function expandEventName(eventName: string) {
   //! HARDCODED, event name not corresponding to
   // Based on sidebar links,

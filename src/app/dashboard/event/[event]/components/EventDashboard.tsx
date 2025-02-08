@@ -16,6 +16,7 @@ import {
 } from '~/api/generated'
 import { getEventNameSlug } from './event-dashboard-utils'
 import Loading from '~/app/components/Loading'
+import { Tab } from '~/app/components/Tab'
 
 function EventDashboard({ eventName }: { eventName: string }) {
   const { toast } = useToast()
@@ -82,6 +83,8 @@ function EventDashboard({ eventName }: { eventName: string }) {
     )
   }
 
+  const contentTypes = ['Team Info', 'Material', 'Task List', 'Verification']
+
   return (
     <div>
       <EventTeamProfileHero
@@ -89,8 +92,19 @@ function EventDashboard({ eventName }: { eventName: string }) {
         userData={userData}
         activeTeamData={activeTeamData}
       />
-      <EventTeamInfo eventName={eventName} user={userData} teamData={activeTeamData} />
-      <EventVerification activeTeamData={activeTeamData} user={userData} />
+      <Tab
+        contentType={contentTypes}
+        content={[
+          <EventTeamInfo
+            eventName={eventName}
+            user={userData}
+            teamData={activeTeamData}
+          />,
+          null,
+          null,
+          <EventVerification activeTeamData={activeTeamData} user={userData} />
+        ]}
+      />
     </div>
   )
 }

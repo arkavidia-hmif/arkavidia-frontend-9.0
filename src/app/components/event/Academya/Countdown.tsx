@@ -12,11 +12,11 @@ export default function Countdown({ targetDate }: CountdownProps) {
 
   return (
     <div className="flex flex-col items-center gap-4 md:flex-row">
-      <TimeSection value={days} label="Days" />
+      <TimeSection value={days} label="Hari" />
       <TitikDua />
-      <TimeSection value={hours} label="Hours" />
+      <TimeSection value={hours} label="Jam" />
       <TitikDua />
-      <TimeSection value={minutes} label="Minutes" />
+      <TimeSection value={minutes} label="Menit" />
     </div>
   )
 }

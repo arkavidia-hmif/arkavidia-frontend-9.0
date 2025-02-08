@@ -28,7 +28,6 @@ import {
 } from '../../../../components/ui/accordion'
 import { useToast } from '~/hooks/use-toast'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
-import { DummyVerification } from './dummy'
 import FilePreview from '../../../[competition]/components/FilePreview'
 import {
   GetEventTeamByTeamIdResponse,
@@ -340,9 +339,9 @@ function EventVerification({
                     </p>
                   </div>
                 )}
-                <div className="mt-5 flex w-full items-center gap-3 md:justify-end">
+                <div className="mt-6 flex w-full items-center gap-3 md:justify-end">
                   <p
-                    className={`flex h-10 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getVerifStatusColor(verif.status)}`}>
+                    className={`flex h-12 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getVerifStatusColor(verif.status)}`}>
                     {getVerifStatus(verif.status)}
                   </p>
                   <Button

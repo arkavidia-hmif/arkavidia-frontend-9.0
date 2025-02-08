@@ -7,10 +7,19 @@ import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import Countdown from '~/app/components/event/Academya/Countdown'
 import { useParams, useRouter } from 'next/navigation'
-import { Event, EventTimeline, getEventById, getEventTimelineById } from '~/api/generated'
+import {
+  Event,
+  EventTimeline,
+  getEvent,
+  getEventById,
+  getEventTimeline,
+  getEventTimelineById
+} from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
 import Link from 'next/link'
+import { getAcademyaEventName, getAcademyaEventType } from '~/lib/utils'
+import ModalPopup from './components/RegisterModal'
 
 interface eventTimeline {
   title: string
@@ -37,41 +46,72 @@ const SPONSORS_EXAMPLE = [
 ]
 
 function EventPage() {
-  const { eventId } = useParams()
+  const { eventName } = useParams()
   const { toast } = useToast()
   const router = useRouter()
   const [event, setEvent] = useState<Event>()
   const [eventTimeline, setEventTimeline] = useState<eventTimeline[]>([])
   const [registrationCloseDate, setRegistrationCloseDate] = useState<string>('')
+  const [eventId, setEventId] = useState<string>('')
   const axiosInstance = useAxiosAuth()
 
   const MOCK_EVENTS_DATA = [
     {
-      title: 'Registration',
-      timeStart: new Date('2025-02-01T00:00:00'),
-      timeEnd: new Date('2025-02-15T23:59:59')
+      title: 'No Data',
+      timeStart: new Date('2025-01-01T00:00:00'),
+      timeEnd: new Date('2025-01-01T00:00:00')
     },
     {
-      title: 'Extended Registration',
-      timeStart: new Date('2025-02-16T00:00:00'),
-      timeEnd: new Date('2025-02-22T23:59:59')
+      title: 'No Data',
+      timeStart: new Date('2025-01-01T00:00:00'),
+      timeEnd: new Date('2025-01-01T00:00:00')
     },
     {
-      title: 'Announcement Phase 1',
-      timeStart: new Date('2025-02-25T12:00:00'),
-      timeEnd: new Date('2025-02-25T23:59:59')
+      title: 'No Data',
+      timeStart: new Date('2025-01-01T00:00:00'),
+      timeEnd: new Date('2025-01-01T00:00:00')
     },
     {
-      title: 'Announcement Phase 2',
-      timeStart: new Date('2025-02-28T12:00:00'),
-      timeEnd: new Date('2025-02-28T23:59:59')
+      title: 'No Data',
+      timeStart: new Date('2025-01-01T00:00:00'),
+      timeEnd: new Date('2025-01-01T00:00:00')
     },
     {
-      title: 'Academya Session',
-      timeStart: new Date('2025-02-01T09:00:00'),
-      timeEnd: new Date('2025-02-05T17:00:00')
+      title: 'No Data',
+      timeStart: new Date('2025-01-01T00:00:00'),
+      timeEnd: new Date('2025-01-01T00:00:00')
     }
   ]
+
+  useEffect(() => {
+    async function getEventData() {
+      try {
+        const res = await getEvent({ client: axiosInstance })
+        if (res.data) {
+          const eventTitle = getAcademyaEventName(eventName as string)
+          const eventType = getAcademyaEventType(eventName as string)
+          const event = res.data.find(
+            (event: Event) =>
+              event.title.toLowerCase() === eventTitle.toLowerCase() ||
+              event.title.toLowerCase().includes(eventType.toLowerCase())
+          )
+
+          if (event) {
+            setEventId(event.id)
+          }
+        }
+      } catch (err: unknown) {
+        toast({
+          title: 'Failed to fetch event data',
+          description: 'Error: ' + err,
+          variant: 'destructive',
+          duration: 5000
+        })
+      }
+    }
+
+    getEventData()
+  }, [])
 
   useEffect(() => {
     const fetchEventById = async (eventId: string) => {
@@ -98,18 +138,18 @@ function EventPage() {
           duration: 5000
         })
 
-        router.push('/event/academya')
+        router.push('/')
       }
     }
 
     // TODO: masih perlu diuji karena belum ada data timeline
     const fetchEventTimeline = async (eventId: string) => {
-      const res = await getEventTimelineById({
+      const res = await getEventTimeline({
         client: axiosInstance,
         path: { eventId: eventId }
-      }).then(res => res.data ?? [])
+      })
 
-      if (Array.isArray(res)) {
+      if (res.data && Array.isArray(res)) {
         const mappedEvents = res.map((timeline: EventTimeline) => ({
           title: timeline.title,
           timeStart: new Date(timeline.startDate),
@@ -127,7 +167,7 @@ function EventPage() {
       }
     }
 
-    if (eventId && typeof eventId === 'string') {
+    if (eventId && typeof eventId === 'string' && eventId.length) {
       fetchEventById(eventId)
       fetchEventTimeline(eventId)
     }
@@ -151,7 +191,7 @@ function EventPage() {
   }, [eventTimeline])
 
   return (
-    <div className="relative flex h-full min-h-screen w-full flex-col items-center justify-center gap-8 px-4 pb-32 pt-28 md:gap-16 md:pt-52 lg:gap-32">
+    <div className="relative flex h-full min-h-screen w-full flex-col items-center justify-center gap-10 px-4 pb-32 pt-24 md:gap-12 md:pt-40 lg:gap-24 lg:pt-32">
       {/* Hero Section */}
       <Hero
         eventTitle={event?.title}
@@ -160,8 +200,8 @@ function EventPage() {
       />
 
       {/* Countdown & Register */}
-      <section className="flex flex-col items-center justify-center gap-16">
-        <div className="p-10">
+      <section className="flex flex-col items-center justify-center gap-6">
+        <div className="p-10 pt-2">
           <Countdown
             targetDate={
               eventTimeline.length > 0
@@ -173,7 +213,7 @@ function EventPage() {
           />
         </div>
 
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-center">
           <Button
             variant={'outline'}
             onClick={() => {
@@ -191,16 +231,22 @@ function EventPage() {
             Download Handbook
           </Button>
           {/* TODO: Handle Register Now Event */}
-          <Button>
-            Register Now
-            <ArrowRight />
-          </Button>
+          {!event || !event.id ? (
+            <Button disabled>
+              Register Now
+              <ArrowRight />
+            </Button>
+          ) : (
+            <ModalPopup eventType={event.id} />
+          )}
         </div>
       </section>
 
       {/* Event Timeline */}
-      <section className="flex flex-col items-center justify-center gap-12 lg:gap-28">
-        <h1 className="text-center font-belanosima text-6xl uppercase">EVENT TIMELINE</h1>
+      <section className="flex flex-col items-center justify-center gap-12 lg:gap-16">
+        <h1 className="mt-6 text-center font-belanosima text-6xl uppercase md:mt-0">
+          EVENT TIMELINE
+        </h1>
         {eventTimeline.length === 0 ? (
           <>
             <Timeline events={MOCK_EVENTS_DATA} variant={'vertical'} />
@@ -215,7 +261,7 @@ function EventPage() {
         <h1 className="font-belanosima text-6xl uppercase">FAQ</h1>
       </section>
       {/* TODO: Sponsors */}
-      <section>
+      {/* <section>
         <h1 className="text-center font-belanosima text-6xl">Sponsors</h1>
         <div className="mt-8 rounded-xl border-2 border-none bg-gradient-to-b from-[rgba(206,106,255,0.2)] to-[rgba(72,230,255,0.2)] px-6 py-4 shadow-[0_0_33.1px_0_#EFD3D3] backdrop-blur-[20px]">
           <div className="flex flex-wrap justify-center gap-8">
@@ -237,7 +283,7 @@ function EventPage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   )
 }

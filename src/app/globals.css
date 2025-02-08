@@ -168,3 +168,7 @@ body {
 .scrollbar::-webkit-scrollbar-thumb:hover {
   background: #ebc3ff;
 }
+
+.event-submenu svg {
+  rotate: 90deg;
+}

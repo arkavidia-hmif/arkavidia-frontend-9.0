@@ -10,7 +10,8 @@ export default function EventPageLayout({ children }: { children: React.ReactNod
         src="/images/event/event-bg.png"
         alt="Event Background"
         fill
-        className="-z-10 object-cover object-center"
+        className="-z-10 bg-purple-900 object-cover object-center"
+        quality={90}
       />
       <Navbar />
       <div>{children}</div>

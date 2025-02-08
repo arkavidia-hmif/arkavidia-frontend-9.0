@@ -28,7 +28,13 @@ import {
 import { useAppSelector } from '~/redux/store'
 import { useRouter } from 'next/navigation'
 
-export default function ModalPopup({ eventType }: { eventType: string }) {
+export default function ModalPopup({
+  eventType,
+  tooltip
+}: {
+  eventType: string
+  tooltip?: string
+}) {
   const isLoggedIn = useAppSelector(state => state.auth.isLoggedIn)
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -304,7 +310,7 @@ export default function ModalPopup({ eventType }: { eventType: string }) {
             <div>
               <Button
                 onClick={openModal}
-                className="flex gap-2 rounded-xl"
+                className="flex gap-2 rounded-lg py-2"
                 disabled={joinedEvent.includes(eventType)}>
                 Register Now
                 <Image
@@ -317,7 +323,9 @@ export default function ModalPopup({ eventType }: { eventType: string }) {
             </div>
           </TooltipTrigger>
           <TooltipContent>
-            {joinedEvent.includes(eventType) ? 'You have already registered' : 'Register'}
+            {joinedEvent.includes(eventType)
+              ? 'You have already registered'
+              : (tooltip ?? 'Register Now')}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

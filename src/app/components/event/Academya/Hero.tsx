@@ -26,9 +26,15 @@ const AcademyaHeroSection = ({
   }
 
   return (
-    <section className="m-0 mx-auto flex max-w-[1200px] flex-col items-center justify-center gap-6 px-4 md:flex-row">
-      <Image src={imageSrc} alt={eventTitle + ' Logo'} width={502} height={363} />
-      <div className="flex max-w-[540px] flex-col gap-6 text-center">
+    <section className="m-0 mx-auto flex w-full flex-col items-center justify-center gap-6 px-10 md:flex-row lg:max-w-[1200px]">
+      <Image
+        src={imageSrc}
+        alt={eventTitle + ' Logo'}
+        width={460}
+        height={320}
+        className="scale-85 [320px] w-[460px] md:scale-100"
+      />
+      <div className="flex max-w-[100vw] flex-col gap-6 text-center md:max-w-[540px]">
         <h1 className="text-wrap font-belanosima text-5xl uppercase text-white">
           {eventTitle}
         </h1>
