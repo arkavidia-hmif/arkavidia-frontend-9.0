@@ -144,19 +144,21 @@ function EventPage() {
 
     // TODO: masih perlu diuji karena belum ada data timeline
     const fetchEventTimeline = async (eventId: string) => {
-      const res = await getEventTimeline({
+      const res = await getEventTimelineById({
         client: axiosInstance,
         path: { eventId: eventId }
       })
 
-      if (res.data && Array.isArray(res)) {
-        const mappedEvents = res.map((timeline: EventTimeline) => ({
+      if (res.data && Array.isArray(res.data)) {
+        const mappedEvents = res.data.map((timeline: EventTimeline) => ({
           title: timeline.title,
           timeStart: new Date(timeline.startDate),
           timeEnd: timeline.endDate ? new Date(timeline.endDate) : undefined
         }))
 
-        setEventTimeline(mappedEvents)
+        setEventTimeline(
+          mappedEvents.toSorted((a, b) => a.timeStart.getTime() - b.timeStart.getTime())
+        )
       } else {
         toast({
           title: 'Failed to fetch event timeline',
@@ -201,19 +203,37 @@ function EventPage() {
 
       {/* Countdown & Register */}
       <section className="flex flex-col items-center justify-center gap-6">
-        <div className="p-10 pt-2">
+        <div className="pt-2">
           <Countdown
             targetDate={
               eventTimeline.length > 0
-                ? eventTimeline.reduce((latest, current) =>
-                    latest.timeStart > current.timeStart ? latest : current
-                  ).timeStart
+                ? (eventTimeline.reduce((earliest, current) => {
+                    const now = new Date()
+                    const isCurrentEventValid =
+                      current.timeEnd &&
+                      current.timeEnd > now &&
+                      current.title.toLowerCase().includes('regis')
+                    const isEarliestEventValid =
+                      earliest.timeEnd &&
+                      earliest.timeEnd > now &&
+                      earliest.title.toLowerCase().includes('regis')
+
+                    if (!isEarliestEventValid) {
+                      return isCurrentEventValid ? current : earliest
+                    }
+
+                    if (!isCurrentEventValid) {
+                      return earliest
+                    }
+
+                    return current.timeStart < earliest.timeStart ? current : earliest
+                  }).timeEnd ?? new Date('2025-02-07T00:00:00'))
                 : new Date('2025-02-07T00:00:00')
             }
           />
         </div>
 
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-center">
+        <div className="mt-2 flex flex-col gap-4 md:flex-row md:items-center md:justify-center">
           <Button
             variant={'outline'}
             onClick={() => {

@@ -71,7 +71,9 @@ const eventDropdownNavbarDesktop = (pathname: string) => {
             key={index}
             className={`hover:cursor-pointer focus:bg-purple-600 focus:text-white ${pathname.includes(item.link) ? 'bg-white text-purple-700' : ''}`}
             asChild>
-            <Link href={item.link || ''} className="mb-1 w-full px-1 hover:bg-purple-600">
+            <Link
+              href={item.link || ''}
+              className="mb-2 w-full px-1 font-dmsans hover:bg-purple-600">
               {item.title}
             </Link>
           </DropdownMenuItem>
@@ -96,7 +98,7 @@ const EventDropdownNavbarMobile = ({
       onOpenChange={isOpen => toggleSubMenuOpen(isOpen)}>
       <DropdownMenuSubTrigger
         onClick={() => toggleSubMenuOpen(prev => !prev)}
-        className={`event-submenu ${pathname.includes('event') ? 'data-[state=closed]:bg-purple-300' : 'data-[state=closed]:bg-transparent'} data-[state=open]:bg-purple-300`}>
+        className={`event-submenu mb-1 ${pathname.includes('event') ? 'data-[state=closed]:bg-purple-300' : 'data-[state=closed]:bg-transparent'} data-[state=open]:bg-purple-300`}>
         <div
           className={`${
             pathname.includes('event')
@@ -113,9 +115,11 @@ const EventDropdownNavbarMobile = ({
         {eventLinks.map((item, index) => (
           <DropdownMenuItem
             key={index}
-            className={pathname.includes(item.link) ? 'bg-white text-purple-700' : ''}
+            className={
+              pathname.includes(item.link) ? 'mb-1.5 bg-white text-purple-700' : 'mb-1.5'
+            }
             asChild>
-            <Link href={item.link || ''} className="w-full hover:bg-gray-500">
+            <Link href={item.link || ''} className="w-full font-dmsans">
               {item.title}
             </Link>
           </DropdownMenuItem>
@@ -213,15 +217,18 @@ function Navbar() {
           <DropdownMenuTrigger className="rounded-md data-[state=open]:bg-purple-700 md:hidden">
             <Menu size={24} className="m-3" color="white" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="z-[150] mr-2 mt-3 min-w-[167px] gap-4 rounded-lg border-none bg-purple-700 px-3 py-5 font-teachers text-base font-bold text-white">
+          <DropdownMenuContent
+            align="end"
+            alignOffset={-8}
+            className="z-[150] mr-2 mt-3 min-w-[167px] gap-4 rounded-lg border-none bg-purple-700 px-3 py-5 font-teachers text-base font-bold text-white">
             {NAV_ITEMS.map((item, index) =>
               item.link ? (
                 <DropdownMenuItem
                   key={index}
                   className={
                     pathname.includes(item.link)
-                      ? 'mt-1.5 bg-white text-purple-700'
-                      : 'mt-1.5'
+                      ? 'mb-1 bg-white text-purple-700'
+                      : 'mb-1'
                   }
                   asChild>
                   <Link href={item.link || ''} className="w-full hover:bg-gray-500">
@@ -241,7 +248,7 @@ function Navbar() {
             {LOGGED_IN ? (
               <>
                 <DropdownMenuItem
-                  className={`mt-1.5 cursor-pointer ${pathname === '/dashboard' ? 'bg-white text-purple-700' : ''}`}>
+                  className={`mb-1 cursor-pointer ${pathname === '/dashboard' ? 'bg-white text-purple-700' : ''}`}>
                   <div className="w-full" onClick={() => checkHasFilledInfo()}>
                     Dashboard
                   </div>

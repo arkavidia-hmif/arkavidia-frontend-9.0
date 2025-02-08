@@ -2,21 +2,32 @@
 
 import { useCountdown } from '~/hooks/useCountdown'
 import { TimeSection } from '~/app/components/event/Academya/TimeSection'
+import { useEffect, useState } from 'react'
 
 interface CountdownProps {
   targetDate: Date
 }
 
-export default function Countdown({ targetDate }: CountdownProps) {
-  const { days, hours, minutes } = useCountdown(targetDate)
+interface TimeLeft {
+  days: string
+  hours: string
+  minutes: string
+}
 
+export default function Countdown({ targetDate }: CountdownProps) {
+  const { days, hours, minutes, seconds } = useCountdown(targetDate)
   return (
-    <div className="flex flex-col items-center gap-4 md:flex-row">
-      <TimeSection value={days} label="Hari" />
+    <div className="grid grid-cols-2 items-center gap-8 md:flex md:flex-row md:gap-6">
+      <TimeSection value={days ?? '00'} label="Hari" />
       <TitikDua />
-      <TimeSection value={hours} label="Jam" />
+
+      <TimeSection value={hours ?? '00'} label="Jam" />
       <TitikDua />
-      <TimeSection value={minutes} label="Menit" />
+
+      <TimeSection value={minutes ?? '00'} label="Menit" />
+      <TitikDua />
+
+      <TimeSection value={seconds ?? '00'} label="Detik" />
     </div>
   )
 }
