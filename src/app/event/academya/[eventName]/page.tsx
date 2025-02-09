@@ -277,9 +277,9 @@ function EventPage() {
       </section>
 
       {/* TODO: FAQ */}
-      <section>
+      {/* <section>
         <h1 className="font-belanosima text-6xl uppercase">FAQ</h1>
-      </section>
+      </section> */}
       {/* TODO: Sponsors */}
       {/* <section>
         <h1 className="text-center font-belanosima text-6xl">Sponsors</h1>
