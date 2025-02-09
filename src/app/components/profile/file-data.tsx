@@ -45,8 +45,9 @@ const handleUpload: (e: uploadedFileState | null ) => void = async (e) => {
     return;
     }
 
-    setFileName(e.fileName);
-    setFileURL('https://' + e.mediaURL);
+    console.log("Reloading..")
+    window.location.reload();
+
 }
 
 return (
