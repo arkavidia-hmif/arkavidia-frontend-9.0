@@ -11,6 +11,7 @@ import { Button } from '../../../components/ui/button'
 import { Tab } from '../../../components/Tab'
 import { ChevronLeft } from 'lucide-react'
 import {
+  getDownloadPresignedLink,
   GetPresignedLinkData,
   getTeamById,
   getTeams,
@@ -162,6 +163,23 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               status: 'unsubmitted'
             }
           } else {
+            const presignedFile = await getDownloadPresignedLink({
+              client: axiosInstance,
+              query: {
+                filename: teamVerifData.data?.document?.[0].media.name || '',
+                // @ts-ignore
+                bucket: teamVerifData.data?.document?.[0].media.bucket
+              }
+            })
+
+            if (presignedFile.error) {
+              toast({
+                title: 'File Error',
+                description: 'Failed to get file URL',
+                variant: 'warning'
+              })
+            }
+
             const isVerified = teamVerifData?.data?.document?.[0].isVerified ?? false
             const verificationError = teamVerifData?.data?.document?.[0].verificationError
             const isRejected =
@@ -176,7 +194,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               rejectionMessage:
                 teamVerifData?.data?.document?.[0].verificationError ?? '',
               isVerified: isVerified,
-              mediaLink: teamVerifData.data?.document?.[0].media.url,
+              mediaLink: presignedFile.data?.mediaUrl,
               mediaName: teamVerifData.data?.document?.[0].media.name
             }
           }
@@ -190,29 +208,48 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           // Get current member document
           const currentMemberDocument = currentMemberData?.document
 
-          // Check if member has submitted the required document
-          MemberDocumentRequirement.forEach((docType: string, index: number) => {
-            // @ts-ignore
-            const memberDoc = currentMemberDocument?.find(
-              (doc: any) => doc.type === docType
-            )
-
-            // If no document found, add to memberVerifications
-            if (!memberDoc) {
-              memberVerifications.push({
-                id: `member-${index}`,
-                userId: currentUserData.data?.id,
-                type: docType as 'poster' | 'twibbon',
-                isVerified: false,
-                status: 'unsubmitted'
+          await Promise.all(
+            MemberDocumentRequirement.map(async (docType: string, index: number) => {
+              // @ts-ignore
+              const memberDoc = currentMemberDocument?.find(
+                (doc: any) => doc.type === docType
+              )
+          
+              if (!memberDoc) {
+                memberVerifications.push({
+                  id: `member-${index}`,
+                  userId: currentUserData.data?.id,
+                  type: docType as 'poster' | 'twibbon',
+                  isVerified: false,
+                  status: 'unsubmitted'
+                })
+                return
+              }
+          
+              const presignedFile = await getDownloadPresignedLink({
+                client: axiosInstance,
+                query: {
+                  filename: memberDoc.media.name,
+                  // @ts-ignore
+                  bucket: memberDoc.media.bucket
+                }
               })
-            } else {
+          
+              if (presignedFile.error) {
+                toast({
+                  title: 'File Error',
+                  description: 'Failed to get file URL',
+                  variant: 'warning'
+                })
+              }
+          
               const isVerified = memberDoc.isVerified ?? false
               const verificationError = memberDoc.verificationError
               const isRejected =
                 verificationError !== '' &&
                 verificationError !== null &&
                 verificationError !== undefined
+          
               memberVerifications.push({
                 id: `member-${index}`,
                 userId: currentUserData.data?.id,
@@ -220,11 +257,12 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                 isVerified: isVerified,
                 rejectionMessage: memberDoc.verificationError ?? '',
                 status: isVerified ? 'verified' : isRejected ? 'rejected' : 'submitted',
-                mediaLink: memberDoc.media.url,
+                mediaLink: presignedFile.data?.mediaUrl,
                 mediaName: memberDoc.media.name
               })
-            }
-          })
+            })
+          )
+          
 
           if (teamVerification) {
             setVerifications(prev => [...prev, teamVerification])

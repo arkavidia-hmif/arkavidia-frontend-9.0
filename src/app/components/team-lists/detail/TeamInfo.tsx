@@ -138,7 +138,7 @@ function FileRequirements({
         client: axiosAuth,
         query: {
           filename: file.media.name,
-          // Ignore this.
+          // @ts-ignore
           bucket: file.media.bucket
         }
       });
@@ -149,6 +149,7 @@ function FileRequirements({
           description: 'Failed to get file URL',
           variant: 'warning'
         })
+        return;
       }
 
       setURL(presigned.data?.presignedUrl);
