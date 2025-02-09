@@ -234,6 +234,23 @@ export default function ModalPopup({
       return
     }
 
+    if (!team_name) {
+      toast({
+        title: 'Team name is required',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    if (team_name.length > 50) {
+      toast({
+        title: 'Team name is too long',
+        description: 'Maximum 50 characters allowed',
+        variant: 'destructive'
+      })
+      return
+    }
+
     const resp = await postCreateEventTeam({
       client: useAuth,
       body: { eventId: eventType, name: team_name }
@@ -353,7 +370,7 @@ export default function ModalPopup({
       </TooltipProvider>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-[400] flex items-center justify-center">
           <div className="fixed inset-0 bg-black opacity-50" onClick={closeModal}></div>
           {/* Modal */}
           {!eventMap.get(eventType)?.toLowerCase().includes('data') ? (
