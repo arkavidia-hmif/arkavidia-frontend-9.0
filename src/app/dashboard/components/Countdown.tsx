@@ -21,7 +21,7 @@ function getDateText(date: Date) {
   return `${day}/${month}/${year}`
 }
 
-function calculateTimeLeft(endDate?: Date): TimeLeft {
+export function calculateTimeLeft(endDate?: Date): TimeLeft {
   if (!endDate) {
     return {
       days: -1,

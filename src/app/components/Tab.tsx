@@ -21,7 +21,7 @@ export const Tab = ({ contentType, content }: TabProps) => {
   const checkOverflow = () => {
     if (tabContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = tabContainerRef.current
-      setIsOverflowingRight(scrollLeft + clientWidth < scrollWidth)
+      setIsOverflowingRight(scrollLeft + clientWidth + 1 < scrollWidth)
       setIsOverflowingLeft(scrollLeft > 0)
     }
   }
@@ -93,7 +93,7 @@ const Menu = ({ Selected, setSelected, title }: MenuProps) => {
   return (
     <Button
       variant="ghost"
-      className="flex h-full w-full flex-col px-0 py-0 text-white hover:bg-white/40 hover:text-white"
+      className="flex h-full w-full flex-col px-0 py-1 text-white hover:bg-white/40 hover:text-white"
       onClick={onClick}>
       <h1 className="font-teachers text-xl font-bold md:text-2xl">{title}</h1>
       {isSelected ? (

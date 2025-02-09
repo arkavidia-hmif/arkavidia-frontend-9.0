@@ -2,37 +2,51 @@ import { expandCompetitionName } from '~/lib/utils'
 
 function getSidebarURL({
   isAdmin,
-  competitionName
+  competitionName,
+  eventName
 }: {
   isAdmin: boolean
-  competitionName: string
+  competitionName?: string
+  eventName?: string
 }) {
   let url = '/dashboard'
   if (isAdmin) {
     url += '/admin'
   }
 
-  switch (competitionName) {
-    case 'CP':
-      url += '/CP'
-      break
-    case 'CTF':
-      url += '/CTF'
-      break
-    case 'UXvidia':
-      url += '/UXvidia'
-      break
-    case 'Arkalogica':
-      url += '/Arkalogica'
-      break
-    case 'Datavidia':
-      url += '/Datavidia'
-      break
-    case 'Hackvidia':
-      url += '/Hackvidia'
-      break
-    default:
-      break
+  if (competitionName) {
+    switch (competitionName) {
+      case 'CP':
+        url += '/CP'
+        break
+      case 'CTF':
+        url += '/CTF'
+        break
+      case 'UXvidia':
+        url += '/UXvidia'
+        break
+      case 'Arkalogica':
+        url += '/Arkalogica'
+        break
+      case 'Datavidia':
+        url += '/Datavidia'
+        break
+      case 'Hackvidia':
+        url += '/Hackvidia'
+        break
+      default:
+        break
+    }
+  } else if (eventName) {
+    /**
+     *  Format event name, for example 'Akademya - Software Engineering' will be converted into
+     * 'akademya-software-engineering'
+     *  */
+
+    url += `/event/${eventName
+      .replace(' - ', '-') // Replace " - " with "-"
+      .replace(/\s+/g, '-') // Convert spaces to hyphens
+      .toLowerCase()}`
   }
 
   return url

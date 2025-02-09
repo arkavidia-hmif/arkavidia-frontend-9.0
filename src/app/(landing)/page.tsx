@@ -5,6 +5,7 @@ import Timeline from '../components/Timeline'
 import { CompetitionGaleryTimeline } from '../components/landing/CompetitionGalleryTimeLine'
 import { ArrowLeftCircle } from 'lucide-react'
 import { FaAngleLeft, FaAngleRight, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import { EventSwiper } from '../components/landing/EventSwiper'
 
 const competitions = [
   {
@@ -77,15 +78,17 @@ const MainLandingCompetitionPage = () => {
         }}>
         <p className="lg-[24px] text-justify font-dmsans text-[16px] leading-5 tracking-wider text-lilac-100 md:text-[20px] md:leading-6 lg:leading-7">
           Arkavidia merupakan acara IT tahunan yang diadakan oleh Himpunan Mahasiswa
-          Informatika ITB. Dengan tema <b>"Innovate for Impact: Bridging Technology and
-          Society”</b>, Arkavidia 9.0 diharapkan akan lebih banyak individu sadar akan hak dan
-          kewajibannya di dunia digital, sehingga dapat mewujudkan kemerdekaan digital
-          bagi dirinya. Diharapkan dengan diadakannya acara ini, dapat memberikan manfaat
-          bagi pelajar, civitas akademik, dan masyarakat umum seluruh Indonesia.
+          Informatika ITB. Dengan tema{' '}
+          <b>"Innovate for Impact: Bridging Technology and Society”</b>, Arkavidia 9.0
+          diharapkan akan lebih banyak individu sadar akan hak dan kewajibannya di dunia
+          digital, sehingga dapat mewujudkan kemerdekaan digital bagi dirinya. Diharapkan
+          dengan diadakannya acara ini, dapat memberikan manfaat bagi pelajar, civitas
+          akademik, dan masyarakat umum seluruh Indonesia.
         </p>
       </div>
 
       <CompetitionSwiper competitions={competitions} />
+      <EventSwiper />
 
       <CompetitionGaleryTimeline />
 

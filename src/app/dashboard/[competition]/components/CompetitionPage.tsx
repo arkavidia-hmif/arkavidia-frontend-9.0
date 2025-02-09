@@ -168,8 +168,8 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               verificationError !== '' &&
               verificationError !== null &&
               verificationError !== undefined
-              teamVerification = {
-                id: 'team-0',
+            teamVerification = {
+              id: 'team-0',
               teamId: teamId,
               type: 'bukti-pembayaran',
               status: isVerified ? 'verified' : isRejected ? 'rejected' : 'submitted',
@@ -179,9 +179,6 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               mediaLink: teamVerifData.data?.document?.[0].media.url,
               mediaName: teamVerifData.data?.document?.[0].media.name
             }
-
-            console.log(verificationError !== '', verificationError !== null, verificationError !== undefined)
-            console.log({isVerified, verificationError, isRejected, teamVerification})
           }
 
           // Get current member data only

@@ -4,22 +4,129 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Button } from './Button'
 import Image from 'next/image'
-import { LogOut, Menu } from 'lucide-react'
+import { ChevronDown, LogOut, Menu } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from './ui/dropdown-menu'
 import { useAuth } from '../contexts/AuthContext'
 import { useAppSelector } from '~/redux/store'
 import { toast } from '~/hooks/use-toast'
 import { cn } from '~/lib/utils'
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 type NavItem = {
   name: string
   link: string
+}
+
+type NavItemReactNode = {
+  name: string
+  link: null
+  type: 'event'
+}
+
+const eventLinks = [
+  {
+    title: 'Academya - Software Engineering',
+    link: '/event/academya/softeng'
+  },
+  {
+    title: 'Academya - Data Science',
+    link: '/event/academya/datascience'
+  },
+  {
+    title: 'Academya - Product Management',
+    link: '/event/academya/pm'
+  },
+  {
+    title: 'Academya - UI UX',
+    link: '/event/academya/uiux'
+  }
+]
+
+const eventDropdownNavbarDesktop = (pathname: string) => {
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger>
+        <div
+          className={`${
+            pathname.includes('event')
+              ? 'rounded-xl bg-purple-300'
+              : 'hover:rounded-lg hover:bg-black/20 hover:py-2'
+          } flex h-full items-center gap-x-3 px-6 py-2 font-teachers text-base font-bold`}>
+          Academya <ChevronDown size={16} />
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="z-[200] bg-purple-700 px-1 py-2 text-white"
+        align="end">
+        {eventLinks.map((item, index) => (
+          <DropdownMenuItem
+            key={index}
+            className={`hover:cursor-pointer focus:bg-purple-600 focus:text-white ${pathname.includes(item.link) ? 'bg-white text-purple-700' : ''}`}
+            asChild>
+            <Link
+              href={item.link || ''}
+              className="mb-2 w-full px-1 font-dmsans hover:bg-purple-600">
+              {item.title}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+const EventDropdownNavbarMobile = ({
+  pathname,
+  subMenuOpen,
+  toggleSubMenuOpen
+}: {
+  pathname: string
+  subMenuOpen: boolean
+  toggleSubMenuOpen: Dispatch<SetStateAction<boolean>>
+}) => {
+  return (
+    <DropdownMenuSub
+      open={subMenuOpen}
+      onOpenChange={isOpen => toggleSubMenuOpen(isOpen)}>
+      <DropdownMenuSubTrigger
+        onClick={() => toggleSubMenuOpen(prev => !prev)}
+        className={`event-submenu mb-1 ${pathname.includes('event') ? 'data-[state=closed]:bg-purple-300' : 'data-[state=closed]:bg-transparent'} data-[state=open]:bg-purple-300`}>
+        <div
+          className={`${
+            pathname.includes('event')
+              ? 'rounded-xl bg-purple-300'
+              : 'hover:rounded-lg hover:bg-black/20'
+          } flex h-full items-center gap-x-3 font-teachers text-[14px] font-bold`}>
+          Academya
+        </div>
+      </DropdownMenuSubTrigger>
+      <DropdownMenuSubContent
+        alignOffset={40}
+        sideOffset={-144}
+        className="z-[200] bg-purple-700 px-1 py-2 text-white">
+        {eventLinks.map((item, index) => (
+          <DropdownMenuItem
+            key={index}
+            className={
+              pathname.includes(item.link) ? 'mb-1.5 bg-white text-purple-700' : 'mb-1.5'
+            }
+            asChild>
+            <Link href={item.link || ''} className="w-full font-dmsans">
+              {item.title}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuSubContent>
+    </DropdownMenuSub>
+  )
 }
 
 function Navbar() {
@@ -30,12 +137,14 @@ function Navbar() {
   const { logout } = useAuth()
   const LOGGED_IN = isAuthenticated // ! hardcode untuk testing
   const pathname = usePathname()
-  const NAV_ITEMS: NavItem[] = [
+
+  const NAV_ITEMS: Array<NavItem | NavItemReactNode> = [
     // { name: 'About Us', link: '/aboutus' },
-    { name: 'Event', link: '/event' },
+    { name: 'Academya', link: null, type: 'event' },
     { name: 'Competition', link: '/competition' }
   ]
   const [scrollY, setScrollY] = useState(0)
+  const [subMenuOpen, setSubMenuOpen] = useState(false)
 
   async function handleLogout() {
     await logout()
@@ -84,9 +193,7 @@ function Navbar() {
     <nav
       className={cn(
         'fixed z-[100] w-full bg-transparent px-4 py-6 lg:px-12',
-        scrollY > 10
-          ? 'backdrop-blur-lg transition-all duration-300 ease-in-out'
-          : ''
+        scrollY > 10 ? 'backdrop-blur-lg transition-all duration-300 ease-in-out' : ''
       )}>
       <div className="flex flex-row items-center justify-between">
         <Link href="/" className="flex flex-row items-center justify-center gap-2 px-4">
@@ -110,21 +217,38 @@ function Navbar() {
           <DropdownMenuTrigger className="rounded-md data-[state=open]:bg-purple-700 md:hidden">
             <Menu size={24} className="m-3" color="white" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="z-[999] mr-2 mt-3 min-w-[167px] gap-4 rounded-lg border-none bg-purple-700 px-3 py-5 font-teachers text-base font-bold text-white">
-            {NAV_ITEMS.map((item, index) => (
-              <DropdownMenuItem
-                key={index}
-                className={pathname === item.link ? 'bg-white text-purple-700' : ''}
-                asChild>
-                <Link href={item.link} className="w-full hover:bg-gray-500">
-                  {item.name}
-                </Link>
-              </DropdownMenuItem>
-            ))}
+          <DropdownMenuContent
+            align="end"
+            alignOffset={-8}
+            className="z-[150] mr-2 mt-3 min-w-[167px] gap-4 rounded-lg border-none bg-purple-700 px-3 py-5 font-teachers text-base font-bold text-white">
+            {NAV_ITEMS.map((item, index) =>
+              item.link ? (
+                <DropdownMenuItem
+                  key={index}
+                  className={
+                    pathname.includes(item.link)
+                      ? 'mb-1 bg-white text-purple-700'
+                      : 'mb-1'
+                  }
+                  asChild>
+                  <Link href={item.link || ''} className="w-full hover:bg-gray-500">
+                    {item.name}
+                  </Link>
+                </DropdownMenuItem>
+              ) : (
+                <div key={index} className="cursor-pointer focus:bg-transparent">
+                  <EventDropdownNavbarMobile
+                    pathname={pathname}
+                    subMenuOpen={subMenuOpen}
+                    toggleSubMenuOpen={setSubMenuOpen}
+                  />
+                </div>
+              )
+            )}
             {LOGGED_IN ? (
               <>
                 <DropdownMenuItem
-                  className={`cursor-pointer ${pathname === '/dashboard' ? 'bg-white text-purple-700' : ''}`}>
+                  className={`mb-1 cursor-pointer ${pathname === '/dashboard' ? 'bg-white text-purple-700' : ''}`}>
                   <div className="w-full" onClick={() => checkHasFilledInfo()}>
                     Dashboard
                   </div>
@@ -149,20 +273,24 @@ function Navbar() {
         </DropdownMenu>
 
         {/* Desktop menu */}
-        <ul className="hidden items-center justify-center space-x-8 text-white md:flex">
-          {NAV_ITEMS.map((item, index) => (
-            <li key={index}>
-              <Link
-                href={item.link}
-                className={`h-full px-6 py-2 font-teachers text-base font-bold ${
-                  pathname === item.link
-                    ? 'rounded-xl bg-purple-300'
-                    : 'hover:rounded-lg hover:bg-black/20 hover:py-4'
-                }`}>
-                {item.name}
-              </Link>
-            </li>
-          ))}
+        <ul className="hidden items-center justify-center space-x-6 text-white md:flex">
+          {NAV_ITEMS.map((item, index) =>
+            item.link ? (
+              <li key={index}>
+                <Link
+                  href={item.link}
+                  className={`h-full px-6 py-2 font-teachers text-base font-bold ${
+                    pathname.includes(item.link)
+                      ? 'rounded-xl bg-purple-300'
+                      : 'hover:rounded-lg hover:bg-black/20 hover:py-2'
+                  }`}>
+                  {item.name}
+                </Link>
+              </li>
+            ) : (
+              <li key={index}>{eventDropdownNavbarDesktop(pathname)}</li>
+            )
+          )}
           {LOGGED_IN ? (
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger>
