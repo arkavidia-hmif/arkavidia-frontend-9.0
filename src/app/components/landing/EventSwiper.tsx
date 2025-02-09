@@ -1,5 +1,5 @@
 'use client'
-import { MutableRefObject, useState } from 'react'
+import { MutableRefObject, useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay } from 'swiper/modules'
 import 'swiper/css'
@@ -11,6 +11,45 @@ import { StandingPreview } from './StandingPreview'
 import { useRef } from 'react'
 import { Swiper as SwiperType } from 'swiper/types'
 import { ArrowSign } from './ArrowSign'
+
+import UIUXLogo from '/public/images/event/academya/uiux-carousel.png'
+import SoftengLogo from '/public/images/event/academya/softeng-carousel.png'
+import PMLogo from '/public/images/event/academya/pm-carousel.png'
+import DSLogo from '/public/images/event/academya/datsci-carousel.png'
+import { getEvent } from '~/api/generated'
+import { axiosInstance } from '~/lib/axios'
+
+const events = [
+  {
+    title: 'Academya UI UX',
+    description: '',
+    preview: '/images/event/academya/Academya - UI UX.svg',
+    carousel: UIUXLogo,
+    link: '/event/academya/uiux'
+  },
+  {
+    title: 'Academya Software Engineering',
+    description: '',
+    preview: '/images/event/academya/Academya - Software Engineering.svg',
+    carousel: SoftengLogo,
+    link: '/event/academya/softeng'
+  },
+  {
+    title: 'Academya Product Management',
+    description: '',
+    preview: '/images/event/academya/Academya - Product Management.svg',
+    carousel: PMLogo,
+    link: '/event/academya/pm'
+  },
+  {
+    title: 'Academya Data Science',
+    description: '',
+    preview: '/images/event/academya/Academya - Data Science.svg',
+    carousel: DSLogo,
+    link: '/event/academya/datascience'
+  }
+]
+
 interface CompetitionsCarouselProps {
   competitions: CompetitionBrief[]
 }
@@ -23,19 +62,45 @@ export interface CompetitionBrief {
   isActive?: boolean
 }
 
-export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) => {
-  const randomIdx = Math.floor(Math.random() * competitions.length)
+export const EventSwiper = () => {
+  const [eventData, setEventData] = useState(events)
+  const randomIdx = Math.floor(Math.random() * eventData.length)
   const [activeIndex, setActiveIndex] = useState(randomIdx)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getEvent({ client: axiosInstance })
+      const eventTemp: typeof events = []
+      if (res.data) {
+        res.data.forEach(event => {
+          const eventName = event.title.split(' ')[2]
+          const currentEventData = eventData.find(data =>
+            data.title.toLowerCase().includes(eventName.toLowerCase())
+          )
+
+          if (currentEventData) {
+            currentEventData.description = event.description
+            eventTemp.push(currentEventData)
+          }
+        })
+        setEventData(eventTemp)
+      }
+      setLoading(false)
+    }
+
+    fetchData()
+  }, [])
 
   function getTitle(index: number) {
-    return competitions.at(index)?.title
+    return eventData.at(index)?.title
   }
   function getLink(index: number) {
-    return competitions.at(index)?.link
+    return eventData.at(index)?.link
   }
 
   function getDescription(index: number) {
-    return competitions.at(index)?.description
+    return eventData.at(index)?.description
   }
 
   function nextSlide() {
@@ -48,11 +113,14 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
   }
 
   const swiperRef = useRef<SwiperType | null>(null)
+
+  if (loading) return null
+
   return (
-    <div className="relative col-span-3 mt-6 flex h-fit w-full items-center justify-center max-md:mt-16 md:mt-48 md:px-10">
+    <div className="relative col-span-3 mt-[120px] flex h-fit w-full items-center justify-center md:mt-[100px] md:px-10">
       <ArrowSign onClick={prevSlide} direction={'left'} />
       <div className="relative flex max-h-[800px] w-full flex-col items-center">
-        <h1 className="z-10 text-center font-belanosima text-[36px] leading-10 text-white md:text-[48px] md:leading-[60px] lg:text-[64px] lg:leading-[88px]">
+        <h1 className="z-[10] text-center font-belanosima text-[32px] leading-10 text-white md:text-[40px] md:leading-[60px] lg:text-[60px] lg:leading-[88px]">
           {getTitle(activeIndex)}
         </h1>
 
@@ -85,7 +153,7 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
               spaceBetween: 60
             }
           }}>
-          {competitions.map((competition, index) => (
+          {eventData.map((event, index) => (
             <SwiperSlide
               key={index}
               className="flex items-center overflow-visible hover:cursor-grab active:cursor-grabbing"
@@ -93,14 +161,11 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
                 setActiveIndex(index)
                 swiperRef.current?.slideToLoop(index, 400)
               }}>
-              <StandingPreview
-                preview={competition.preview}
-                isActive={activeIndex === index}
-              />
+              <StandingPreview preview={event.preview} isActive={activeIndex === index} />
             </SwiperSlide>
           ))}
         </Swiper>
-        <div className="absolute top-[35rem] z-10 flex w-[300px] flex-col items-center gap-4 md:w-[600px]">
+        <div className="absolute top-[35rem] z-[10] flex w-[300px] flex-col items-center gap-4 md:w-[600px]">
           <p className="font-dmsans md:text-lg lg:text-xl">
             {getDescription(activeIndex)}
           </p>
