@@ -184,3 +184,7 @@ body {
 .text-glow-animated {
   animation: glow 1.5s infinite alternate;
 }
+
+.event-submenu svg {
+  rotate: 90deg;
+}

@@ -165,8 +165,8 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             const isVerified = teamVerifData?.data?.document?.[0].isVerified ?? false
             const verificationError = teamVerifData?.data?.document?.[0].verificationError
             const isRejected =
-              verificationError !== '' ||
-              verificationError !== null ||
+              verificationError !== '' &&
+              verificationError !== null &&
               verificationError !== undefined
             teamVerification = {
               id: 'team-0',
@@ -210,8 +210,8 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               const isVerified = memberDoc.isVerified ?? false
               const verificationError = memberDoc.verificationError
               const isRejected =
-                verificationError !== '' ||
-                verificationError !== null ||
+                verificationError !== '' &&
+                verificationError !== null &&
                 verificationError !== undefined
               memberVerifications.push({
                 id: `member-${index}`,

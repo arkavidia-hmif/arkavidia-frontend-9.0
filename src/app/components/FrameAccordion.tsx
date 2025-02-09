@@ -11,7 +11,7 @@ function FrameAccordion({
     color: string;
     radius: string;
     title: string;
-    content: string;
+    content: React.ReactNode;
     isExpanded: boolean;
     onToggle: () => void;
   }) {

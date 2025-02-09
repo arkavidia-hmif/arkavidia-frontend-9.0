@@ -134,16 +134,16 @@ export const JoinTeamPopup: React.FC<{
       return
     }
 
-    if (resp.error) {
+    if (resp.error || !resp.data) {
       // @ts-expect-error - error doesn't exists on response definition
-      setError(resp.error.error)
+      setError(resp.error.error || 'Failed to join team')
       return
     }
 
     const getTeamInfo = await getTeamById({
       client: axiosAuth,
       path: {
-        // @ts-ignore
+        // @ts-expect-error - teamId doesn't exists on response definition
         teamId: resp.data.teamId
       }
     })

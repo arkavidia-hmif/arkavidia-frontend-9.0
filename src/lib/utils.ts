@@ -16,6 +16,50 @@ export function expandCompetitionName(competitionName: string) {
   }
 }
 
+export function getAcademyaEventName(eventName: string) {
+  if (eventName === 'softeng') {
+    return 'Academya - Software Engineering'
+  } else if (eventName === 'datascience') {
+    return 'Academya - Data Science'
+  } else if (eventName === 'pm') {
+    return 'Academya - Product Management'
+  } else if (eventName === 'uiux') {
+    return 'Academya - UI UX'
+  } else {
+    return ''
+  }
+}
+
+export function getAcademyaEventType(eventName: string) {
+  if (eventName === 'softeng') {
+    return 'Software'
+  } else if (eventName === 'datascience') {
+    return 'Data'
+  } else if (eventName === 'pm') {
+    return 'Product'
+  } else if (eventName === 'uiux') {
+    return 'UI'
+  } else {
+    return ''
+  }
+}
+
+export function expandEventName(eventName: string) {
+  //! HARDCODED, event name not corresponding to
+  // Based on sidebar links,
+  switch (eventName) {
+    default:
+      return capitalizeFirstLetter(eventName)
+  }
+}
+
+export function getBeautifulEventName(eventName: string) {
+  // Based on sidebar links, ex: academya-software-engineering
+  const split = eventName.split('-').map(s => s.toLowerCase())
+  split[0] = split[0].replace('academya', 'academya -')
+  return split.map(s => s.toUpperCase()).join(' ')
+}
+
 export function getFormattedBirthDate(date: Date) {
   const year = date.getFullYear()
   const month = date.getMonth() + 1

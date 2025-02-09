@@ -22,7 +22,7 @@ export const Tab = ({ contentType, content }: TabProps) => {
   const checkOverflow = () => {
     if (tabContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = tabContainerRef.current
-      setIsOverflowingRight(scrollLeft + clientWidth < scrollWidth)
+      setIsOverflowingRight(scrollLeft + clientWidth + 1 < scrollWidth)
       setIsOverflowingLeft(scrollLeft > 0)
     }
   }

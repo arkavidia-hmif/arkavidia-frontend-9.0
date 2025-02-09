@@ -157,6 +157,8 @@ export const CreateTeamPopup: React.FC<{
 
     if (!teamName) {
       setError('Team name is required!')
+    } else if (teamName.length > 50) {
+      setError('Team name is too long! (Max. 50 characters)')
     } else {
       // Generate a random team code (in a real app, this would be done on the server)
       const resp = await postCreateTeam({
@@ -167,7 +169,7 @@ export const CreateTeamPopup: React.FC<{
         }
       })
 
-      if (resp.error) {
+      if (resp.error || !resp.data) {
         // @ts-expect-error
         if (resp.error.error.startsWith('A team with the name')) {
           toast({
@@ -178,6 +180,7 @@ export const CreateTeamPopup: React.FC<{
         setError('Failed to create team.')
         return
       }
+
       toast({
         title: 'Team created successfully',
         variant: 'success',
