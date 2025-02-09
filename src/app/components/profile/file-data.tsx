@@ -2,7 +2,7 @@ import { useState } from 'react'
 import FileInput, { uploadedFileState } from '../FileInput'
 import Image from 'next/image'
 import { Button } from '../ui/button'
-import { updateUserDocument } from '~/api/generated'
+import { getDownloadPresignedLink, updateUserDocument } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
 import Link from 'next/link'
@@ -44,10 +44,27 @@ const handleUpload: (e: uploadedFileState | null ) => void = async (e) => {
     })
     return;
     }
+    
+    const presURL = await getDownloadPresignedLink({
+        client: axiosAuth,
+        query: {
+            filename: e.fileName,
+            // @ts-expect-error
+            bucket: e.bucket
+        }
+    })
 
-    console.log("Reloading..")
-    window.location.reload();
+    if (presURL.error) {
+        toast({
+            title: 'Error',
+            description: 'Gagal mendapatkan URL file',
+            variant: 'destructive'
+        })
+        return;
+        }
 
+    setFileName(e.fileName);
+    setFileURL(presURL.data?.presignedUrl ?? '');
 }
 
 return (

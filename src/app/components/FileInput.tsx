@@ -14,7 +14,7 @@ import { axiosInstance } from "~/lib/axios"
 export type uploadedFileState = {
     mediaID: string,
     fileName: string,
-    mediaURL: string
+    bucket: string
 }
 
 type ComponentProps = {
@@ -179,8 +179,8 @@ export default function FileInput({onUpload, className, displaySucces, supported
                 if (upload.status === 200) {
                     onUpload && onUpload({
                         mediaID: getLink.data.mediaId,
-                        fileName: formattedFileName,
-                        mediaURL: getLink.data.mediaUrl
+                        fileName: getLink.data.media.name,
+                        bucket: getLink.data.media.bucket
                     });
                 } else {
                     toast({
