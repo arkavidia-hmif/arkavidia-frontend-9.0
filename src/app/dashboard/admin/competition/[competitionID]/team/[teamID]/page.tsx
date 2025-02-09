@@ -193,6 +193,12 @@ function TeamDetails() {
     await fetchTeamData()
   }
 
+  const createdAt = new Date(teamData.createdAt as string).toLocaleDateString('en-GB', { 
+    day: '2-digit', 
+    month: 'long', 
+    year: 'numeric' 
+  });
+
   return (
     <div
       className="flex min-h-screen flex-col gap-7 bg-gradient-to-r from-[#1F0246] to-[#2E046A] px-4"
@@ -214,6 +220,7 @@ function TeamDetails() {
             contentType={['Team Information', 'Submission']}
             content={[
               <TeamInfo
+                createdAt={createdAt}
                 final={teamData.finalStatus}
                 prelim={teamData.preeliminaryStatus}
                 key="team-info"
@@ -233,6 +240,7 @@ function TeamDetails() {
             contentType={['Team Information']}
             content={[
               <TeamInfo
+                createdAt={createdAt}
                 final={teamData.finalStatus}
                 prelim={teamData.preeliminaryStatus}
                 key="team-info"

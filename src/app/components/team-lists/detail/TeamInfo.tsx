@@ -116,10 +116,6 @@ function FileRequirements({
 
   useEffect(() => {
     const fetchURL = async () => {
-      console.log({
-        name: file.media.name,
-        bucket: file.media.bucket
-      })
 
       const selfData = await self({
         client: axiosAuth
@@ -581,10 +577,11 @@ export default function TeamInfo({
   competitionID,
   prelim,
   final,
-  onRefetch
+  onRefetch,
+  createdAt
 }: GetTeamDetailResponse & { competitionID: string } & {
   prelim: string
-} & { final: string }) {
+} & { final: string } & {createdAt: string}) {
   if (members?.length === 0) {
     return (
       <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-[2rem] py-[1rem] shadow-lg">
@@ -597,8 +594,9 @@ export default function TeamInfo({
 
   return (
     <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-[2rem] py-[1rem] font-dmsans shadow-lg">
-      <div className="mb-3 mr-2">
+      <div className="mb-4 mr-2">
         <h1 className="font-teachers text-[32px] font-bold">Verification</h1>
+        <p>Created: {createdAt}</p>
       </div>
       {paymentProof ? (
         <PaymentProof
