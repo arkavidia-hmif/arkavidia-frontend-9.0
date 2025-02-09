@@ -60,7 +60,7 @@ const eventDropdownNavbarDesktop = (pathname: string) => {
               ? 'rounded-xl bg-purple-300'
               : 'hover:rounded-lg hover:bg-black/20 hover:py-2'
           } flex h-full items-center gap-x-3 px-6 py-2 font-teachers text-base font-bold`}>
-          Event <ChevronDown size={16} />
+          Academya <ChevronDown size={16} />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -105,7 +105,7 @@ const EventDropdownNavbarMobile = ({
               ? 'rounded-xl bg-purple-300'
               : 'hover:rounded-lg hover:bg-black/20'
           } flex h-full items-center gap-x-3 font-teachers text-[14px] font-bold`}>
-          Event
+          Academya
         </div>
       </DropdownMenuSubTrigger>
       <DropdownMenuSubContent
@@ -140,7 +140,7 @@ function Navbar() {
 
   const NAV_ITEMS: Array<NavItem | NavItemReactNode> = [
     // { name: 'About Us', link: '/aboutus' },
-    { name: 'Event', link: null, type: 'event' },
+    { name: 'Academya', link: null, type: 'event' },
     { name: 'Competition', link: '/competition' }
   ]
   const [scrollY, setScrollY] = useState(0)
