@@ -181,13 +181,23 @@ export default function ModalPopup({
       return
     }
 
-    if (joinedEvent.includes(eventType)) {
-      toast({
-        title: 'Already Registered',
-        description: 'You have already registered for ' + eventMap.get(eventType),
-        variant: 'destructive'
-      })
-      return
+    // Check if user already registered to an event
+    if (joinedEvent.length > 0) {
+      if (joinedEvent.includes(eventType)) {
+        toast({
+          title: 'Already Registered',
+          description: 'You have already registered for ' + eventMap.get(eventType),
+          variant: 'destructive'
+        })
+        return
+      } else {
+        toast({
+          title: 'Already Registered',
+          description: 'You have already registered for another event',
+          variant: 'destructive'
+        })
+        return
+      }
     }
 
     const resp = await postCreateEventTeamSolo({
@@ -225,13 +235,22 @@ export default function ModalPopup({
       return
     }
 
-    if (joinedEvent.includes(eventType)) {
-      toast({
-        title: 'Already Registered',
-        description: 'You have already registered for' + eventMap.get(eventType),
-        variant: 'destructive'
-      })
-      return
+    if (joinedEvent.length > 0) {
+      if (joinedEvent.includes(eventType)) {
+        toast({
+          title: 'Already Registered',
+          description: 'You have already registered for' + eventMap.get(eventType),
+          variant: 'destructive'
+        })
+        return
+      } else {
+        toast({
+          title: 'Already Registered',
+          description: 'You have already registered for another event',
+          variant: 'destructive'
+        })
+        return
+      }
     }
 
     if (!team_name) {
@@ -286,13 +305,22 @@ export default function ModalPopup({
       return
     }
 
-    if (joinedEvent.includes(eventType)) {
-      toast({
-        title: 'Already Registered',
-        description: 'You have already registered for this event',
-        variant: 'destructive'
-      })
-      return
+    if (joinedEvent.length > 0) {
+      if (joinedEvent.includes(eventType)) {
+        toast({
+          title: 'Already Registered',
+          description: 'You have already registered for ' + eventMap.get(eventType),
+          variant: 'destructive'
+        })
+        return
+      } else {
+        toast({
+          title: 'Already Registered',
+          description: 'You have already registered for another event',
+          variant: 'destructive'
+        })
+        return
+      }
     }
 
     const resp = await joinEventTeamByCode({
@@ -350,7 +378,7 @@ export default function ModalPopup({
               <Button
                 onClick={openModal}
                 className="flex gap-2 rounded-lg py-2"
-                disabled={joinedEvent.includes(eventType)}>
+                disabled={joinedEvent.length > 0}>
                 Register Now
                 <Image
                   src="/icons/events/arrow_forward.svg"
@@ -362,9 +390,11 @@ export default function ModalPopup({
             </div>
           </TooltipTrigger>
           <TooltipContent>
-            {joinedEvent.includes(eventType)
-              ? 'You have already registered'
-              : (tooltip ?? 'Register Now')}
+            {joinedEvent.length > 0
+              ? joinedEvent.includes(eventType)
+                ? 'You have already registered for this event'
+                : 'You have already registered for another event'
+              : (tooltip ?? 'Register to this event')}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
