@@ -71,6 +71,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (isAdmin) {
             appDispatch(setAdmin())
             if (userReq.data.role) appDispatch(setAdminRole(userReq.data.role))
+          } else {
+            appDispatch(setNotAdmin())
           }
         }
       }

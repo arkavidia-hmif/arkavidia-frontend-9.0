@@ -46,6 +46,16 @@ function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
       if (response.data) {
         if (response.data.role === 'admin' || response.data.role?.includes('admin')) {
           setLoading(false)
+        } else {
+          toast({
+            title: 'Unauthorized',
+            description: 'Anda tidak memiliki akses untuk mengakses halaman ini',
+            variant: 'destructive'
+          })
+          setTimeout(() => {
+            router.push('/')
+          }, 1000)
+          return
         }
       } else {
         toast({
