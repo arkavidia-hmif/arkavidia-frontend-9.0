@@ -38,19 +38,19 @@ function Footer() {
         <Image
           src="/Logos.svg"
           alt="Arkavidia Logo"
-          className="object-contain"
+          className="object-contain mb-2"
           width={150}
           height={40}
         />
         {/* <img src='/Logos.svg' alt='Arkavidia Logo' className='w-[150px] h-[40px] object-contain' /> */}
-        <div className="flex flex-row items-center justify-center space-x-4 font-teachers text-sm font-bold text-white">
+        {/* <div className="flex flex-row items-center justify-center space-x-4 font-teachers text-sm font-bold text-white">
           <Link href="/event" className="hover:underline">
             Events
           </Link>
           <Link href="/competition" className="hover:underline">
             Competitions
           </Link>
-        </div>
+        </div> */}
         <div className="flex flex-row items-center justify-center space-x-2">
           <a
             href="https://www.linkedin.com/company/arkavidia/"
