@@ -12,25 +12,52 @@ function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const isAdmin = useAppSelector(state => state.auth.isAdmin)
   const router = useRouter()
   const axiosAuth = useAxiosAuth()
-  const [isUserDataAdmin, setIsUserDataAdmin] = React.useState(false)
   const [loading, setLoading] = React.useState(true)
   const { toast } = useToast()
 
-  const getUserData = async () => {
+  const checkRole = async () => {
     try {
+      setLoading(true)
+      if (!isLoggedIn) {
+        toast({
+          title: 'Unauthorized',
+          description: 'Anda harus login terlebih dahulu untuk mengakses halaman ini',
+          variant: 'destructive'
+        })
+        setTimeout(() => {
+          router.push('/')
+        }, 1000)
+        return
+      }
+
+      if (!isAdmin) {
+        toast({
+          title: 'Unauthorized',
+          description: 'Anda tidak memiliki akses untuk mengakses halaman ini',
+          variant: 'destructive'
+        })
+        setTimeout(() => {
+          router.push('/')
+        }, 1000)
+        return
+      }
+
       const response = await getUser({ client: axiosAuth })
       if (response.data) {
-        setIsUserDataAdmin(
-          response.data.role?.toLowerCase() === 'admin'
-            ? true
-            : response.data.role?.toLowerCase().includes('admin')
-              ? true
-              : false
-        )
+        if (response.data.role === 'admin' || response.data.role?.includes('admin')) {
+          setLoading(false)
+        }
+      } else {
+        toast({
+          title: 'Unauthorized',
+          description: 'Anda tidak memiliki akses untuk mengakses halaman ini',
+          variant: 'destructive'
+        })
+        setTimeout(() => {
+          router.push('/')
+        }, 1000)
+        return
       }
-      setTimeout(() => {
-        setLoading(false)
-      }, 100)
     } catch (error) {
       toast({
         title: 'Error',
@@ -41,37 +68,13 @@ function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   }
 
   React.useEffect(() => {
-    if (isLoggedIn) {
-      getUserData()
-    }
-  }, [])
+    checkRole()
+  }, [isLoggedIn, isAdmin])
 
   if (loading) {
     return null
   }
 
-  if (!isLoggedIn) {
-    toast({
-      title: 'Unauthorized',
-      description: 'Anda harus login terlebih dahulu untuk mengakses halaman ini',
-      variant: 'destructive'
-    })
-  }
-
-  if (!isAdmin || !isUserDataAdmin) {
-    toast({
-      title: 'Unauthorized',
-      description: 'Anda tidak memiliki akses untuk mengakses halaman ini',
-      variant: 'destructive'
-    })
-  }
-
-  if (!isLoggedIn || !isAdmin || !isUserDataAdmin) {
-    setTimeout(() => {
-      router.push('/')
-    }, 1000)
-    return null
-  }
   return <section>{children}</section>
 }
 
