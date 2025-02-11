@@ -82,19 +82,38 @@ const COMPETITIONMAP: CompetitionMap = {
       { name: 'Maul', contact: 'https://wa.me/6287728997015', type: 'whatsapp' }
     ]
   }
-};
-
+}
 
 const transformToTimelineEvents = (
   competitionTimeline: CompetitionTimeline[]
 ): TimelineEventProps[] => {
   const data: TimelineEventProps[] = []
   competitionTimeline.forEach(event => {
-    const arr = {
-      title: event.title,
-      timeStart: event.startDate ? new Date(event.startDate) : undefined,
-      timeEnd: event.endDate ? new Date(event.endDate) : undefined
+    let arr: TimelineEventProps
+    // TBA
+    if (event.showOnLanding === true) {
+      arr = {
+        title: event.title,
+        timeStart: undefined,
+        timeEnd: undefined,
+        isTBA: true
+      }
+    } else {
+      arr = {
+        title: event.title,
+        timeStart: event.startDate ? new Date(event.startDate) : undefined,
+        timeEnd: event.endDate ? new Date(event.endDate) : undefined,
+        isTBA: false
+      }
     }
+
+    if (event.showTime === true) {
+      arr = {
+        ...arr,
+        isUpdated: true
+      }
+    }
+
     data.push(arr)
   })
   return data
