@@ -153,7 +153,9 @@ function EventPage() {
         const mappedEvents = res.data.map((timeline: EventTimeline) => ({
           title: timeline.title,
           timeStart: new Date(timeline.startDate),
-          timeEnd: timeline.endDate ? new Date(timeline.endDate) : undefined
+          timeEnd: timeline.endDate ? new Date(timeline.endDate) : undefined,
+          isTBA: timeline.showOnLanding === true,
+          isUpdated: timeline.showTime === true
         }))
 
         setEventTimeline(
@@ -263,9 +265,12 @@ function EventPage() {
       </section>
 
       {/* Event Timeline */}
-      <section className="flex flex-col items-center justify-center gap-12 lg:gap-16">
+      <section className="flex flex-col items-center justify-center gap-8 md:gap-12">
         <h1 className="mt-6 text-center font-belanosima text-6xl uppercase md:mt-0">
           EVENT TIMELINE
+        </h1>
+        <h1 className="text-center font-belanosima text-2xl font-extrabold uppercase sm:text-3xl md:text-4xl">
+          (Updated)
         </h1>
         {eventTimeline.length === 0 ? (
           <>

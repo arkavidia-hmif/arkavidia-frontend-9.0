@@ -87,7 +87,7 @@ const CompetitionContext = ({
             )
           ]
         const total = data?.count || 0
-        const verified = data?.verifiedCount || 0
+        const verified = data?.verificationStatus.verified || 0
 
         setCompNumber({
           unverified: total - verified,

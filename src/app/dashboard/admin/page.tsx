@@ -45,7 +45,7 @@ const AdminDashboardPage = () => {
         const statsResponse = await getCompetitionStatistic({ client: axiosInstance })
         const data = statsResponse.data
 
-        const totalVerified = data?.verifiedCount ?? 0
+        const totalVerified = data?.verificationStatus.verified ?? 0
         const totalTeam = data?.count ?? 0
 
         setOverallStats({

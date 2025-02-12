@@ -38,7 +38,7 @@ function Footer() {
         <Image
           src="/Logos.svg"
           alt="Arkavidia Logo"
-          className="object-contain mb-2"
+          className="mb-2 object-contain"
           width={150}
           height={40}
         />
@@ -68,14 +68,14 @@ function Footer() {
             <Image src="/instagram.svg" alt="Instagram Logo" width={24} height={24} />
             {/* <img src='/instagram.svg' alt='Instagram Logo' className='w-6 h-6' /> */}
           </a>
-          <a
+          {/* <a
             href="https://x.com/arkavidia"
             target="_blank"
             rel="noreferrer noopener"
             className="hover:underline">
             <Image src="/x.svg" alt="X Logo" width={24} height={24} />
-            {/* <img src='/x.svg' alt='X Logo' className='w-6 h-6' /> */}
-          </a>
+            <img src='/x.svg' alt='X Logo' className='w-6 h-6' />
+          </a> */}
         </div>
         <p className="text-sm text-white">© 2025 ARKAVIDIA. All rights reserved.</p>
       </div>

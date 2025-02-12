@@ -273,13 +273,12 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               target={
                 props.handbookLink === '#' || props.handbookLink === '' ? '' : '_blank'
               }
-              rel="noopener noreferrer"
-            >
+              rel="noopener noreferrer">
               <Button variant="outline" className="w-full sm:w-auto">
-                  <div className="flex flex-row items-center justify-center gap-2">
-                    <IoMdDownload className="text-[#48E6FF]" />
-                    <span>Download Handbook</span>
-                  </div>
+                <div className="flex flex-row items-center justify-center gap-2">
+                  <IoMdDownload className="text-[#48E6FF]" />
+                  <span>Download Handbook</span>
+                </div>
               </Button>
             </Link>
             <CompetitionRegistration
@@ -292,10 +291,13 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
 
         {/* Timeline Section */}
         <section
-          className="mt-20 flex flex-col items-center gap-8 md:gap-16 w-full"
+          className="mt-20 flex w-full flex-col items-center gap-8 md:gap-12"
           id="competition-timeline">
           <h1 className="text-center font-belanosima text-3xl font-extrabold uppercase sm:text-4xl md:text-5xl">
             Competition Timeline
+          </h1>
+          <h1 className="text-center font-belanosima text-2xl font-extrabold uppercase sm:text-3xl md:text-4xl">
+            (Updated)
           </h1>
           <Timeline events={props.registrationDeadline} variant="vertical" />
         </section>
@@ -355,8 +357,11 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
               </div>
               <div className="flex w-full flex-col flex-wrap gap-4 sm:gap-2 md:flex-row">
                 {props.contactPerson?.map(contact => (
-                  <Link key={contact.contact} href={contact.contact || '#'} className="w-full sm:w-auto">
-                    <Button variant="outline" className='w-full'>
+                  <Link
+                    key={contact.contact}
+                    href={contact.contact || '#'}
+                    className="w-full sm:w-auto">
+                    <Button variant="outline" className="w-full">
                       <div className="flex flex-row items-center justify-center gap-2 px-4">
                         <Image
                           src={contactLogo[contact.type] || ''}
