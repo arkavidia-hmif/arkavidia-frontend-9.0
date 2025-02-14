@@ -732,14 +732,16 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                 {verif.type === 'poster' && (
                   <div>
                     <p className="mb-4 md:text-[18px] lg:text-[21px]">
-                      Silakan upload poster di sini
+                      Silakan upload poster di sini. Poster yang perlu diupload hanyalah
+                      poster anda saja. (Poster diupload oleh masing-masing anggota tim)
                     </p>
                   </div>
                 )}
                 {verif.type === 'twibbon' && (
                   <div>
                     <p className="mb-4 md:text-[18px] lg:text-[21px]">
-                      Silakan upload twibbon di sini
+                      Silakan upload twibbon di sini. Twibbon yang perlu diupload hanyalah
+                      twibbon anda saja. (Twibbon diupload oleh masing-masing anggota tim)
                     </p>
                   </div>
                 )}
