@@ -733,7 +733,8 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                   <div>
                     <p className="mb-4 md:text-[18px] lg:text-[21px]">
                       Silakan upload poster di sini. Poster yang perlu diupload hanyalah
-                      poster anda saja. (Poster diupload oleh masing-masing anggota tim)
+                      poster anda saja.{' '}
+                      <b>(Poster diupload oleh masing-masing anggota tim)</b>
                     </p>
                   </div>
                 )}
@@ -741,7 +742,8 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                   <div>
                     <p className="mb-4 md:text-[18px] lg:text-[21px]">
                       Silakan upload twibbon di sini. Twibbon yang perlu diupload hanyalah
-                      twibbon anda saja. (Twibbon diupload oleh masing-masing anggota tim)
+                      twibbon anda saja.{' '}
+                      <b>(Twibbon diupload oleh masing-masing anggota tim)</b>
                     </p>
                   </div>
                 )}
