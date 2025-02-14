@@ -2,6 +2,8 @@
 
 import React, { useEffect } from 'react'
 import {
+  getDownloadPresignedLink,
+  GetDownloadPresignedLinkData,
   getEventTeamSubmission,
   GetPresignedLinkData,
   putEventTeamSubmission
@@ -37,6 +39,50 @@ function EventTaskList({ teamId, eventName }: { teamId?: string; eventName: stri
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
 
+  const getMediaPresignedGetLink = async (
+    filename: string,
+    bucket: GetDownloadPresignedLinkData['query']['bucket'] | undefined
+  ) => {
+    try {
+      if (!filename || !bucket) {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch media: Filename or bucket not found',
+          variant: 'warning',
+          duration: 6000
+        })
+        return
+      }
+
+      const res = await getDownloadPresignedLink({
+        client: axiosAuth,
+        query: {
+          filename: filename,
+          bucket: bucket
+        }
+      })
+
+      if (res.error || !res.data) {
+        toast({
+          title: 'Error',
+          description: `Failed to fetch media: ${filename}. Error: ${res.error}`,
+          variant: 'warning',
+          duration: 6000
+        })
+        return
+      }
+
+      return res.data
+    } catch (err: unknown) {
+      toast({
+        title: 'Error',
+        description: `Failed to fetch media: ${filename}. Error: ${err}`,
+        variant: 'destructive',
+        duration: 6000
+      })
+    }
+  }
+
   async function getTaskList() {
     try {
       if (teamId) {
@@ -58,23 +104,57 @@ function EventTaskList({ teamId, eventName }: { teamId?: string; eventName: stri
 
         if (res.data) {
           const newTasks: EventTask[] = []
-          res.data.map(task => {
-            const item = {
-              id: task.requirement.typeId,
-              title: task.requirement.typeName,
-              description: task.requirement.description,
-              dueDate: new Date(task.requirement.deadline ?? ''),
-              status: getStatusTask(task) ?? ('notopened' as EventTask['status']),
-              submission: task.submission
-            }
+          const results = await Promise.allSettled(
+            res.data.map(async task => {
+              let submissionFile: typeof task.submission = task.submission
+              // If there is a submission
+              if (submissionFile) {
+                const file = await getMediaPresignedGetLink(
+                  task.submission?.media.name ?? '',
+                  task.submission?.media.bucket
+                    ? (task.submission.media
+                        .bucket as GetDownloadPresignedLinkData['query']['bucket'])
+                    : undefined
+                )
 
-            newTasks.push(item)
+                if (file) {
+                  if (task.submission) {
+                    submissionFile = {
+                      ...task.submission,
+                      media: {
+                        ...task.submission.media,
+                        url: file.mediaUrl
+                      }
+                    }
+                  }
+                }
+              }
+
+              const item = {
+                id: task.requirement.typeId,
+                title: task.requirement.typeName,
+                description: task.requirement.description,
+                dueDate: new Date(task.requirement.deadline ?? ''),
+                status: getStatusTask(task) ?? ('notopened' as EventTask['status']),
+                submission: submissionFile
+              }
+
+              return item
+            })
+          )
+
+          results.forEach(result => {
+            if (result.status === 'fulfilled') {
+              newTasks.push(result.value)
+            }
           })
 
-          setTasks(prev => [
-            ...prev.filter(t => !newTasks.some(nt => nt.id === t.id)),
-            ...newTasks
-          ])
+          setTasks(prev => {
+            return [
+              ...prev.filter(t => !newTasks.some(nt => nt.id === t.id)),
+              ...newTasks
+            ]
+          })
         }
       }
     } catch (err: unknown) {
@@ -126,24 +206,18 @@ function EventTaskList({ teamId, eventName }: { teamId?: string; eventName: stri
       }
 
       if (res.data) {
-        const updatedTasks = tasks.map(task => {
-          if (task.id === typeId) {
-            return {
-              ...task,
-              status: 'completed' as 'completed'
-            }
-          }
-          return task
-        })
-
-        setTasks(updatedTasks)
+        setLoadingTask(true)
+        await getTaskList()
         setSelectedTask(null)
-        toast({
-          title: 'Success',
-          description: 'File submitted successfully',
-          variant: 'success',
-          duration: 5000
-        })
+        setTimeout(() => {
+          setLoadingTask(false)
+          toast({
+            title: 'Success',
+            description: 'File submitted successfully',
+            variant: 'success',
+            duration: 5000
+          })
+        }, 300)
       }
     } catch (err: unknown) {
       toast({
