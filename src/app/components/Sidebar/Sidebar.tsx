@@ -16,7 +16,12 @@ import {
   getEventTeam,
   GetEventTeamResponse,
   getEventById,
-  GetEventByIdResponse
+  GetEventByIdResponse,
+  getAdminCompetitions,
+  GetAdminCompetitionsResponse,
+  getEvent,
+  GetEventResponse,
+  type Event as EventType
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
@@ -24,7 +29,7 @@ import { useToast } from '~/hooks/use-toast'
 import { useAuth } from '../../contexts/AuthContext'
 import { expandCompetitionName, expandEventName } from '~/lib/utils'
 import SidebarItem from './SidebarItems'
-import { getAdminLinks, getSidebarURL } from './SidebarLinks'
+import { getSidebarURL } from './SidebarLinks'
 
 const CollapsibleSection = ({
   title,
@@ -41,9 +46,8 @@ const CollapsibleSection = ({
     <div className="w-full">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between px-3 py-2 text-white hover:bg-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-white transition"
-      >
-        <span className="text-base sm:text-lg font-bold font-teachers">{title}</span>
+        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
+        <span className="font-teachers text-base font-bold sm:text-lg">{title}</span>
         <ChevronUp
           className={`h-5 w-5 transition-transform duration-300 ${
             isOpen ? 'rotate-0' : 'rotate-180'
@@ -52,9 +56,8 @@ const CollapsibleSection = ({
       </button>
       <div
         className={`overflow-hidden transition-all duration-300 ${
-          isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
+          isOpen ? 'max-h-full opacity-100' : 'max-h-0 opacity-0'
+        }`}>
         {links.map((item, index) => (
           <SidebarItem
             key={index}
@@ -113,7 +116,9 @@ function Sidebar({ announcement = false }: SidebarProps) {
           variant: 'destructive'
         })
       } else if (teamsRes.data) {
-        const competitionList = JSON.parse(JSON.stringify(teamsRes.data)) as GetTeamsResponse
+        const competitionList = JSON.parse(
+          JSON.stringify(teamsRes.data)
+        ) as GetTeamsResponse
 
         competitionList.forEach(competition => {
           links.push({
@@ -137,7 +142,9 @@ function Sidebar({ announcement = false }: SidebarProps) {
           variant: 'destructive'
         })
       } else {
-        const eventList = JSON.parse(JSON.stringify(eventTeamRes.data)) as GetEventTeamResponse
+        const eventList = JSON.parse(
+          JSON.stringify(eventTeamRes.data)
+        ) as GetEventTeamResponse
 
         for (const event of eventList) {
           const eventRes = await getEventById({
@@ -152,16 +159,79 @@ function Sidebar({ announcement = false }: SidebarProps) {
               variant: 'destructive'
             })
           } else {
-            const eventData = JSON.parse(JSON.stringify(eventRes.data)) as GetEventByIdResponse
+            // @ts-expect-error
+            const eventData = eventRes.data as EventType
 
             links.push({
-              name: expandEventName(eventData[0].title),
-              link: getSidebarURL({ isAdmin, eventName: eventData[0].title }),
+              name: expandEventName(eventData.title),
+              link: getSidebarURL({ isAdmin, eventName: eventData.title }),
               type: 'event'
             })
           }
         }
       }
+
+      setSidebarLinks(links)
+    }
+
+    async function fetchSidebarLinksAdmin() {
+      const links: Array<SidebarLink> = [
+        {
+          name: 'Dashboard',
+          link: '/dashboard'
+        }
+      ]
+
+      // Fetch competition
+      const resComp = await getAdminCompetitions({ client: authAxios })
+
+      if (resComp.error || resComp.status !== 200) {
+        toast({
+          title: 'Failed getting data',
+          description: 'Failed to get competitions',
+          variant: 'destructive'
+        })
+      }
+
+      const competitionList = JSON.parse(
+        JSON.stringify(resComp.data)
+      ) as GetAdminCompetitionsResponse
+
+      // Add competition to sidebar
+      competitionList.forEach(competition => {
+        links.push({
+          name: expandCompetitionName(competition.title),
+          link: getSidebarURL({
+            isAdmin: true,
+            competitionName: competition.title
+          }),
+          type: 'competition'
+        })
+      })
+
+      // Fetch all events
+      const resEvents = await getEvent({ client: authAxios })
+
+      if (resEvents.error || resEvents.status !== 200) {
+        toast({
+          title: 'Failed getting data',
+          description: 'Failed to get events',
+          variant: 'destructive'
+        })
+      }
+
+      const eventList = JSON.parse(JSON.stringify(resEvents.data)) as GetEventResponse
+
+      eventList.forEach(event => {
+        links.push({
+          name: expandEventName(event.title),
+          link: getSidebarURL({
+            isAdmin: true,
+            eventName: event.title
+          }),
+          type: 'event'
+        })
+      })
 
       setSidebarLinks(links)
     }
@@ -177,8 +247,8 @@ function Sidebar({ announcement = false }: SidebarProps) {
     if (!isAdmin) {
       fetchSidebarLinks()
     } else {
-      // TODO: handle admin links for events
-      setSidebarLinks(getAdminLinks())
+      // setSidebarLinks(getAdminLinks(authAxios))
+      fetchSidebarLinksAdmin()
     }
 
     window.addEventListener('scroll', handleScroll)
@@ -212,8 +282,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
       <div
         className={`fixed z-50 flex w-full items-center justify-between p-4 lg:hidden ${
           hasScrolled ? 'bg-black/40 lg:bg-none' : ''
-        }`}
-      >
+        }`}>
         <Link href="/">
           <Image
             src="/arkavidiaLogo.svg"
@@ -225,8 +294,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
         </Link>
         <div
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="mr-2 cursor-pointer rounded-lg bg-gradient-to-b from-[#2E046A] to-[#0B1936] p-2"
-        >
+          className="mr-2 cursor-pointer rounded-lg bg-gradient-to-b from-[#2E046A] to-[#0B1936] p-2">
           {isSidebarOpen ? (
             <X className="h-6 w-6 text-white" />
           ) : (
@@ -239,8 +307,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
         className={`fixed -left-2 z-50 my-2 h-full w-[200px] -translate-x-full transform overflow-visible rounded-xl bg-cover bg-center bg-no-repeat shadow-[0px_0px_10px_0px_#1B3E88] transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-3' : ''
         } lg:left-0 lg:top-0 lg:m-2 lg:block lg:translate-x-0`}
-        style={{ backgroundImage: "url('/images/sidebar/bg.svg')" }}
-      >
+        style={{ backgroundImage: "url('/images/sidebar/bg.svg')" }}>
         <div className="absolute inset-0 flex flex-col justify-between overflow-hidden">
           <div className="relative my-2 flex h-full w-full flex-col items-center justify-start lg:my-6">
             <Link href="/">
@@ -251,8 +318,8 @@ function Sidebar({ announcement = false }: SidebarProps) {
                 height={100}
               />
             </Link>
-            <div className="flex h-full flex-col justify-between">
-              <div className="mt-4 flex w-full gap-5 grow flex-col overflow-y-auto px-2 lg:mt-7 lg:px-[10px]">
+            <div className="scrollbar flex h-full flex-col justify-between overflow-y-auto">
+              <div className="mt-4 flex w-full grow flex-col gap-5 px-2 lg:mt-7 lg:px-[10px]">
                 {sidebarLinks.length ? (
                   <>
                     {/* Dashboard Links */}
@@ -268,10 +335,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
 
                     {/* Competition Section */}
                     {competitionLinks.length > 0 && (
-                      <CollapsibleSection
-                        title="Competitions"
-                        links={competitionLinks}
-                      />
+                      <CollapsibleSection title="Competitions" links={competitionLinks} />
                     )}
 
                     {/* Event Section */}
@@ -289,12 +353,10 @@ function Sidebar({ announcement = false }: SidebarProps) {
                 <DropdownMenu
                   modal={false}
                   open={isDropdownOpen}
-                  onOpenChange={setIsDropdownOpen}
-                >
+                  onOpenChange={setIsDropdownOpen}>
                   <DropdownMenuTrigger
                     asChild
-                    className="my-6 flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white"
-                  >
+                    className="my-6 flex w-full items-center gap-2 rounded-xl p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white">
                     <div className="flex flex-1 items-center gap-2 text-left">
                       <Image
                         src="/profileLogo.svg"
@@ -304,9 +366,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
                         className="lg:h-6 lg:w-6"
                       />
                       <span className="truncate text-ellipsis text-sm font-medium text-white lg:text-base">
-                        {USERNAME.length > 10
-                          ? `${USERNAME.slice(0, 10)}...`
-                          : USERNAME}
+                        {USERNAME.length > 10 ? `${USERNAME.slice(0, 10)}...` : USERNAME}
                       </span>
                       <ChevronUp
                         className={`m-1 ml-auto h-4 w-4 text-white transition-transform duration-300 ease-in-out lg:h-5 lg:w-5 ${
@@ -317,8 +377,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="center"
-                    className="m-auto ml-1 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-lilac-200 border-transparent overflow-hidden"
-                  >
+                    className="m-auto ml-1 overflow-hidden rounded-md border-transparent bg-gradient-to-r from-purple-500 to-blue-600 p-2 shadow-lilac-200">
                     <Link href="/" className="cursor-pointer">
                       <DropdownMenuItem className="cursor-pointer rounded-lg text-white focus:text-white/80">
                         <Image
@@ -347,8 +406,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
                     )}
                     <DropdownMenuItem
                       onClick={handleLogout}
-                      className="cursor-pointer rounded-lg text-red-500 focus:text-red-400"
-                    >
+                      className="cursor-pointer rounded-lg text-red-500 focus:text-red-400">
                       <LogOut className="mr-2 h-4 w-4" />
                       Log out
                     </DropdownMenuItem>

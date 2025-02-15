@@ -28,12 +28,13 @@ function AdminCompetitionDashboard() {
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(true)
-
-  const currentPage = Number(searchParams.get('page')) || 1
-  const limit = searchParams.get('limit') ?? '10'
+  const limit = '10'
 
   const [isCompetitionFound, setIsCompetitionFound] = useState(true)
   const [currentCompetitionId, setCurrentCompetitionId] = useState<string | null>(null)
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1)
   const [teamData, setTeamData] = useState<Team[]>([])
   const [pagination, setPagination] = useState<Pagination>({
     currentPage: currentPage,
@@ -42,6 +43,21 @@ function AdminCompetitionDashboard() {
     next: null,
     prev: null
   })
+
+  // Filter & search states
+  const [teamStatusFilter, setTeamStatusFilter] = useState<
+    Exclude<Team['verificationStatus'], null> | undefined
+  >(
+    (searchParams.get('status') as
+      | Exclude<Team['verificationStatus'], null>
+      | undefined) ?? undefined
+  )
+  const [teamStageFilter, setTeamStageFilter] = useState<Team['stage'] | undefined>(
+    (searchParams.get('stage') as Team['stage']) ?? undefined
+  )
+  const [searchFilter, setSearchFilter] = useState<string>(
+    searchParams.get('search') ?? ''
+  )
 
   const fetchTeams = async (page: number) => {
     try {
@@ -68,7 +84,13 @@ function AdminCompetitionDashboard() {
       const response = await getAdminAllCompetitionTeams({
         client: authAxios,
         path: { competitionId: competitions.data[0].id },
-        query: { page: page.toString(), limit: limit }
+        query: {
+          page: page.toString(),
+          search: searchFilter,
+          stage: teamStageFilter,
+          verifStatus: teamStatusFilter,
+          limit: limit
+        }
       })
 
       if (response.data) {
@@ -104,6 +126,40 @@ function AdminCompetitionDashboard() {
     }
   }
 
+  const generateAllQueryString = ({
+    page,
+    search,
+    stage,
+    status
+  }: {
+    page?: number
+    search?: string
+    stage?: typeof teamStageFilter
+    status?: typeof teamStatusFilter
+  }) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page ? page.toString() : currentPage.toString())
+    params.set('search', search ? search : searchFilter)
+
+    if (!stage) {
+      if (teamStageFilter) {
+        params.set('stage', teamStageFilter)
+      } else {
+        params.delete('stage')
+      }
+    }
+
+    if (!status) {
+      if (teamStatusFilter) {
+        params.set('status', teamStatusFilter)
+      } else {
+        params.delete('status')
+      }
+    }
+
+    return params.toString()
+  }
+
   const createQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString())
@@ -116,20 +172,19 @@ function AdminCompetitionDashboard() {
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return
-
-    // Update URL with new page query parameter
-    router.push(`?${createQueryString('page', newPage.toString())}`)
-
-    fetchTeams(newPage)
-    setPagination(prev => ({
-      ...prev,
-      currentPage: newPage
-    }))
+    setCurrentPage(newPage)
   }
 
+  // Effect for updating data when page or filter changes
   useEffect(() => {
     fetchTeams(currentPage)
-  }, [currentPage])
+    router.push(`?${generateAllQueryString({ search: searchFilter })}`)
+  }, [currentPage, teamStatusFilter, teamStageFilter])
+
+  function onSearchClick() {
+    fetchTeams(currentPage)
+    router.push(`?${generateAllQueryString({ search: searchFilter })}`)
+  }
 
   return (
     <>
@@ -147,10 +202,19 @@ function AdminCompetitionDashboard() {
         </div>
       ) : (
         <RegisteredTeamList
+          itemsPerPage={limit}
           teamData={teamData}
           pagination={pagination}
           competitionId={currentCompetitionId}
+          currentSearchFilter={searchFilter}
+          currentPage={currentPage}
+          filterStates={{ teamStatusFilter, teamStageFilter }}
           onPageChange={handlePageChange}
+          setCurrentPage={setCurrentPage}
+          setSearchFilter={setSearchFilter}
+          setTeamStatusFilter={setTeamStatusFilter}
+          setTeamStageFilter={setTeamStageFilter}
+          onSearchClick={onSearchClick}
         />
       )}
     </>

@@ -100,18 +100,18 @@ export const CompetitionSwiper = ({ competitions }: CompetitionsCarouselProps) =
             </SwiperSlide>
           ))}
         </Swiper>
-        <div className="absolute z-10 flex w-[300px] top-[35rem] flex-col items-center gap-4 md:w-[600px]">
+        <div className="absolute top-[35rem] z-10 flex w-[300px] flex-col items-center gap-4 md:w-[600px]">
           <p className="font-dmsans md:text-lg lg:text-xl">
             {getDescription(activeIndex)}
           </p>
-          <Button className="flex flex-row gap-3 rounded-xl px-5">
-            <Link
-              href={getLink(activeIndex) ?? ''}
-              className="flex flex-row items-center gap-3">
+          <Link
+            href={getLink(activeIndex) ?? ''}
+            className="flex flex-row items-center gap-3">
+            <Button className="flex flex-row gap-3 rounded-xl px-5">
               <p className="mx-5 font-dmsans text-base">Go To Page</p>
               <FaArrowRight />
-            </Link>
-          </Button>
+            </Button>
+          </Link>
         </div>
       </div>
 

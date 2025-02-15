@@ -1,14 +1,7 @@
 'use client'
 import React, { useState, useMemo, useEffect } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './../Table'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious
-} from './../Pagination'
+import { Pagination } from './../Pagination'
 import {
   Select,
   SelectContent,
@@ -22,6 +15,7 @@ import { Search, Pencil } from 'lucide-react'
 import { Team } from '~/api/generated'
 import Link from 'next/link'
 import { capitalizeFirstLetter } from '~/lib/utils'
+import PaginationComponent from './Pagination'
 
 interface Pagination {
   currentPage: number
@@ -35,24 +29,21 @@ interface RegisteredTeamListProps {
   teamData: Team[]
   pagination: Pagination
   competitionId: string | 'null'
+  currentSearchFilter: string
+  filterStates: {
+    teamStatusFilter: Exclude<Team['verificationStatus'], null> | undefined
+    teamStageFilter: Team['stage'] | undefined
+  }
+  currentPage: number
+  itemsPerPage: string
   onPageChange: (newPage: number) => void // Callback for handling page changes
-}
-
-const maximumItemPage = 10
-
-const getPaginationRange = (current: number, total: number, delta = 2) => {
-  const range: (number | string)[] = []
-  const left = Math.max(2, current - delta)
-  const right = Math.min(total - 1, current + delta)
-
-  range.push(1)
-
-  if (left > 2) range.push('...')
-  for (let i = left; i <= right; i++) range.push(i)
-  if (right < total - 1) range.push('...')
-  if (total > 1) range.push(total)
-
-  return range
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>
+  setSearchFilter: React.Dispatch<React.SetStateAction<string>>
+  setTeamStageFilter: React.Dispatch<React.SetStateAction<Team['stage'] | undefined>>
+  setTeamStatusFilter: React.Dispatch<
+    React.SetStateAction<Exclude<Team['verificationStatus'], null> | undefined>
+  >
+  onSearchClick: () => void
 }
 
 //! HARDCODED
@@ -65,10 +56,12 @@ export type TeamStatus = Team['verificationStatus']
 
 //! HARDCODED
 export const possibleTeamStatus: Array<NonNullable<TeamStatus>> = [
+  'INCOMPLETE',
   'VERIFIED',
   'DENIED',
   'WAITING',
-  'CHANGED'
+  'CHANGED',
+  'ON REVIEW'
 ]
 
 //! HARDCODED
@@ -88,7 +81,9 @@ export const mapStatusTag: Record<
   VERIFIED: 'success',
   DENIED: 'danger',
   WAITING: 'warning',
+  'ON REVIEW': 'warning',
   CHANGED: 'blue',
+  INCOMPLETE: 'neutral',
   'NO STATUS YET': 'neutral'
 }
 
@@ -112,81 +107,55 @@ export const mapStageTag: Record<
   verification: 'warning'
 }
 
-export const possibleCompetitionStatus: Array<TeamStage> = [
-  'pre-eliminary',
-  'final',
-  'verification'
-]
+export const possibleCompetitionStatus: Array<TeamStage> = ['pre-eliminary', 'final']
 
 export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   teamData,
   pagination,
   competitionId,
-  onPageChange
+  currentSearchFilter,
+  currentPage,
+  itemsPerPage,
+  filterStates,
+  onPageChange,
+  setCurrentPage,
+  setSearchFilter,
+  setTeamStageFilter,
+  setTeamStatusFilter,
+  onSearchClick
 }) => {
-  const [currentPage, setCurrentPage] = useState(pagination.currentPage)
-  const [itemsPerPage] = useState(maximumItemPage)
-  const [statusFilter, setStatusFilter] = useState<string | null>(null)
-  const [CompetitionStatusFilter, setCompetitionStatusFilter] = useState<string | null>(
-    null
-  )
-  const [searchTerm, setSearchTerm] = useState('')
-
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return
-    setCurrentPage(newPage)
     onPageChange(newPage)
-
-    // Reset filters when pagination changes
-    setStatusFilter(null)
-    setCompetitionStatusFilter(null)
-    setSearchTerm('')
   }
-
-  // Apply filter
-  const filteredData = useMemo(() => {
-    return teamData.filter(team => {
-      // Check if statusFilter is not set or matches the verification status
-      const matchesStatus = !statusFilter || getTeamStatus(team) === statusFilter
-
-      // Check if CompetitionStatusFilter is not set or matches the verification status
-      const matchesCompetitionStatus =
-        !CompetitionStatusFilter || team.stage === CompetitionStatusFilter.toLowerCase()
-
-      // Check if the team name or team ID contains the search term (case-insensitive)
-      const matchesSearchTerm =
-        team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        team.id.toLowerCase().includes(searchTerm.toLowerCase())
-
-      return matchesStatus && matchesCompetitionStatus && matchesSearchTerm
-    })
-  }, [teamData, statusFilter, CompetitionStatusFilter, searchTerm])
-
-  // Total data
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
-
-  // Set up the page in pagination
-  useEffect(() => {
-    setCurrentPage(prevPage => Math.min(prevPage, totalPages || 1))
-  }, [totalPages])
 
   // Unique attributes for filter
   const uniqueStatuses = Array.from(new Set<string>(possibleTeamStatus))
   const uniqueCompetitionStatuss = Array.from(new Set(possibleCompetitionStatus))
 
   const handleStatusFilterChange = (value: string) => {
-    setStatusFilter(value === 'default' ? null : value)
+    setTeamStatusFilter(
+      value === 'default' ? undefined : (value as Exclude<TeamStatus, null>)
+    )
     setCurrentPage(1)
   }
 
   const handleCompetitionStatusFilterChange = (value: string) => {
-    setCompetitionStatusFilter(value === 'default' ? null : value)
+    setTeamStageFilter(
+      value === 'default' ? undefined : (value.toLowerCase() as TeamStage)
+    )
     setCurrentPage(1)
   }
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value)
-    setCurrentPage(1)
+    setSearchFilter(event.target.value ?? '')
+  }
+
+  const searchClick = () => {
+    setTimeout(() => {
+      onSearchClick()
+      setCurrentPage(1)
+    }, 100)
   }
 
   return (
@@ -202,17 +171,27 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
             <Input
               type="text"
               placeholder="Search by team name or team ID"
-              value={searchTerm}
+              value={currentSearchFilter}
               onChange={handleSearchChange}
+              onKeyDown={e => e.key === 'Enter' && searchClick()}
               className="h-10 w-full border-[1.5px] border-[#7138C0] bg-[#F5E1FF] font-dmsans font-medium text-[#935ce0] sm:h-12"
             />
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 transform text-[#935ce0]" />
+            <Search
+              className="absolute right-3 top-1/2 -translate-y-1/2 transform text-[#935ce0] hover:cursor-pointer"
+              onClick={searchClick}
+            />
           </div>
 
           {/* Filters */}
           {/* Filter on stages */}
           <div className="grid flex-shrink-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4">
-            <Select onValueChange={handleCompetitionStatusFilterChange}>
+            <Select
+              defaultValue={
+                filterStates.teamStageFilter
+                  ? capitalizeFirstLetter(filterStates.teamStageFilter)
+                  : 'default'
+              }
+              onValueChange={handleCompetitionStatusFilterChange}>
               <SelectTrigger className="h-10 w-full border-[1.5px] border-[#7138C0] bg-[#F5E1FF] font-dmsans font-medium text-[#7138C0] sm:h-12 xl:w-72">
                 <SelectValue placeholder="Filter by Stage" />
               </SelectTrigger>
@@ -224,6 +203,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                 </SelectItem>
                 {uniqueCompetitionStatuss.map(stat => (
                   <SelectItem
+                    className="hover:bg-[#E0C2FF] focus:bg-[#E0C2FF] active:bg-[#D1A3FF]"
                     key={capitalizeFirstLetter(stat)}
                     value={capitalizeFirstLetter(stat)}>
                     {capitalizeFirstLetter(stat)}
@@ -233,14 +213,23 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
             </Select>
 
             {/* Filter on team status */}
-            <Select onValueChange={handleStatusFilterChange}>
+            <Select
+              defaultValue={filterStates.teamStatusFilter ?? 'default'}
+              onValueChange={handleStatusFilterChange}>
               <SelectTrigger className="h-10 w-full border-[1.5px] border-[#7138C0] bg-[#F5E1FF] font-dmsans font-medium text-[#7138C0] sm:h-12 xl:w-72">
                 <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="default">All Status</SelectItem>
+              <SelectContent className="bg-[#F5E1FF] font-dmsans font-medium text-[#7138C0]">
+                <SelectItem
+                  value="default"
+                  className="hover:bg-[#E0C2FF] focus:bg-[#E0C2FF] active:bg-[#D1A3FF]">
+                  All Status
+                </SelectItem>
                 {uniqueStatuses.map(status => (
-                  <SelectItem key={status} value={status}>
+                  <SelectItem
+                    key={status}
+                    value={status}
+                    className="hover:bg-[#E0C2FF] focus:bg-[#E0C2FF] active:bg-[#D1A3FF]">
                     {status}
                   </SelectItem>
                 ))}
@@ -263,84 +252,77 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredData
-                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                .map((team, index) => (
-                  <TableRow key={team.id}>
-                    <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                    <TableCell>{team.id}</TableCell>
-                    <TableCell>{team.name}</TableCell>
-                    <TableCell>
-                      <Tag
-                        text={getTeamStatus(team) || 'No Status Yet'}
-                        variant={mapStatusTag[getTeamStatus(team) || 'NO STATUS YET']}
-                        className="capitalize"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Tag
-                        text={capitalizeFirstLetter(team.stage)}
-                        variant={mapStageTag[team.stage]}
-                        className="capitalize"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Link
-                        href={`/dashboard/admin/competition/${competitionId}/team/${team.id}`}
-                        className="flex w-full justify-center align-middle">
-                        <Pencil className="h-auto w-5" />
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ))}
+              {teamData.map((team, index) => (
+                <TableRow key={team.id}>
+                  <TableCell>
+                    {(pagination.currentPage - 1) * Number(itemsPerPage) + index + 1}
+                  </TableCell>
+                  <TableCell>{team.id}</TableCell>
+                  <TableCell>{team.name}</TableCell>
+                  <TableCell>
+                    <Tag
+                      text={getTeamStatus(team) || 'No Status Yet'}
+                      variant={mapStatusTag[getTeamStatus(team) || 'NO STATUS YET']}
+                      className="capitalize"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Tag
+                      text={capitalizeFirstLetter(team.stage)}
+                      variant={mapStageTag[team.stage]}
+                      className="capitalize"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/dashboard/admin/competition/${competitionId}/team/${team.id}`}
+                      className="flex w-full justify-center align-middle">
+                      <Pencil className="h-auto w-5" />
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
+          {teamData.length === 0 && (
+            <p className="mt-4 text-center font-dmsans text-[18px] text-white/80">
+              No data found
+            </p>
+          )}
         </div>
 
         {/* Pagination Section */}
         <div className="mt-4 flex justify-center">
-          <Pagination>
-            <PaginationContent className="flex-wrap">
-              {/* Previous Button */}
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  aria-disabled={currentPage === 1}
-                  className={currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}
-                />
-              </PaginationItem>
-
-              {/* Pagination Numbers */}
-              {getPaginationRange(currentPage, pagination.totalPages).map(
-                (item, index) => (
-                  <PaginationItem key={index}>
-                    {typeof item === 'number' ? (
-                      <PaginationLink
-                        onClick={() => handlePageChange(item)}
-                        isActive={currentPage === item}>
-                        {item}
-                      </PaginationLink>
-                    ) : (
-                      <span className="px-2 text-gray-500">{item}</span>
-                    )}
-                  </PaginationItem>
-                )
-              )}
-
-              {/* Next Button */}
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  aria-disabled={currentPage === pagination.totalPages}
-                  className={
-                    currentPage === pagination.totalPages
-                      ? 'cursor-not-allowed opacity-50'
-                      : ''
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <PaginationComponent
+            currentPage={currentPage}
+            totalItems={pagination.totalItems}
+            totalPages={pagination.totalPages}
+            itemsPerPage={Number(itemsPerPage)}
+            handlePageChange={handlePageChange}
+          />
+        </div>
+        <div className="mt-2 flex items-center justify-center gap-x-2 text-center font-dmsans text-[16px]">
+          <p>Page</p>
+          <Select onValueChange={value => handlePageChange(Number(value))}>
+            <SelectTrigger className="w-[80px] bg-purple-400">
+              <SelectValue placeholder={currentPage} />
+            </SelectTrigger>
+            <SelectContent
+              side="top"
+              className="max-h-[240px] overflow-y-auto bg-purple-400 text-white">
+              {Array.from({ length: pagination.totalPages }, (_, i) => (
+                <SelectItem
+                  key={i + 1}
+                  value={(i + 1).toString()}
+                  className="font-dmsans text-[16px] focus:bg-black/50">
+                  {i + 1}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p>
+            of <span className="text-white">{pagination.totalPages}</span>
+          </p>
         </div>
       </div>
     </div>

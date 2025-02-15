@@ -265,6 +265,7 @@ function MemberCard({
   studentCard,
   poster,
   twibbon,
+  instance,
   competitionID,
   userID,
   onRefetch
@@ -274,6 +275,7 @@ function MemberCard({
   name: string
   email: string
   phone: string
+  instance: string
   studentCard: UserDocument | null
   poster: TeamMemberDocument | null
   twibbon: TeamMemberDocument | null
@@ -291,6 +293,7 @@ function MemberCard({
         />
       )}
       <Field title="Name" value={name} />
+      <Field title="Instance" value={instance} />
       <Field title="Email" value={email} />
       <Field title="Phone" value={phone ? phone : '-'} />
 
@@ -571,6 +574,7 @@ export default function TeamInfo({
               <MemberCard
                 key={index}
                 teamID={teamID}
+                instance={member.user?.instance ? member.user.instance : DEFAULT_FIELD}
                 name={member.user?.fullName ? member.user.fullName : DEFAULT_FIELD}
                 email={member.user?.email ? member.user?.email : DEFAULT_FIELD}
                 phone={

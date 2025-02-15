@@ -165,8 +165,8 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             const isVerified = teamVerifData?.data?.document?.[0].isVerified ?? false
             const verificationError = teamVerifData?.data?.document?.[0].verificationError
             const isRejected =
-              verificationError !== '' ||
-              verificationError !== null ||
+              verificationError !== '' &&
+              verificationError !== null &&
               verificationError !== undefined
             teamVerification = {
               id: 'team-0',
@@ -210,8 +210,8 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               const isVerified = memberDoc.isVerified ?? false
               const verificationError = memberDoc.verificationError
               const isRejected =
-                verificationError !== '' ||
-                verificationError !== null ||
+                verificationError !== '' &&
+                verificationError !== null &&
                 verificationError !== undefined
               memberVerifications.push({
                 id: `member-${index}`,
@@ -694,14 +694,18 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                 {verif.type === 'poster' && (
                   <div>
                     <p className="mb-4 md:text-[18px] lg:text-[21px]">
-                      Silakan upload poster di sini
+                      Silakan upload poster di sini. Poster yang perlu diupload hanyalah
+                      poster anda saja.{' '}
+                      <b>(Poster diupload oleh masing-masing anggota tim)</b>
                     </p>
                   </div>
                 )}
                 {verif.type === 'twibbon' && (
                   <div>
                     <p className="mb-4 md:text-[18px] lg:text-[21px]">
-                      Silakan upload twibbon di sini
+                      Silakan upload twibbon di sini. Twibbon yang perlu diupload hanyalah
+                      twibbon anda saja.{' '}
+                      <b>(Twibbon diupload oleh masing-masing anggota tim)</b>
                     </p>
                   </div>
                 )}
