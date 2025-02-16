@@ -7,6 +7,8 @@ import {
   GetAdminCompetitionTeamInformationResponse,
   getAdminCompetitionTeamSubmissions,
   GetAdminCompetitionTeamSubmissionsResponse,
+  getDownloadPresignedLink,
+  GetDownloadPresignedLinkData,
   getTeamSubmission
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
@@ -51,7 +53,7 @@ export default function Submission({
 
     const combinedData = preEliminaryData?.concat(finalData ?? [])
 
-    combinedData?.forEach(data => {
+    combinedData?.forEach(async data => {
       const stage = capitalizeFirstLetter(data.requirement.stage)
 
       let currentDoc: SubmissionDoc = {
@@ -66,10 +68,19 @@ export default function Submission({
 
       // If there is a submission, update the currentDoc
       if (data.submission && data.submission.media) {
+        const linkResponse = await getDownloadPresignedLink({
+          client: axiosAuth,
+          query: {
+            bucket: data.submission.media
+              .bucket as GetDownloadPresignedLinkData['query']['bucket'],
+            filename: data.submission.media.name
+          }
+        })
+
         currentDoc = {
           ...currentDoc,
           file_name: data.submission.media.name,
-          file_url: data.submission.media.url,
+          file_url: linkResponse.data ? linkResponse.data.mediaUrl : '',
           feedback: data.submission.judgeResponse || undefined,
           status: data.submission.judgeResponse ? 'Change Needed' : 'Submitted'
         }
