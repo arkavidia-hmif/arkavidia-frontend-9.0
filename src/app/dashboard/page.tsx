@@ -272,14 +272,14 @@ function UserDashboard() {
       }
   
       if (eventTeam.data) {
-        const eventOptions: ExtendedMenuItem[] = eventTeam.data.map((team, index) => ({
-          id: options.length + index,
-          option: team.event!.title,
-          competitionId: team.event!.id,
+        const eventOptions: ExtendedMenuItem = {
+          id: options.length,
+          option: eventTeam.data[0].event!.title,
+          competitionId: eventTeam.data[0].event!.id,
           type: 'Event' as 'Event'
-        }));
+        };
 
-        options.push(...eventOptions);
+        options.push(eventOptions);
         setUserEventTeams(eventTeam.data);
         setCurrentEventTeam(eventTeam.data);
       }
