@@ -185,6 +185,8 @@ function UserDashboard() {
   useEffect(() => {
     async function fetchTeams() {
       const userTeam = await getTeams({ client: axiosAuth })
+      const eventTeam = await getEventTeam({ client: axiosAuth })
+      let length = 0
 
       if (userTeam.error) {
         toast({
@@ -194,20 +196,31 @@ function UserDashboard() {
         })
       }
 
+      if (eventTeam.error) {
+        toast({
+          title: 'Failed getting data',
+          description: 'Failed to get event teams',
+          variant: 'destructive'
+        })
+      }
+
       if (userTeam.data) {
         if (userTeam.data.length > 0) {
+          length = userTeam.data.length
           const competitions = userTeam.data.toSorted((a, b) =>
             // @ts-ignore
             expandCompetitionName(a.competition!.title).localeCompare(
               expandCompetitionName(b.competition!.title)
             )
           )
-          const options: ExtendedMenuItem[] = competitions.map((team: Team, index: number) => ({
-            id: index,
-            option: expandCompetitionName(team.competition!.title),
-            competitionId: team.competition!.id,
-            type: 'Competition' as 'Competition'
-          }))
+          const options: ExtendedMenuItem[] = competitions.map(
+            (team: Team, index: number) => ({
+              id: index,
+              option: expandCompetitionName(team.competition!.title),
+              competitionId: team.competition!.id,
+              type: 'Competition' as 'Competition'
+            })
+          )
 
           setOptions(options)
           setUserTeams(competitions)
@@ -221,6 +234,34 @@ function UserDashboard() {
           setHasCompetitions(false)
         }
       }
+
+      if (eventTeam.data) {
+        if (eventTeam.data.length > 0) {
+          const competitions = eventTeam.data.toSorted((a, b) =>
+            // @ts-ignore
+            expandCompetitionName(a.event!.title).localeCompare(
+              expandCompetitionName(b.event!.title)
+            )
+          )
+          const options: ExtendedMenuItem[] = competitions.map(
+            (team: any, index: number) => ({
+              id: index + length,
+              option: team.event.title,
+              competitionId: team.event!.id,
+              type: 'Event'
+            })
+          )
+
+          setOptions((prevOptions: ExtendedMenuItem[]) => [...prevOptions, ...options])
+          setUserEventTeams(competitions);
+          setCurrentEventTeam(competitions);
+
+          // console.log('currentTeam: ' + currentTeam.name)
+          // @ts-ignore
+          // router.push(`/dashboard/${chosenCompetition.competition.title.toLowerCase()}`)
+        }
+      }
+
       setTimeout(() => {
         setIsLoading(false)
       }, 1000)
@@ -257,37 +298,6 @@ function UserDashboard() {
 
     fetchCompetitionData()
   }, [currentTeam])
-
-  // Fetching user event teams
-  useEffect(() => {
-    async function fetchEventTeams() {
-      const eventTeam = await getEventTeam({ client: axiosAuth });
-  
-      if (eventTeam.error) {
-        toast({
-          title: 'Failed getting data',
-          description: 'Failed to get event teams',
-          variant: 'destructive'
-        });
-      }
-  
-      if (eventTeam.data) {
-        const eventOptions: ExtendedMenuItem = {
-          id: options.length,
-          option: eventTeam.data[0].event!.title,
-          competitionId: eventTeam.data[0].event!.id,
-          type: 'Event' as 'Event'
-        };
-
-        options.push(eventOptions);
-        setUserEventTeams(eventTeam.data);
-        setCurrentEventTeam(eventTeam.data);
-      }
-        
-    }
-  
-    fetchEventTeams();
-  }, []);
 
   // fetching event timeline
   useEffect(() => {
