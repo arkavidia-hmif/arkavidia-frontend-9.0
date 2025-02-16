@@ -8,7 +8,12 @@ import {
   getCompetitionTimelineWithCompetitionId,
   GetCompetitionTimelineWithCompetitionIdResponse,
   GetCompetitionTimelineWithCompetitionIdData,
-  getTeamSubmission
+  getTeamSubmission,
+  EventTeam,
+  GetEventTimelineByIdResponse,
+  getEventTeam,
+  GetEventTeamResponse,
+  getEventTimelineById
 } from '~/api/generated'
 import { toast } from '~/hooks/use-toast'
 import { useRouter } from 'next/navigation'
@@ -31,6 +36,7 @@ import Loading from '../components/Loading'
 
 export interface ExtendedMenuItem extends MenuItem {
   competitionId: string
+  type: 'Competition' | 'Event'
 }
 
 interface Information {
@@ -136,10 +142,12 @@ const getNearestDeadline = (data: GetCompetitionTimelineWithCompetitionIdRespons
 function UserDashboard() {
   const [hasCompetitions, setHasCompetitions] = React.useState(true)
   const [userTeams, setUserTeams] = React.useState<Team[]>([])
+  const [userEventTeams, setUserEventTeams] = React.useState<GetEventTeamResponse>();  
   const [userName, setUserName] = React.useState(
     useAppSelector(state => state.auth.username)
   )
   const [currentTeam, setCurrentTeam] = React.useState<Team>()
+  const [currentEventTeam, setCurrentEventTeam] = React.useState<GetEventTeamResponse>();
   const [options, setOptions] = React.useState<ExtendedMenuItem[]>([])
   const [currentCompetition, setCurrentCompetition] = React.useState<ExtendedMenuItem>()
   const [isLoading, setIsLoading] = React.useState(true)
@@ -148,6 +156,8 @@ function UserDashboard() {
   const router = useRouter()
   const [competitionTimeline, setCompetitionTimeline] =
     React.useState<GetCompetitionTimelineWithCompetitionIdResponse>()
+  const [eventTimeline, setEventTimeline] = 
+    React.useState<GetEventTimelineByIdResponse>();
   const [submissionRequirementData, setSubmissionRequirementData] = React.useState<any>()
 
   // Fetching user name
@@ -192,10 +202,11 @@ function UserDashboard() {
               expandCompetitionName(b.competition!.title)
             )
           )
-          const options = competitions.map((team: Team, index: number) => ({
+          const options: ExtendedMenuItem[] = competitions.map((team: Team, index: number) => ({
             id: index,
             option: expandCompetitionName(team.competition!.title),
-            competitionId: team.competition!.id
+            competitionId: team.competition!.id,
+            type: 'Competition' as 'Competition'
           }))
 
           setOptions(options)
@@ -246,6 +257,63 @@ function UserDashboard() {
 
     fetchCompetitionData()
   }, [currentTeam])
+
+  // Fetching user event teams
+  useEffect(() => {
+    async function fetchEventTeams() {
+      const eventTeam = await getEventTeam({ client: axiosAuth });
+  
+      if (eventTeam.error) {
+        toast({
+          title: 'Failed getting data',
+          description: 'Failed to get event teams',
+          variant: 'destructive'
+        });
+      }
+  
+      if (eventTeam.data) {
+        const eventOptions: ExtendedMenuItem[] = eventTeam.data.map((team, index) => ({
+          id: options.length + index,
+          option: team.event!.title,
+          competitionId: team.event!.id,
+          type: 'Event' as 'Event'
+        }));
+
+        options.push(...eventOptions);
+        setUserEventTeams(eventTeam.data);
+        setCurrentEventTeam(eventTeam.data);
+      }
+        
+    }
+  
+    fetchEventTeams();
+  }, []);
+
+  // fetching event timeline
+  useEffect(() => {
+    async function fetchEventTimeline() {
+      if (currentEventTeam) {
+        const timeline = await getEventTimelineById({
+          client: axiosAuth,
+          path: { eventId: currentEventTeam[0].event!.id }
+        });
+  
+        if (timeline.error) {
+          toast({
+            title: 'Failed getting data',
+            description: 'Failed to get event timeline',
+            variant: 'destructive'
+          });
+        }
+  
+        if (timeline.data) {
+          setEventTimeline(timeline.data);
+        }
+      }
+    }
+  
+    fetchEventTimeline();
+  }, [currentEventTeam]);
 
   // Fetching stage and submission
   useEffect(() => {
@@ -350,12 +418,14 @@ function UserDashboard() {
     // }
   ]
 
-  const handleDropdownChange = (selectedCompetition: ExtendedMenuItem) => {
-    setCurrentCompetition(selectedCompetition)
-    setCurrentTeam(
-      userTeams.find(team => team.competition!.id === selectedCompetition.competitionId)
-    )
-  }
+  const handleDropdownChange = (selected: ExtendedMenuItem) => {
+    if (selected.type === 'Competition') {
+      setCurrentCompetition(selected);
+      setCurrentTeam(userTeams.find(team => team.competition!.id === selected.competitionId));
+    } else {
+      setCurrentEventTeam(userEventTeams);
+    }
+  };
 
   if (isLoading) {
     return (
