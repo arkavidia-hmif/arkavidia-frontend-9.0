@@ -20,6 +20,7 @@ const fileTypeAssets = {
   'image/png': 'PNG',
   'application/pdf': 'PDF',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+  'application/zip': 'ZIP',
   default: 'TXT'
 }
 
