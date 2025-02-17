@@ -18,6 +18,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger
   } from '~/app/components/ui/alert-dialog'
+import { putAdminEventTeamVerification } from '~/api/generated'
 
   interface FeedbackProps {
     submissionTypeId: string
@@ -57,7 +58,7 @@ import {
       }
   
       try {
-        const saveRequest = await putAdmin({
+        const saveRequest = await putAdminEventTeamVerification({
           client: axiosAuth,
           path: {
             eventId: eventId,
