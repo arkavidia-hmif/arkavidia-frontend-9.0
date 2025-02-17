@@ -343,7 +343,7 @@ export default function ModalPopup({
       const teamRes = await getEventTeamByTeamId({
         client: useAuth,
         path: {
-          teamId: resp.data.id
+          teamId: resp.data.teamId
         }
       })
 
