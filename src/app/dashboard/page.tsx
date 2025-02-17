@@ -477,7 +477,7 @@ function UserDashboard() {
 
             <section className="flex w-full flex-col gap-6 lg:flex-row lg:justify-between xl:flex-wrap xl:gap-[45px]">
               {/* left section */}
-              <section className="flex flex-col gap-6 lg:gap-8 xl:flex-grow">
+              <section className="flex flex-col gap-6 lg:gap-8 lg:flex-grow">
                 {/* Header */}
                 <div>
                   {/* Title */}
