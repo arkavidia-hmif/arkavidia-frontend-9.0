@@ -21,6 +21,7 @@ const fileTypeAssets = {
   'application/pdf': 'PDF',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
   'application/zip': 'ZIP',
+  'application/x-zip-compressed': 'ZIP',
   default: 'TXT'
 }
 
@@ -39,7 +40,9 @@ const TaskDropzone: React.FC<TaskDropzoneProps> = ({
       'image/jpeg',
       'image/png',
       'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/zip',
+      'application/x-zip-compressed'
     ]
     const maxSizeMB = 20
 
@@ -132,7 +135,7 @@ const TaskDropzone: React.FC<TaskDropzoneProps> = ({
           <p className="font-light">or drag and drop</p>
         </div>
         <p className="mt-1 text-xs text-[#8C8C8C]">
-          Supported formats: JPEG, PNG, PDF, DOCX (Max 20MB)
+          Supported formats: JPEG, PNG, PDF, DOCX, ZIP (Max 20MB)
         </p>
 
         {error && <p className="mt-2 text-sm font-semibold text-red-400">{error}</p>}
