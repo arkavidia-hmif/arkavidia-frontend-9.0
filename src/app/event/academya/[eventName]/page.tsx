@@ -20,6 +20,7 @@ import { useToast } from '~/hooks/use-toast'
 import Link from 'next/link'
 import { getAcademyaEventName, getAcademyaEventType } from '~/lib/utils'
 import ModalPopup from './components/RegisterModal'
+import { set } from 'date-fns'
 
 interface eventTimeline {
   title: string
@@ -52,6 +53,7 @@ function EventPage() {
   const [event, setEvent] = useState<Event>()
   const [eventTimeline, setEventTimeline] = useState<eventTimeline[]>([])
   const [registrationCloseDate, setRegistrationCloseDate] = useState<string>('')
+  const [closeRegisDate, setCloseRegisDate] = useState<Date | undefined>(undefined)
   const [eventId, setEventId] = useState<string>('')
   const axiosInstance = useAxiosAuth()
 
@@ -183,6 +185,7 @@ function EventPage() {
         ? eventTimeline.find(event => event.title.toLowerCase().includes('regist'))
         : MOCK_EVENTS_DATA.find(event => event.title.toLowerCase().includes('regist')) // pake mock data kalo ga ada data timeline
     if (registrationEvent?.timeEnd) {
+      setCloseRegisDate(registrationEvent.timeEnd)
       setRegistrationCloseDate(
         registrationEvent.timeEnd.toLocaleDateString('en-US', {
           weekday: 'long',
@@ -252,8 +255,8 @@ function EventPage() {
             />
             Download Handbook
           </Button>
-          {/* TODO: Handle Register Now Event */}
-          {!event || !event.id ? (
+          {/* Disable Register if no event or event id, and if registration date are over */}
+          {!event || !event.id || !closeRegisDate || closeRegisDate < new Date() ? (
             <Button disabled>
               Register Now
               <ArrowRight />
