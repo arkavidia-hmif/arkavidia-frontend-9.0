@@ -46,6 +46,8 @@ interface Information {
   content: string
 }
 
+type TeamOrEventTeam = Team | EventTeam;
+
 const transformEventData = (
   data: { startDate: string; endDate: string | null; title: string }[]
 ) => {
@@ -141,13 +143,11 @@ const getNearestDeadline = (data: GetCompetitionTimelineWithCompetitionIdRespons
 
 function UserDashboard() {
   const [hasCompetitions, setHasCompetitions] = React.useState(true)
-  const [userTeams, setUserTeams] = React.useState<Team[]>([])
-  const [userEventTeams, setUserEventTeams] = React.useState<GetEventTeamResponse>();  
+  const [userTeams, setUserTeams] = React.useState<TeamOrEventTeam[]>([])
   const [userName, setUserName] = React.useState(
     useAppSelector(state => state.auth.username)
   )
-  const [currentTeam, setCurrentTeam] = React.useState<Team>()
-  const [currentEventTeam, setCurrentEventTeam] = React.useState<GetEventTeamResponse>();
+  const [currentTeam, setCurrentTeam] = React.useState<TeamOrEventTeam>()
   const [options, setOptions] = React.useState<ExtendedMenuItem[]>([])
   const [currentCompetition, setCurrentCompetition] = React.useState<ExtendedMenuItem>()
   const [isLoading, setIsLoading] = React.useState(true)
@@ -248,15 +248,13 @@ function UserDashboard() {
               id: index + length,
               option: team.event.title,
               competitionId: team.event!.id,
-              type: 'Event'
+              type: 'Event' as 'Event'
             })
           )
 
           setOptions((prevOptions: ExtendedMenuItem[]) => [...prevOptions, ...options])
-          setUserEventTeams(competitions);
-          setCurrentEventTeam(competitions);
+          setUserTeams((prevTeams: TeamOrEventTeam[]) => [...prevTeams, ...competitions])
 
-          // console.log('currentTeam: ' + currentTeam.name)
           // @ts-ignore
           // router.push(`/dashboard/${chosenCompetition.competition.title.toLowerCase()}`)
         }
@@ -270,60 +268,51 @@ function UserDashboard() {
     fetchTeams()
   }, [])
 
-  // fetching competition timeline
   useEffect(() => {
-    // console.log('currentTeam: ' + JSON.stringify(currentTeam))
-
-    async function fetchCompetitionData() {
+    async function fetchTimeline() {
       if (currentTeam) {
-        const competitionData = await getCompetitionTimelineWithCompetitionId({
-          client: axiosAuth,
-          path: { competitionId: currentTeam.competition!.id } // typo di setup api nya jd competititon
-        })
-
-        if (competitionData.error) {
-          toast({
-            title: 'Failed getting data',
-            description: 'Failed to get competition data',
-            variant: 'destructive'
-          })
-        }
-
-        if (competitionData.data) {
-          // console.log('competition timeline: ' + JSON.stringify(competitionData.data))
-          setCompetitionTimeline(competitionData.data)
-        }
-      }
-    }
-
-    fetchCompetitionData()
-  }, [currentTeam])
-
-  // fetching event timeline
-  useEffect(() => {
-    async function fetchEventTimeline() {
-      if (currentEventTeam) {
-        const timeline = await getEventTimelineById({
-          client: axiosAuth,
-          path: { eventId: currentEventTeam[0].event!.id }
-        });
-  
-        if (timeline.error) {
-          toast({
-            title: 'Failed getting data',
-            description: 'Failed to get event timeline',
-            variant: 'destructive'
+        if ('competition' in currentTeam) {
+          // Ini adalah Team
+          const competitionData = await getCompetitionTimelineWithCompetitionId({
+            client: axiosAuth,
+            path: { competitionId: currentTeam.competition!.id }
           });
-        }
   
-        if (timeline.data) {
-          setEventTimeline(timeline.data);
+          if (competitionData.error) {
+            toast({
+              title: 'Failed getting data',
+              description: 'Failed to get competition data',
+              variant: 'destructive'
+            });
+          }
+  
+          if (competitionData.data) {
+            setCompetitionTimeline(competitionData.data);
+          }
+        } else if ('event' in currentTeam) {
+          // Ini adalah EventTeam
+          const eventTimeline = await getEventTimelineById({
+            client: axiosAuth,
+            path: { eventId: currentTeam.event!.id }
+          });
+  
+          if (eventTimeline.error) {
+            toast({
+              title: 'Failed getting data',
+              description: 'Failed to get event timeline',
+              variant: 'destructive'
+            });
+          }
+  
+          if (eventTimeline.data) {
+            setEventTimeline(eventTimeline.data);
+          }
         }
       }
     }
   
-    fetchEventTimeline();
-  }, [currentEventTeam]);
+    fetchTimeline();
+  }, [currentTeam]);
 
   // Fetching stage and submission
   useEffect(() => {
@@ -428,13 +417,16 @@ function UserDashboard() {
     // }
   ]
 
-  const handleDropdownChange = (selected: ExtendedMenuItem) => {
-    if (selected.type === 'Competition') {
-      setCurrentCompetition(selected);
-      setCurrentTeam(userTeams.find(team => team.competition!.id === selected.competitionId));
-    } else {
-      setCurrentEventTeam(userEventTeams);
-    }
+  const handleDropdownChange = (selectedCompetition: ExtendedMenuItem) => {
+    setCurrentCompetition(selectedCompetition);
+    const selectedTeam = userTeams.find(team => {
+      if (selectedCompetition.type === 'Competition') {
+        return (team as Team).competition?.id === selectedCompetition.competitionId;
+      } else {
+        return (team as EventTeam).event?.id === selectedCompetition.competitionId;
+      }
+    });
+    setCurrentTeam(selectedTeam);
   };
 
   if (isLoading) {
@@ -515,7 +507,9 @@ function UserDashboard() {
                         <Category
                           categoryName={
                             currentTeam
-                              ? expandCompetitionName(currentTeam?.competition!.title)
+                              ? 'competition' in currentTeam
+                                ? expandCompetitionName(currentTeam.competition!.title)
+                                : 'event' in currentTeam ? currentTeam.event!.title : ''
                               : ''
                           }
                         />
