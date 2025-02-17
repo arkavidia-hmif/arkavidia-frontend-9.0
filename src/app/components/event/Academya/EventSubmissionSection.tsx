@@ -2,23 +2,23 @@ import React from 'react'
 import EventSubmissionTable from './EventSubmissionTable'
 import { SubmissionDoc } from '../../team-lists/detail/SubmissionTable'
 
-function SubmissionSection({
+
+function EventSubmissionSection({
   stageData,
-  competitionID,
+  eventID,
+  refetchData
 }: {
   stageData: SubmissionDoc[]
   teamID: string
-  competitionID: string
+  eventID: string
+  refetchData: () => Promise<void>
 }) {
-  async function refetchData() {
-
-  }
 
   return (
     <div className="flex flex-col gap-6">
       <EventSubmissionTable
         submissionDocs={stageData}
-        eventID={competitionID}
+        eventID={eventID}
         refetchData={refetchData}
       />
       {/* <MessageBox typeId={submission.requirement_type} feedback={submission.feedback} /> */}
@@ -26,4 +26,4 @@ function SubmissionSection({
   )
 }
 
-export default SubmissionSection
+export default EventSubmissionSection
