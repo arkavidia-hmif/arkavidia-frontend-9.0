@@ -3,32 +3,18 @@
 import { useParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
+import { getEvent } from '~/api/generated'
 import { useToast } from '~/hooks/use-toast'
+import { axiosInstance } from '~/lib/axios'
 import { useAppSelector } from '~/redux/store'
 
 function AdminEventDashboardLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = React.useState(true)
   const { event } = useParams() as { event: string }
-  const eventName = event.toLowerCase() as keyof typeof eventMap
   const adminRole = useAppSelector(state => state.auth.adminRole)
   const isAdmin = useAppSelector(state => state.auth.isAdmin)
   const router = useRouter()
   const { toast } = useToast()
-
-
-  const eventMap = {
-    ogqnrwas: 'Product Management',
-    eqpginai: 'Software Engineering',
-    oajbedpk: 'Data Science',
-    oqgjwbra: 'UI UX'
-  }
-
-  const eventRole = {
-    pm: 'ogqnrwas',
-    softeng: 'eqpginai',
-    datsci: 'oajbedpk',
-    uiux: 'oqgjwbra'
-  }
 
   useEffect(() => {
     if (!isAdmin) {
@@ -43,8 +29,8 @@ function AdminEventDashboardLayout({ children }: { children: React.ReactNode }) 
       }, 500)
     }
 
-    // Redirect if user is event admins
-    if (adminRole?.includes('event')) {
+    // Redirect if user is competition admins
+    if (adminRole?.includes('compe')) {
       toast({
         title: 'Unauthorized',
         description: 'Only event admins can access this page',
@@ -58,8 +44,8 @@ function AdminEventDashboardLayout({ children }: { children: React.ReactNode }) 
 
     if (
       adminRole?.toLowerCase() === 'admin' ||
-      adminRole?.toLowerCase() === 'admin_event' ||
-      adminRole?.toLowerCase() === `admin_event_${eventMap[eventName]}`
+      adminRole?.toLowerCase() === 'admin_event'
+      // adminRole?.toLowerCase() === `admin_event_${eventMap[eventName]}`
     ) {
       setLoading(false)
     } else {
@@ -69,19 +55,18 @@ function AdminEventDashboardLayout({ children }: { children: React.ReactNode }) 
         variant: 'destructive',
         duration: 4000
       })
-      const checkRole = adminRole?.split('_')
+      // const checkRole = adminRole?.split('_')
 
       //   admin_event can access all event while admin_event_{eventID} can only access that event
-      setTimeout(() => {
-        if (checkRole?.length === 4 || checkRole?.length === 2) {
-          router.push(
-            // `/dashboard/admin/${eventMap[checkRole[2].toLowerCase() as keyof typeof eventMap]}`
-            `/dashboard/admin/${eventRole[checkRole[3] as keyof typeof eventRole].toLowerCase()}`
-          )
-        } else {
-          router.push('/dashboard/admin')
-        }
-      }, 500)
+      // setTimeout(() => {
+      //   if (checkRole?.length === 4) {
+      //     router.push(
+      //       `/dashboard/admin/event/${eventRole[checkRole[3] as keyof typeof eventRole].toLowerCase()}`
+      //     )
+      //   } else {
+      //     router.push('/dashboard/admin')
+      //   }
+      // }, 500)
     }
   }, [])
 

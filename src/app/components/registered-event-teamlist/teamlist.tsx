@@ -84,7 +84,7 @@ export const mapStatusTag: Record<
   'ON REVIEW': 'warning',
   CHANGED: 'blue',
   INCOMPLETE: 'neutral',
-  'NO STATUS YET': 'neutral'
+  'NO STATUS': 'neutral'
 }
 
 export type TeamStage = EventTeam['stage']
@@ -263,8 +263,8 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                   <TableCell>{team.name}</TableCell>
                   <TableCell>
                     <Tag
-                      text={getTeamStatus(team) || 'No Status Yet'}
-                      variant={mapStatusTag[getTeamStatus(team) || 'NO STATUS YET']}
+                      text={getTeamStatus(team) || 'No Status'}
+                      variant={mapStatusTag[getTeamStatus(team) || 'NO STATUS']}
                       className="capitalize"
                     />
                   </TableCell>

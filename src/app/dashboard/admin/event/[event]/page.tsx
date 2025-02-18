@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
-import { getAdminAllEventTeams, getEventById } from '~/api/generated'
+import { getAdminAllEventTeams, getEvent, getEventById } from '~/api/generated'
 import { EventTeam } from '~/api/generated'
 
 import { useToast } from '~/hooks/use-toast'
@@ -12,6 +12,7 @@ import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { RegisteredTeamList } from '~/app/components/registered-event-teamlist/teamlist'
 import Loading from '~/app/components/Loading'
 import { AxiosError } from 'axios'
+import { axiosInstance } from '~/lib/axios'
 
 interface Pagination {
   currentPage: number
@@ -44,12 +45,33 @@ function AdminEventDashboard() {
     prev: null
   })
 
-  const nameToIdMap = {
-    'academya-product-management': 'ogqnrwas',
-    'academya-software-engineering': 'eqpginai',
-    'academya-data-science': 'oajbedpk',
-    'academya-ui-ux': 'oqgjwbra'
-  }
+  // Get the event ID
+  useEffect(() => {
+    async function getEventId() {
+      setIsLoading(true)
+      const response = await getEvent({ client: axiosInstance })
+      if (response.data) {
+        const type = params.event.split('-')[1]
+        const event = response.data.find(event =>
+          event.title.toLowerCase().includes(type)
+        )
+
+        if (event) {
+          setCurrentEventId(event.id)
+        }
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to get event data. Please refresh the page to try again.',
+          variant: 'destructive',
+          duration: 6000
+        })
+      }
+      setIsLoading(false)
+    }
+
+    getEventId()
+  }, [params.event])
 
   // Filter & search states
   const [teamStatusFilter, setTeamStatusFilter] = useState<
@@ -69,9 +91,13 @@ function AdminEventDashboard() {
   const fetchTeams = async (page: number) => {
     try {
       setIsLoading(true)
+      if (!currentEventId) {
+        return
+      }
+
       const events = await getEventById({
         client: authAxios,
-        path: { eventId: nameToIdMap[params.event as keyof typeof nameToIdMap] }
+        path: { eventId: currentEventId }
       })
 
       if (!events?.data || events.data.length === 0) {
@@ -86,11 +112,12 @@ function AdminEventDashboard() {
       }
 
       setIsEventFound(true)
-      setCurrentEventId(nameToIdMap[params.event as keyof typeof nameToIdMap])
+      // @ts-expect-error
+      setCurrentEventId(events.data.id)
 
       const response = await getAdminAllEventTeams({
         client: authAxios,
-        // @ts-ignore
+        // @ts-expect-error
         path: { eventId: events.data.id },
         query: {
           page: page.toString(),
