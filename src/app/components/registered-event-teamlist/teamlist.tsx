@@ -10,7 +10,7 @@ import {
   SelectValue
 } from '../ui/select'
 import Tag from '../Tag'
-import { Input } from '../ui/input'
+import { Input } from '../Input'
 import { Search, Pencil } from 'lucide-react'
 import { EventTeam } from '~/api/generated'
 import Link from 'next/link'
@@ -161,7 +161,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   return (
     // <div className="flex flex-col gap-6 space-y-6 px-4 py-16 sm:px-6 lg:px-8">
     <div className="flex flex-col gap-6 space-y-6 px-0 py-16 sm:px-0 lg:px-8">
-      <p className="font-dmsans text-6xl font-bold [text-shadow:0px_0px_17.7px_rgba(255,255,255,0.5)]">
+      <p className="font-dmsans text-5xl font-bold [text-shadow:0px_0px_17.7px_rgba(255,255,255,0.5)] md:text-6xl">
         {eventId === 'oajbedpk' ? 'Team List' : 'Participant List'}
       </p>
       <div className="w-full space-y-6">
@@ -170,6 +170,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
           {/* Search Bar */}
           <div className="relative w-full flex-grow xl:w-[500px]">
             <Input
+              size={window.innerWidth >= 768 ? 'md' : 'lg'}
               type="text"
               placeholder={`Search by ${eventId === 'oajbedpk' ? 'team' : ''} name or ${eventId === 'oajbedpk' ? 'team' : ''} ID`}
               value={currentSearchFilter}
