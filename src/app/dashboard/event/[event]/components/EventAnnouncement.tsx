@@ -55,6 +55,14 @@ export const AnnouncementEventContent = ({ eventId }: AnnouncementProps) => {
     return idx % 2 === 0 ? 'to-[#FACCCC]' : 'to-[#4D06B0]'
   }
 
+  if (!announcements || !announcements.length) {
+    return (
+      <div className="mt-12 flex items-center justify-center font-dmsans font-semibold">
+        Belum ada pengumuman saat ini
+      </div>
+    )
+  }
+
   return (
     <Accordion type="single" collapsible>
       {announcements?.map(announcement => (
