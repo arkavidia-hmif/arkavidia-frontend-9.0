@@ -1,14 +1,20 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { GetAdminCompetitionTeamInformationResponse, getAdminEventTeamSubmissions, GetAdminEventTeamSubmissionsResponse } from '~/api/generated'
-// TODO: For placeholder use the competition. Change into event later. The event team information not yet given
+import {
+  getAdminEventTeamSubmissions,
+  GetAdminEventTeamSubmissionsResponse,
+  getAdminEventTeamInformation,
+  EventTeam
+  
+} from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { capitalizeFirstLetter } from '~/lib/utils'
 import EventSubmissionSection from './EventSubmissionSection'
 import { SubmissionDoc } from '../../team-lists/detail/SubmissionTable'
-import { useParams } from 'next/navigation'
+import { useParams,  useRouter } from 'next/navigation'
 import { EventTeamStatus } from './EventTeamStatus'
+import { useToast } from '~/hooks/use-toast'
 
 const FINAL_QUALIFICATIONS = [
   { id: 1, option: 'Juara 1' },
@@ -25,29 +31,53 @@ const NOT_FINAL_QUALIFICATIONS = [
   { id: 3, option: 'On Review' }
 ]
 
-export default function Submission({
-  teamData
-}: {
-  teamData: GetAdminCompetitionTeamInformationResponse
-}) {
+export default function EventSubmission({}: {}) {
   const [prelimSubmission, setPrelimSubmission] = useState<Array<SubmissionDoc>>([])
   const [finalSubmission, setFinalSubmission] = useState<Array<SubmissionDoc>>([])
-  const { eventID, teamID } = useParams()
+  const params = useParams()
   const axiosAuth = useAxiosAuth()
+  const router = useRouter()
+  const { toast } = useToast()
+
+  const [teamData, setTeamData] = useState<EventTeam>()
+  
+  const teamID = params.team as string // If using teamID, change params.team to params.teamID
+  const eventID = params.event as string // Same with event
+
+  const fetchTeamData = async () => {
+    const response = await getAdminEventTeamInformation({
+      client: axiosAuth,
+      path: { teamId: teamID, eventId: eventID }
+    })
+
+    if (!response || response.error || response.status !== 200 || !response.data) {
+      toast({
+        title: 'Failed fetching team data',
+        variant: 'destructive'
+      })
+      router.replace('/404')
+      return
+    }
+
+    const responseData = response?.data as EventTeam
+
+    setTeamData(responseData)
+  }
 
   function generateSubmissionData(
     teamSubmissions?: GetAdminEventTeamSubmissionsResponse
   ) {
-    setPrelimSubmission([])
-    setFinalSubmission([])
+    const prelimSubmissions: SubmissionDoc[] = []
+    const finalSubmissions: SubmissionDoc[] = []
+  
     const preEliminaryData = teamSubmissions?.['pre-eliminary']
     const finalData = teamSubmissions?.final
-
+    // console.log(preEliminaryData, finalData)
     const combinedData = preEliminaryData?.concat(finalData ?? [])
-
+  
     combinedData?.forEach(data => {
       const stage = capitalizeFirstLetter(data.requirement.stage)
-
+  
       let currentDoc: SubmissionDoc = {
         req_id: data.requirement.typeId,
         title: data.requirement.typeName,
@@ -57,8 +87,7 @@ export default function Submission({
         status: 'Not Submitted',
         feedback: ''
       }
-
-      // If there is a submission, update the currentDoc
+  
       if (data.submission && data.submission.media) {
         currentDoc = {
           ...currentDoc,
@@ -68,23 +97,28 @@ export default function Submission({
           status: data.submission.judgeResponse ? 'Change Needed' : 'Submitted'
         }
       }
-
-      const deadline = new Date(data.requirement.deadline ?? Date.now())
-      const currentDate = new Date()
-      if (currentDate > deadline) {
-        if (currentDoc.status === 'Waiting') {
-          currentDoc.status = 'Not Submitted'
+  
+      if (data.requirement.deadline) {
+        const deadline = new Date(data.requirement.deadline)
+        const currentDate = new Date()
+        if (currentDate > deadline) {
+          if (currentDoc.status === 'Waiting') {
+            currentDoc.status = 'Not Submitted'
+          }
         }
       }
-
-      // Add submission to the correct stage
+  
       if (stage.toLowerCase().includes('final')) {
-        setFinalSubmission(prev => [...prev, currentDoc])
+        finalSubmissions.push(currentDoc)
       } else {
-        setPrelimSubmission(prev => [...prev, currentDoc])
+        prelimSubmissions.push(currentDoc)
       }
     })
+  
+    setPrelimSubmission(prelimSubmissions)
+    setFinalSubmission(finalSubmissions)
   }
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,12 +130,14 @@ export default function Submission({
           })
         )?.data
 
-        generateSubmissionData(response)
+        // ! Delete groupedResult if API fixed
+        generateSubmissionData(response?.groupedResult)
       }
     }
     fetchData()
+    fetchTeamData()
   }, [teamID, axiosAuth])
-
+  
   const refetchData = async () => {
     if (teamID && typeof teamID === 'string') {
       const response = (
@@ -110,9 +146,15 @@ export default function Submission({
           path: { eventId: eventID as string, teamId: teamID }
         })
       )?.data
-
-      generateSubmissionData(response)
+      
+      // TODO: delete grouped result from API
+      // ! Delete groupedResult if API fixed
+      generateSubmissionData(response?.groupedResult)
     }
+  }
+
+  if (!teamData) {
+    return null;
   }
 
   return (
