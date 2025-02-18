@@ -15,14 +15,6 @@ function AdminEventDashboardLayout({ children }: { children: React.ReactNode }) 
   const router = useRouter()
   const { toast } = useToast()
 
-  //   const eventMap = {
-  //     cp: 'CP',
-  //     ctf: 'CTF',
-  //     hackvidia: 'Hackvidia',
-  //     uxvidia: 'UXvidia',
-  //     datavidia: 'Datavidia',
-  //     arkalogica: 'Arkalogica'
-  //   }
 
   const eventMap = {
     ogqnrwas: 'Product Management',

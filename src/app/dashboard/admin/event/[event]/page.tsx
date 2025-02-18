@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
 import { getAdminAllEventTeams, getEventById } from '~/api/generated'
@@ -85,12 +85,8 @@ function AdminEventDashboard() {
         return
       }
 
-      //   console.log(JSON.stringify(events))
       setIsEventFound(true)
       setCurrentEventId(nameToIdMap[params.event as keyof typeof nameToIdMap])
-      // @ts-ignore
-      console.log('Current Event ID: ', events.data.id) // ignore error
-      console.log('Current Event ID NIH: ', currentEventId)
 
       const response = await getAdminAllEventTeams({
         client: authAxios,
@@ -104,8 +100,6 @@ function AdminEventDashboard() {
           limit: limit
         }
       })
-
-      console.log('Response: ', JSON.stringify(response))
 
       if (response.data) {
         setTeamData(response.data.result ?? [])
