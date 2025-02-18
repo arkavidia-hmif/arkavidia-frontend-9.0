@@ -38,19 +38,19 @@ function Footer() {
         <Image
           src="/Logos.svg"
           alt="Arkavidia Logo"
-          className="object-contain"
+          className="mb-2 object-contain"
           width={150}
           height={40}
         />
         {/* <img src='/Logos.svg' alt='Arkavidia Logo' className='w-[150px] h-[40px] object-contain' /> */}
-        <div className="flex flex-row items-center justify-center space-x-4 font-teachers text-sm font-bold text-white">
+        {/* <div className="flex flex-row items-center justify-center space-x-4 font-teachers text-sm font-bold text-white">
           <Link href="/event" className="hover:underline">
             Events
           </Link>
           <Link href="/competition" className="hover:underline">
             Competitions
           </Link>
-        </div>
+        </div> */}
         <div className="flex flex-row items-center justify-center space-x-2">
           <a
             href="https://www.linkedin.com/company/arkavidia/"
@@ -68,14 +68,14 @@ function Footer() {
             <Image src="/instagram.svg" alt="Instagram Logo" width={24} height={24} />
             {/* <img src='/instagram.svg' alt='Instagram Logo' className='w-6 h-6' /> */}
           </a>
-          <a
+          {/* <a
             href="https://x.com/arkavidia"
             target="_blank"
             rel="noreferrer noopener"
             className="hover:underline">
             <Image src="/x.svg" alt="X Logo" width={24} height={24} />
-            {/* <img src='/x.svg' alt='X Logo' className='w-6 h-6' /> */}
-          </a>
+            <img src='/x.svg' alt='X Logo' className='w-6 h-6' />
+          </a> */}
         </div>
         <p className="text-sm text-white">© 2025 ARKAVIDIA. All rights reserved.</p>
       </div>

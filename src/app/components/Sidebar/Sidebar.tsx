@@ -21,7 +21,8 @@ import {
   GetAdminCompetitionsResponse,
   getEvent,
   GetEventResponse,
-  type Event as EventType
+  type Event as EventType,
+  getUser
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
@@ -183,6 +184,24 @@ function Sidebar({ announcement = false }: SidebarProps) {
       ]
 
       // Fetch competition
+      // Check admin
+      const adminRes = await getUser({ client: authAxios })
+      if (!adminRes.data) {
+        toast({
+          title: 'Failed getting data',
+          description: '',
+          variant: 'destructive'
+        })
+        return
+      }
+
+      const isAdmin =
+        adminRes.data.role?.toLowerCase() === 'admin' ||
+        adminRes.data.role?.toLowerCase().includes('admin')
+      if (!isAdmin) {
+        return null
+      }
+
       const resComp = await getAdminCompetitions({ client: authAxios })
 
       if (resComp.error || resComp.status !== 200) {
@@ -191,6 +210,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
           description: 'Failed to get competitions',
           variant: 'destructive'
         })
+        return
       }
 
       const competitionList = JSON.parse(

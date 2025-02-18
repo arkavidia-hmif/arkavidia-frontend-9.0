@@ -42,6 +42,7 @@ const authSlice = createSlice({
     },
     setNotAdmin(state) {
       state.isAdmin = false
+      state.adminRole = null
     },
     setAdminRole(state, action: PayloadAction<string>) {
       state.adminRole = action.payload
