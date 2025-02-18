@@ -8,7 +8,15 @@ import {
   getCompetitionTimelineWithCompetitionId,
   GetCompetitionTimelineWithCompetitionIdResponse,
   GetCompetitionTimelineWithCompetitionIdData,
-  getTeamSubmission
+  getTeamSubmission,
+  EventTeam,
+  GetEventTimelineByIdResponse,
+  getEventTeam,
+  GetEventTeamResponse,
+  getEventTimelineById,
+  CompetitionTimeline,
+  EventTimeline,
+  getEventTeamSubmission
 } from '~/api/generated'
 import { toast } from '~/hooks/use-toast'
 import { useRouter } from 'next/navigation'
@@ -31,6 +39,7 @@ import Loading from '../components/Loading'
 
 export interface ExtendedMenuItem extends MenuItem {
   competitionId: string
+  type: 'Competition' | 'Event'
 }
 
 interface Information {
@@ -40,8 +49,11 @@ interface Information {
   content: string
 }
 
+type TeamOrEventTeam = Team | EventTeam;
+type Timeline = CompetitionTimeline | EventTimeline;
+
 const transformEventData = (
-  data: { startDate: string; endDate: string | null; title: string }[]
+  data: Timeline[]
 ) => {
   const events: { date: Date; information: string }[] = []
 
@@ -112,7 +124,7 @@ const getTeamStage = (
   }
 }
 
-const getNearestDeadline = (data: GetCompetitionTimelineWithCompetitionIdResponse) => {
+const getNearestDeadline = (data: Timeline[]) => {
   const now = new Date()
   const deadlines = data
     .filter(item => new Date(item.endDate || item.startDate) >= now) // Filter berdasarkan startDate
@@ -135,11 +147,11 @@ const getNearestDeadline = (data: GetCompetitionTimelineWithCompetitionIdRespons
 
 function UserDashboard() {
   const [hasCompetitions, setHasCompetitions] = React.useState(true)
-  const [userTeams, setUserTeams] = React.useState<Team[]>([])
+  const [userTeams, setUserTeams] = React.useState<TeamOrEventTeam[]>([])
   const [userName, setUserName] = React.useState(
     useAppSelector(state => state.auth.username)
   )
-  const [currentTeam, setCurrentTeam] = React.useState<Team>()
+  const [currentTeam, setCurrentTeam] = React.useState<TeamOrEventTeam>()
   const [options, setOptions] = React.useState<ExtendedMenuItem[]>([])
   const [currentCompetition, setCurrentCompetition] = React.useState<ExtendedMenuItem>()
   const [isLoading, setIsLoading] = React.useState(true)
@@ -147,7 +159,7 @@ function UserDashboard() {
   const axiosAuth = useAxiosAuth()
   const router = useRouter()
   const [competitionTimeline, setCompetitionTimeline] =
-    React.useState<GetCompetitionTimelineWithCompetitionIdResponse>()
+    React.useState<Timeline[]>()
   const [submissionRequirementData, setSubmissionRequirementData] = React.useState<any>()
 
   // Fetching user name
@@ -175,6 +187,8 @@ function UserDashboard() {
   useEffect(() => {
     async function fetchTeams() {
       const userTeam = await getTeams({ client: axiosAuth })
+      const eventTeam = await getEventTeam({ client: axiosAuth })
+      let length = 0
 
       if (userTeam.error) {
         toast({
@@ -184,19 +198,31 @@ function UserDashboard() {
         })
       }
 
+      if (eventTeam.error) {
+        toast({
+          title: 'Failed getting data',
+          description: 'Failed to get event teams',
+          variant: 'destructive'
+        })
+      }
+
       if (userTeam.data) {
         if (userTeam.data.length > 0) {
+          length = userTeam.data.length
           const competitions = userTeam.data.toSorted((a, b) =>
             // @ts-ignore
             expandCompetitionName(a.competition!.title).localeCompare(
               expandCompetitionName(b.competition!.title)
             )
           )
-          const options = competitions.map((team: Team, index: number) => ({
-            id: index,
-            option: expandCompetitionName(team.competition!.title),
-            competitionId: team.competition!.id
-          }))
+          const options: ExtendedMenuItem[] = competitions.map(
+            (team: Team, index: number) => ({
+              id: index,
+              option: expandCompetitionName(team.competition!.title),
+              competitionId: team.competition!.id,
+              type: 'Competition' as 'Competition'
+            })
+          )
 
           setOptions(options)
           setUserTeams(competitions)
@@ -210,6 +236,32 @@ function UserDashboard() {
           setHasCompetitions(false)
         }
       }
+
+      if (eventTeam.data) {
+        if (eventTeam.data.length > 0) {
+          const competitions = eventTeam.data.toSorted((a, b) =>
+            // @ts-ignore
+            expandCompetitionName(a.event!.title).localeCompare(
+              expandCompetitionName(b.event!.title)
+            )
+          )
+          const options: ExtendedMenuItem[] = competitions.map(
+            (team: any, index: number) => ({
+              id: index + length,
+              option: team.event.title,
+              competitionId: team.event!.id,
+              type: 'Event' as 'Event'
+            })
+          )
+
+          setOptions((prevOptions: ExtendedMenuItem[]) => [...prevOptions, ...options])
+          setUserTeams((prevTeams: TeamOrEventTeam[]) => [...prevTeams, ...competitions])
+
+          // @ts-ignore
+          // router.push(`/dashboard/${chosenCompetition.competition.title.toLowerCase()}`)
+        }
+      }
+
       setTimeout(() => {
         setIsLoading(false)
       }, 1000)
@@ -218,55 +270,93 @@ function UserDashboard() {
     fetchTeams()
   }, [])
 
-  // fetching competition timeline
+  // fetch timeline
   useEffect(() => {
-    // console.log('currentTeam: ' + JSON.stringify(currentTeam))
-
-    async function fetchCompetitionData() {
+    async function fetchTimeline() {
       if (currentTeam) {
-        const competitionData = await getCompetitionTimelineWithCompetitionId({
-          client: axiosAuth,
-          path: { competitionId: currentTeam.competition!.id } // typo di setup api nya jd competititon
-        })
-
-        if (competitionData.error) {
-          toast({
-            title: 'Failed getting data',
-            description: 'Failed to get competition data',
-            variant: 'destructive'
-          })
-        }
-
-        if (competitionData.data) {
-          // console.log('competition timeline: ' + JSON.stringify(competitionData.data))
-          setCompetitionTimeline(competitionData.data)
+        if ('competition' in currentTeam) {
+          // Ini adalah Team
+          const competitionData = await getCompetitionTimelineWithCompetitionId({
+            client: axiosAuth,
+            path: { competitionId: currentTeam.competition!.id }
+          });
+  
+          if (competitionData.error) {
+            toast({
+              title: 'Failed getting data',
+              description: 'Failed to get competition data',
+              variant: 'destructive'
+            });
+          }
+  
+          if (competitionData.data) {
+            setCompetitionTimeline(competitionData.data);
+          }
+        } else if ('event' in currentTeam) {
+          // Ini adalah EventTeam
+          const eventTimeline = await getEventTimelineById({
+            client: axiosAuth,
+            path: { eventId: currentTeam.event!.id }
+          });
+  
+          if (eventTimeline.error) {
+            toast({
+              title: 'Failed getting data',
+              description: 'Failed to get event timeline',
+              variant: 'destructive'
+            });
+          }
+  
+          if (eventTimeline.data) {
+            setCompetitionTimeline(eventTimeline.data);
+          }
         }
       }
     }
-
-    fetchCompetitionData()
-  }, [currentTeam])
+  
+    fetchTimeline();
+  }, [currentTeam]);
 
   // Fetching stage and submission
   useEffect(() => {
     async function fetchSubmission() {
       if (currentTeam) {
-        const submissionData = await getTeamSubmission({
-          client: axiosAuth,
-          path: { teamId: currentTeam.id }
-        })
-
-        if (submissionData.error) {
-          toast({
-            title: 'Failed getting data',
-            description: 'Failed to get submission data',
-            variant: 'destructive'
+        if ('competition' in currentTeam) {
+          const submissionData = await getTeamSubmission({
+            client: axiosAuth,
+            path: { teamId: currentTeam.id }
           })
-        }
 
-        if (submissionData.data) {
-          // console.log('submissionData: ' + JSON.stringify(submissionData.data))
-          setSubmissionRequirementData(submissionData.data)
+          if (submissionData.error) {
+            toast({
+              title: 'Failed getting data',
+              description: 'Failed to get submission data',
+              variant: 'destructive'
+            })
+          }
+
+          if (submissionData.data) {
+            // console.log('submissionData: ' + JSON.stringify(submissionData.data))
+            setSubmissionRequirementData(submissionData.data)
+          }
+        } else if ('event' in currentTeam) {
+          const submissionData = await getEventTeamSubmission({
+            client: axiosAuth,
+            path: { teamId: currentTeam.id }
+          })
+
+          if (submissionData.error) {
+            toast({
+              title: 'Failed getting data',
+              description: 'Failed to get submission data',
+              variant: 'destructive'
+            })
+          }
+
+          if (submissionData.data) {
+            // console.log('submissionData: ' + JSON.stringify(submissionData.data))
+            setSubmissionRequirementData(submissionData.data)
+          }
         }
       }
     }
@@ -351,11 +441,16 @@ function UserDashboard() {
   ]
 
   const handleDropdownChange = (selectedCompetition: ExtendedMenuItem) => {
-    setCurrentCompetition(selectedCompetition)
-    setCurrentTeam(
-      userTeams.find(team => team.competition!.id === selectedCompetition.competitionId)
-    )
-  }
+    setCurrentCompetition(selectedCompetition);
+    const selectedTeam = userTeams.find(team => {
+      if (selectedCompetition.type === 'Competition') {
+        return (team as Team).competition?.id === selectedCompetition.competitionId;
+      } else {
+        return (team as EventTeam).event?.id === selectedCompetition.competitionId;
+      }
+    });
+    setCurrentTeam(selectedTeam);
+  };
 
   if (isLoading) {
     return (
@@ -397,7 +492,7 @@ function UserDashboard() {
 
             <section className="flex w-full flex-col gap-6 lg:flex-row lg:justify-between xl:flex-wrap xl:gap-[45px]">
               {/* left section */}
-              <section className="flex flex-col gap-6 lg:gap-8 xl:flex-grow">
+              <section className="flex flex-col gap-6 lg:gap-8 lg:flex-grow">
                 {/* Header */}
                 <div>
                   {/* Title */}
@@ -435,7 +530,9 @@ function UserDashboard() {
                         <Category
                           categoryName={
                             currentTeam
-                              ? expandCompetitionName(currentTeam?.competition!.title)
+                              ? 'competition' in currentTeam
+                                ? expandCompetitionName(currentTeam.competition!.title)
+                                : 'event' in currentTeam ? currentTeam.event!.title : ''
                               : ''
                           }
                         />
@@ -505,20 +602,20 @@ function UserDashboard() {
                     <Calendar eventDate={events} />
                     {/* Informasi event */}
                     <div className="mt-[23px] grid grid-rows-4 self-start">
-                      {events &&
-                        events.map((event, index) => (
-                          <div className="flex items-center gap-2" key={index}>
-                            <div className="h-3 w-3 rounded-full bg-gradient-to-br from-[#FF71A0] to-[#CE6AFF]"></div>
-                            <h6 className="text-[14px] font-semibold lg:text-[12px] xl:text-[14px]">
-                              {String(event.date.getDate()).padStart(2, '0')}/
-                              {String(event.date.getMonth() + 1).padStart(2, '0')}/
-                              {String(event.date.getFullYear()).slice(-2)}
-                            </h6>
-                            <p className="text-[14px] lg:text-[12px] xl:text-[14px]">
-                              : {event.information}
-                            </p>
-                          </div>
-                        ))}
+                    {events &&
+                      events.map((event, index) => (
+                        <div className="flex items-center gap-2" key={index}>
+                          <div className="h-3 w-3 rounded-full bg-gradient-to-br from-[#FF71A0] to-[#CE6AFF]"></div>
+                          <h6 className="text-[14px] font-semibold lg:text-[12px] xl:text-[14px]">
+                            {String(event.date.getDate()).padStart(2, '0')}/
+                            {String(event.date.getMonth() + 1).padStart(2, '0')}/
+                            {String(event.date.getFullYear()).slice(-2)}
+                          </h6>
+                          <p className="text-[14px] lg:text-[12px] xl:text-[14px]">
+                            : {event.information}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </ComponentBox>
