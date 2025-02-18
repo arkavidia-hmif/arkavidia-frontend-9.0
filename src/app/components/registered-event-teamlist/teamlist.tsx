@@ -28,7 +28,7 @@ interface Pagination {
 interface RegisteredTeamListProps {
   teamData: EventTeam[]
   pagination: Pagination
-  competitionId: string | 'null'
+  eventId: string | 'null'
   currentSearchFilter: string
   filterStates: {
     teamStatusFilter: Exclude<EventTeam['verificationStatus'], null> | undefined
@@ -107,12 +107,12 @@ export const mapStageTag: Record<
   verification: 'warning'
 }
 
-export const possibleCompetitionStatus: Array<TeamStage> = ['pre-eliminary', 'final']
+export const possibleEventStatus: Array<TeamStage> = ['pre-eliminary', 'final']
 
 export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   teamData,
   pagination,
-  competitionId,
+  eventId,
   currentSearchFilter,
   currentPage,
   itemsPerPage,
@@ -131,7 +131,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
 
   // Unique attributes for filter
   const uniqueStatuses = Array.from(new Set<string>(possibleTeamStatus))
-  const uniqueCompetitionStatuss = Array.from(new Set(possibleCompetitionStatus))
+  const uniqueEventStatuss = Array.from(new Set(possibleEventStatus))
 
   const handleStatusFilterChange = (value: string) => {
     setTeamStatusFilter(
@@ -140,7 +140,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     setCurrentPage(1)
   }
 
-  const handleCompetitionStatusFilterChange = (value: string) => {
+  const handleEventStatusFilterChange = (value: string) => {
     setTeamStageFilter(
       value === 'default' ? undefined : (value.toLowerCase() as TeamStage)
     )
@@ -159,7 +159,8 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
   }
 
   return (
-    <div className="flex flex-col gap-6 space-y-6 px-4 py-16 sm:px-6 lg:px-8">
+    // <div className="flex flex-col gap-6 space-y-6 px-4 py-16 sm:px-6 lg:px-8">
+    <div className="flex flex-col gap-6 space-y-6 px-0 py-16 sm:px-0 lg:px-8">
       <p className="font-dmsans text-6xl font-bold [text-shadow:0px_0px_17.7px_rgba(255,255,255,0.5)]">
         Team List
       </p>
@@ -191,7 +192,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                   ? capitalizeFirstLetter(filterStates.teamStageFilter)
                   : 'default'
               }
-              onValueChange={handleCompetitionStatusFilterChange}>
+              onValueChange={handleEventStatusFilterChange}>
               <SelectTrigger className="h-10 w-full border-[1.5px] border-[#7138C0] bg-[#F5E1FF] font-dmsans font-medium text-[#7138C0] sm:h-12 xl:w-72">
                 <SelectValue placeholder="Filter by Stage" />
               </SelectTrigger>
@@ -201,7 +202,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                   className="hover:bg-[#E0C2FF] focus:bg-[#E0C2FF] active:bg-[#D1A3FF]">
                   All Stages
                 </SelectItem>
-                {uniqueCompetitionStatuss.map(stat => (
+                {uniqueEventStatuss.map(stat => (
                   <SelectItem
                     className="hover:bg-[#E0C2FF] focus:bg-[#E0C2FF] active:bg-[#D1A3FF]"
                     key={capitalizeFirstLetter(stat)}
@@ -275,7 +276,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                   </TableCell>
                   <TableCell>
                     <Link
-                      href={`/dashboard/admin/competition/${competitionId}/team/${team.id}`}
+                      href={`/dashboard/admin/competition/${eventId}/team/${team.id}`}
                       className="flex w-full justify-center align-middle">
                       <Pencil className="h-auto w-5" />
                     </Link>

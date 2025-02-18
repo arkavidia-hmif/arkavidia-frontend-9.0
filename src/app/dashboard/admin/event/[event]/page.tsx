@@ -4,8 +4,6 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
 import { getAdminAllEventTeams, getEventById } from '~/api/generated'
-// getCompetitionByName,diganti getEventById
-// import { Team } from '~/api/generated'
 import { EventTeam } from '~/api/generated'
 
 import { useToast } from '~/hooks/use-toast'
@@ -82,12 +80,14 @@ function AdminEventDashboard() {
 
       //   console.log(JSON.stringify(events))
       setIsEventFound(true)
-      setCurrentEventId(params.event) // ignore error
-      console.log('Current Event ID: ', events.data.id)
+      setCurrentEventId(params.event) 
+      // @ts-ignore
+      console.log('Current Event ID: ', events.data.id) // ignore error
       console.log('Current Event ID NIH: ', currentEventId)
 
       const response = await getAdminAllEventTeams({
         client: authAxios,
+        // @ts-ignore
         path: { eventId: events.data.id },
         query: {
           page: page.toString(),
@@ -191,7 +191,7 @@ function AdminEventDashboard() {
         </div>
       ) : !isEventFound ? (
         <h1 className="font-belanosima text-3xl text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.7)] md:text-5xl">
-          No event found with the name "${params.event}"
+          No event found with the name "{params.event}"
         </h1>
       ) : currentEventId === null ? (
         <div className="text-whitemd:text-3xl font-belanosima text-2xl">
@@ -202,7 +202,7 @@ function AdminEventDashboard() {
           itemsPerPage={limit}
           teamData={teamData}
           pagination={pagination}
-          competitionId={currentEventId}
+          eventId={currentEventId}
           currentSearchFilter={searchFilter}
           currentPage={currentPage}
           filterStates={{ teamStatusFilter, teamStageFilter }}
@@ -215,9 +215,6 @@ function AdminEventDashboard() {
         />
       )}
     </>
-    // <div>
-    //   <h1>Admin Event Dashboard</h1>
-    // </div>
   )
 }
 
