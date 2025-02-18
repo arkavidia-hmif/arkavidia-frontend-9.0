@@ -16,7 +16,9 @@ import {
   getEventTimelineById,
   CompetitionTimeline,
   EventTimeline,
-  getEventTeamSubmission
+  getEventTeamSubmission,
+  GetEventTeamSubmissionResponse,
+  GetTeamSubmissionResponse
 } from '~/api/generated'
 import { toast } from '~/hooks/use-toast'
 import { useRouter } from 'next/navigation'
@@ -49,12 +51,10 @@ interface Information {
   content: string
 }
 
-type TeamOrEventTeam = Team | EventTeam;
-type Timeline = CompetitionTimeline | EventTimeline;
+type TeamOrEventTeam = Team | EventTeam
+type Timeline = CompetitionTimeline | EventTimeline
 
-const transformEventData = (
-  data: Timeline[]
-) => {
+const transformEventData = (data: Timeline[]) => {
   const events: { date: Date; information: string }[] = []
 
   data.forEach(item => {
@@ -77,23 +77,6 @@ const transformEventData = (
   events.sort((a, b) => a.date.getTime() - b.date.getTime())
 
   return events
-}
-
-const transformSubmissionData = (
-  submissionData: {
-    requirement: { typeName: string; startDate: string; deadline: string }
-  }[]
-) => {
-  const now = new Date()
-  const submissions = submissionData
-    .filter(item => new Date(item.requirement.startDate) >= now) // Filter berdasarkan startDate
-    .map(item => ({
-      title: item.requirement.typeName,
-      link: '#',
-      date: new Date(item.requirement.deadline)
-    }))
-
-  return submissions
 }
 
 const getTeamStage = (
@@ -158,9 +141,10 @@ function UserDashboard() {
 
   const axiosAuth = useAxiosAuth()
   const router = useRouter()
-  const [competitionTimeline, setCompetitionTimeline] =
-    React.useState<Timeline[]>()
-  const [submissionRequirementData, setSubmissionRequirementData] = React.useState<any>()
+  const [competitionTimeline, setCompetitionTimeline] = React.useState<Timeline[]>()
+  const [submissionRequirementData, setSubmissionRequirementData] = React.useState<
+    GetTeamSubmissionResponse | GetEventTeamSubmissionResponse
+  >()
 
   // Fetching user name
   useEffect(() => {
@@ -279,43 +263,43 @@ function UserDashboard() {
           const competitionData = await getCompetitionTimelineWithCompetitionId({
             client: axiosAuth,
             path: { competitionId: currentTeam.competition!.id }
-          });
-  
+          })
+
           if (competitionData.error) {
             toast({
               title: 'Failed getting data',
               description: 'Failed to get competition data',
               variant: 'destructive'
-            });
+            })
           }
-  
+
           if (competitionData.data) {
-            setCompetitionTimeline(competitionData.data);
+            setCompetitionTimeline(competitionData.data)
           }
         } else if ('event' in currentTeam) {
           // Ini adalah EventTeam
           const eventTimeline = await getEventTimelineById({
             client: axiosAuth,
             path: { eventId: currentTeam.event!.id }
-          });
-  
+          })
+
           if (eventTimeline.error) {
             toast({
               title: 'Failed getting data',
               description: 'Failed to get event timeline',
               variant: 'destructive'
-            });
+            })
           }
-  
+
           if (eventTimeline.data) {
-            setCompetitionTimeline(eventTimeline.data);
+            setCompetitionTimeline(eventTimeline.data)
           }
         }
       }
     }
-  
-    fetchTimeline();
-  }, [currentTeam]);
+
+    fetchTimeline()
+  }, [currentTeam])
 
   // Fetching stage and submission
   useEffect(() => {
@@ -411,11 +395,12 @@ function UserDashboard() {
     events.push(...transformedData)
   }
 
-  const submissions = []
-  if (submissionRequirementData) {
-    const transformedSubmissionData = transformSubmissionData(submissionRequirementData)
-    submissions.push(...transformedSubmissionData)
-  }
+  // const submissions = []
+  // if (submissionRequirementData) {
+  //   const transformedSubmissionData = transformSubmissionData(submissionRequirementData)
+
+  //   submissions.push(...transformedSubmissionData)
+  // }
 
   // Masih dummy data
   const informations: Array<Information> = [
@@ -441,16 +426,16 @@ function UserDashboard() {
   ]
 
   const handleDropdownChange = (selectedCompetition: ExtendedMenuItem) => {
-    setCurrentCompetition(selectedCompetition);
+    setCurrentCompetition(selectedCompetition)
     const selectedTeam = userTeams.find(team => {
       if (selectedCompetition.type === 'Competition') {
-        return (team as Team).competition?.id === selectedCompetition.competitionId;
+        return (team as Team).competition?.id === selectedCompetition.competitionId
       } else {
-        return (team as EventTeam).event?.id === selectedCompetition.competitionId;
+        return (team as EventTeam).event?.id === selectedCompetition.competitionId
       }
-    });
-    setCurrentTeam(selectedTeam);
-  };
+    })
+    setCurrentTeam(selectedTeam)
+  }
 
   if (isLoading) {
     return (
@@ -492,7 +477,7 @@ function UserDashboard() {
 
             <section className="flex w-full flex-col gap-6 lg:flex-row lg:justify-between xl:flex-wrap xl:gap-[45px]">
               {/* left section */}
-              <section className="flex flex-col gap-6 lg:gap-8 lg:flex-grow">
+              <section className="flex flex-col gap-6 lg:flex-grow lg:gap-8">
                 {/* Header */}
                 <div>
                   {/* Title */}
@@ -532,7 +517,9 @@ function UserDashboard() {
                             currentTeam
                               ? 'competition' in currentTeam
                                 ? expandCompetitionName(currentTeam.competition!.title)
-                                : 'event' in currentTeam ? currentTeam.event!.title : ''
+                                : 'event' in currentTeam
+                                  ? currentTeam.event!.title
+                                  : ''
                               : ''
                           }
                         />
@@ -580,7 +567,7 @@ function UserDashboard() {
 
                 {/* Submisi */}
                 <div className="hidden lg:block">
-                  <Submisi submissions={submissions} />
+                  <Submisi submissions={submissionRequirementData} />
                 </div>
               </section>
 
@@ -588,7 +575,7 @@ function UserDashboard() {
               <section className="flex w-full flex-col gap-6 lg:w-auto lg:gap-8">
                 {/* Submisi */}
                 <div className="lg:hidden">
-                  <Submisi submissions={submissions} />
+                  <Submisi submissions={submissionRequirementData} />
                 </div>
 
                 {/* Countdown */}
@@ -602,20 +589,20 @@ function UserDashboard() {
                     <Calendar eventDate={events} />
                     {/* Informasi event */}
                     <div className="mt-[23px] grid grid-rows-4 self-start">
-                    {events &&
-                      events.map((event, index) => (
-                        <div className="flex items-center gap-2" key={index}>
-                          <div className="h-3 w-3 rounded-full bg-gradient-to-br from-[#FF71A0] to-[#CE6AFF]"></div>
-                          <h6 className="text-[14px] font-semibold lg:text-[12px] xl:text-[14px]">
-                            {String(event.date.getDate()).padStart(2, '0')}/
-                            {String(event.date.getMonth() + 1).padStart(2, '0')}/
-                            {String(event.date.getFullYear()).slice(-2)}
-                          </h6>
-                          <p className="text-[14px] lg:text-[12px] xl:text-[14px]">
-                            : {event.information}
-                          </p>
-                        </div>
-                      ))}
+                      {events &&
+                        events.map((event, index) => (
+                          <div className="flex items-center gap-2" key={index}>
+                            <div className="h-3 w-3 rounded-full bg-gradient-to-br from-[#FF71A0] to-[#CE6AFF]"></div>
+                            <h6 className="text-[14px] font-semibold lg:text-[12px] xl:text-[14px]">
+                              {String(event.date.getDate()).padStart(2, '0')}/
+                              {String(event.date.getMonth() + 1).padStart(2, '0')}/
+                              {String(event.date.getFullYear()).slice(-2)}
+                            </h6>
+                            <p className="text-[14px] lg:text-[12px] xl:text-[14px]">
+                              : {event.information}
+                            </p>
+                          </div>
+                        ))}
                     </div>
                   </div>
                 </ComponentBox>

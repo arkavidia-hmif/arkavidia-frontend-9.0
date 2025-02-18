@@ -664,6 +664,17 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
     // Task List Content
     <div className="font-dmsans">
+      <div className="mb-4">
+        <div className="flex w-full items-center gap-x-2">
+          {/* <p className="text-[12px] text-gray-300">Keterangan: </p> */}
+          <div className="flex h-3 w-3 gap-x-1 bg-[#E50000]/80 text-[12px]"></div>
+          <p className="text-[12px]">Past due</p>
+          <div className="flex h-3 w-3 gap-x-1 bg-[#FFCC00CC]/80 text-[12px]"></div>
+          <p className="text-[12px]">Ongoing</p>
+          <div className="flex h-3 w-3 gap-x-1 bg-[#4D06B0CC]/80 text-[12px]"></div>
+          <p className="text-[12px]">Completed</p>
+        </div>
+      </div>
       {selectedTask ? (
         // Specific Task
         <div className="rounded-lg border border-white bg-gradient-to-r from-[#0202024D]/30 to-[#7138C099]/60 px-8 py-8 md:px-16">
