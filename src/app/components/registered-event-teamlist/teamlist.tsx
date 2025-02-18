@@ -162,7 +162,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
     // <div className="flex flex-col gap-6 space-y-6 px-4 py-16 sm:px-6 lg:px-8">
     <div className="flex flex-col gap-6 space-y-6 px-0 py-16 sm:px-0 lg:px-8">
       <p className="font-dmsans text-6xl font-bold [text-shadow:0px_0px_17.7px_rgba(255,255,255,0.5)]">
-        Team List
+        {eventId === 'oajbedpk' ? 'Team List' : 'Participant List'}
       </p>
       <div className="w-full space-y-6">
         {/* Search and Filters Section */}
@@ -171,7 +171,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
           <div className="relative w-full flex-grow xl:w-[500px]">
             <Input
               type="text"
-              placeholder="Search by team name or team ID"
+              placeholder={`Search by ${eventId === 'oajbedpk' ? 'team' : ''} name or ${eventId === 'oajbedpk' ? 'team' : ''} ID`}
               value={currentSearchFilter}
               onChange={handleSearchChange}
               onKeyDown={e => e.key === 'Enter' && searchClick()}
@@ -245,8 +245,8 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[100px]">No.</TableHead>
-                <TableHead>Team ID</TableHead>
-                <TableHead>Team Name</TableHead>
+                <TableHead>{eventId === 'oajbedpk' && 'Team'} ID</TableHead>
+                <TableHead>{eventId === 'oajbedpk' && 'Team'} Name</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Stage</TableHead>
                 <TableHead className="w-[100px]">Action</TableHead>
@@ -276,7 +276,7 @@ export const RegisteredTeamList: React.FC<RegisteredTeamListProps> = ({
                   </TableCell>
                   <TableCell>
                     <Link
-                      href={`/dashboard/admin/competition/${eventId}/team/${team.id}`}
+                      href={`/dashboard/admin/event/${eventId}/team/${team.id}`}
                       className="flex w-full justify-center align-middle">
                       <Pencil className="h-auto w-5" />
                     </Link>

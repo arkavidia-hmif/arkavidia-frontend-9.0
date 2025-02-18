@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState} from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
 import { getAdminAllEventTeams, getEventById } from '~/api/generated'
@@ -44,6 +44,13 @@ function AdminEventDashboard() {
     prev: null
   })
 
+  const nameToIdMap = {
+    'academya-product-management': 'ogqnrwas',
+    'academya-software-engineering': 'eqpginai',
+    'academya-data-science': 'oajbedpk',
+    'academya-ui-ux': 'oqgjwbra'
+  }
+
   // Filter & search states
   const [teamStatusFilter, setTeamStatusFilter] = useState<
     Exclude<EventTeam['verificationStatus'], null> | undefined
@@ -64,14 +71,14 @@ function AdminEventDashboard() {
       setIsLoading(true)
       const events = await getEventById({
         client: authAxios,
-        path: { eventId: params.event }
+        path: { eventId: nameToIdMap[params.event as keyof typeof nameToIdMap] }
       })
 
       if (!events?.data || events.data.length === 0) {
         setIsEventFound(false)
         toast({
           title: 'Event Not Found',
-          description: `No event found with the id "${params.event}"`,
+          description: `No event found with the name "${params.event}"`,
           variant: 'destructive'
         })
         setIsLoading(false)
@@ -80,7 +87,7 @@ function AdminEventDashboard() {
 
       //   console.log(JSON.stringify(events))
       setIsEventFound(true)
-      setCurrentEventId(params.event) 
+      setCurrentEventId(nameToIdMap[params.event as keyof typeof nameToIdMap])
       // @ts-ignore
       console.log('Current Event ID: ', events.data.id) // ignore error
       console.log('Current Event ID NIH: ', currentEventId)
