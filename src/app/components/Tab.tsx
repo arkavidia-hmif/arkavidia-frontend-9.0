@@ -17,12 +17,35 @@ export const Tab = ({ contentType, content }: TabProps) => {
   const tabContainerRef = useRef<HTMLDivElement>(null)
 
   const selectedContent = content[contentType.indexOf(selected)]
+  const indicatorRef = useRef<HTMLSpanElement>(null)
 
   const checkOverflow = () => {
     if (tabContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = tabContainerRef.current
       setIsOverflowingRight(scrollLeft + clientWidth + 1 < scrollWidth)
       setIsOverflowingLeft(scrollLeft > 0)
+    }
+  }
+
+  const updateIndicator = () => {
+    if (!indicatorRef.current || !tabContainerRef.current) return
+
+
+    const activeTab = tabContainerRef.current.querySelector(`[data-tab="${selected}"]`) as HTMLButtonElement
+    
+    if (activeTab) {
+      const containerRect = tabContainerRef.current.getBoundingClientRect()
+      const activeTabRect = activeTab.getBoundingClientRect()
+
+      const visibleLeft = Math.max(activeTabRect.left, containerRect.left)
+      const visibleRight = Math.min(activeTabRect.right, containerRect.right)
+      const visibleWidth = Math.max(0, visibleRight - visibleLeft)
+
+      const relativeLeft = visibleLeft - containerRect.left
+
+      indicatorRef.current.style.width = `${visibleWidth}px`
+      indicatorRef.current.style.transform = `translateX(${relativeLeft}px)`
+      indicatorRef.current.style.transition = 'transform 0.6s ease, width 0.3s ease'
     }
   }
 
@@ -33,6 +56,13 @@ export const Tab = ({ contentType, content }: TabProps) => {
       window.removeEventListener('resize', checkOverflow)
     }
   }, [])
+
+   useEffect(() => {
+
+    updateIndicator()
+    window.addEventListener('resize', updateIndicator)
+    return () => window.removeEventListener('resize', updateIndicator)
+  }, [selected])
 
   return (
     <>
@@ -54,9 +84,12 @@ export const Tab = ({ contentType, content }: TabProps) => {
         )}
 
         <div
-          className="relative z-10 flex h-fit w-full flex-row justify-between gap-12 overflow-x-auto"
+          className="relative z-10 flex h-fit w-full -translate-y-1 flex-row justify-evenly overflow-x-auto"
           ref={tabContainerRef}
-          onScroll={checkOverflow} // Dynamically check overflow on scroll
+          onScroll={()=> {
+            checkOverflow()
+            updateIndicator()
+          }} // Dynamically check overflow on scroll
         >
           {contentType.map(title => (
             <Menu
@@ -67,7 +100,10 @@ export const Tab = ({ contentType, content }: TabProps) => {
             />
           ))}
         </div>
-        <span className="absolute bottom-0 h-1 w-full rounded-full bg-white"></span>
+        <div className="absolute bottom-0 left-0 h-1 w-full rounded-full bg-white"></div>
+        <span
+          ref={indicatorRef}
+          className="absolute bottom-0 h-1 rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] transition-all duration-300"></span>
       </div>
 
       {/* Render Selected Content */}
@@ -92,15 +128,11 @@ const Menu = ({ Selected, setSelected, title }: MenuProps) => {
 
   return (
     <Button
+      data-tab={title}
       variant="ghost"
-      className="flex h-full w-full flex-col px-0 py-1 text-white hover:bg-white/40 hover:text-white"
+      className={`relative w-full px-6 py-2 text-white transition-all duration-200 hover:bg-white/40 hover:text-white`}
       onClick={onClick}>
       <h1 className="font-teachers text-xl font-bold md:text-2xl">{title}</h1>
-      {isSelected ? (
-        <span className="h-1.5 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF]"></span>
-      ) : (
-        <span className="h-1.5 w-full"></span>
-      )}
     </Button>
   )
 }

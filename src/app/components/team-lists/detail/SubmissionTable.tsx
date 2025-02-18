@@ -63,9 +63,7 @@ function SubmissionTable({
               {!doc.file_name || !doc.file_url ? (
                 '-'
               ) : (
-                <Link
-                  href={'https://' + doc.file_url}
-                  className="underline underline-offset-2">
+                <Link href={doc.file_url} className="underline underline-offset-2">
                   {doc.file_name}
                 </Link>
               )}

@@ -9,7 +9,8 @@ export const CompetitionGaleryTimeline = () => {
       timeEnd: new Date('2025-03-22T00:00:00')
     },
     {
-      title: 'ArkavX'
+      title: 'ArkavX',
+      isComingSoon: true
     }
     // {
     //   title: 'Gala Dinner'

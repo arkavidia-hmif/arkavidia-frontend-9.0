@@ -20,6 +20,7 @@ import { useToast } from '~/hooks/use-toast'
 import Link from 'next/link'
 import { getAcademyaEventName, getAcademyaEventType } from '~/lib/utils'
 import ModalPopup from './components/RegisterModal'
+import { set } from 'date-fns'
 
 interface eventTimeline {
   title: string
@@ -52,6 +53,7 @@ function EventPage() {
   const [event, setEvent] = useState<Event>()
   const [eventTimeline, setEventTimeline] = useState<eventTimeline[]>([])
   const [registrationCloseDate, setRegistrationCloseDate] = useState<string>('')
+  const [closeRegisDate, setCloseRegisDate] = useState<Date | undefined>(undefined)
   const [eventId, setEventId] = useState<string>('')
   const axiosInstance = useAxiosAuth()
 
@@ -153,7 +155,9 @@ function EventPage() {
         const mappedEvents = res.data.map((timeline: EventTimeline) => ({
           title: timeline.title,
           timeStart: new Date(timeline.startDate),
-          timeEnd: timeline.endDate ? new Date(timeline.endDate) : undefined
+          timeEnd: timeline.endDate ? new Date(timeline.endDate) : undefined,
+          isTBA: timeline.showOnLanding === true,
+          isUpdated: timeline.showTime === true
         }))
 
         setEventTimeline(
@@ -181,6 +185,7 @@ function EventPage() {
         ? eventTimeline.find(event => event.title.toLowerCase().includes('regist'))
         : MOCK_EVENTS_DATA.find(event => event.title.toLowerCase().includes('regist')) // pake mock data kalo ga ada data timeline
     if (registrationEvent?.timeEnd) {
+      setCloseRegisDate(registrationEvent.timeEnd)
       setRegistrationCloseDate(
         registrationEvent.timeEnd.toLocaleDateString('en-US', {
           weekday: 'long',
@@ -250,8 +255,8 @@ function EventPage() {
             />
             Download Handbook
           </Button>
-          {/* TODO: Handle Register Now Event */}
-          {!event || !event.id ? (
+          {/* Disable Register if no event or event id, and if registration date are over */}
+          {!event || !event.id || !closeRegisDate || closeRegisDate < new Date() ? (
             <Button disabled>
               Register Now
               <ArrowRight />
@@ -263,9 +268,12 @@ function EventPage() {
       </section>
 
       {/* Event Timeline */}
-      <section className="flex flex-col items-center justify-center gap-12 lg:gap-16">
+      <section className="flex flex-col items-center justify-center gap-8 md:gap-12">
         <h1 className="mt-6 text-center font-belanosima text-6xl uppercase md:mt-0">
           EVENT TIMELINE
+        </h1>
+        <h1 className="text-center font-belanosima text-2xl font-extrabold uppercase sm:text-3xl md:text-4xl">
+          (Updated)
         </h1>
         {eventTimeline.length === 0 ? (
           <>
