@@ -11,10 +11,11 @@ import EventSubmissionEditFeedback from './EventSubmissionEditFeedback';
 
 function EventSubmissionTable(
   {
-    submissionDocs, eventID, refetchData
+    submissionDocs, eventID, teamID, refetchData
   }:  
   {submissionDocs: SubmissionDoc[]
     eventID: string
+    teamID: string
     refetchData?: () => Promise<void>}
 ) {
     const variantDeterminer = (status: string) => {
@@ -62,6 +63,7 @@ function EventSubmissionTable(
                 <EventSubmissionEditFeedback
                   feedback={doc.feedback}
                   eventId={eventID}
+                  teamID={teamID}
                   submissionTypeId={doc.req_id}
                   refetchData={refetchData}
                 />

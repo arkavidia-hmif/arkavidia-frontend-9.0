@@ -6,7 +6,6 @@ import { useToast } from '~/hooks/use-toast'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { Input } from '../../Input'
 import { Button } from '../../Button'
-import { useParams } from 'next/navigation'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -18,18 +17,20 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger
   } from '~/app/components/ui/alert-dialog'
-import { putAdminEventTeamVerification } from '~/api/generated'
+import { putAdminEventTeamSubmissionVerdict } from '~/api/generated'
 
   interface FeedbackProps {
     submissionTypeId: string
     feedback?: string
     eventId?: string
+    teamID: string
     refetchData?: () => Promise<void>
   }
   
   function EventSubmissionEditFeedback({
     submissionTypeId,
     feedback,
+    teamID,
     eventId,
     refetchData
   }: FeedbackProps) {
@@ -40,7 +41,6 @@ import { putAdminEventTeamVerification } from '~/api/generated'
       feedback && feedback.length ? feedback : ''
     )
     const [newFeedback, setNewFeedback] = React.useState('')
-    const teamID = useParams().teamID as string
   
     const onEditButtonClick = () => {
       setIsEditing(true)
@@ -58,7 +58,7 @@ import { putAdminEventTeamVerification } from '~/api/generated'
       }
   
       try {
-        const saveRequest = await putAdminEventTeamVerification({
+        const saveRequest = await putAdminEventTeamSubmissionVerdict({
           client: axiosAuth,
           path: {
             eventId: eventId,
