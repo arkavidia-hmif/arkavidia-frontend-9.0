@@ -14,15 +14,15 @@ const AdminDashboardPage = () => {
 
   if (adminRole === 'admin') {
     return (
-      <div className="flex flex-col gap-y-6">
+      <div className="flex flex-col">
         <MainDashboardCompe />
-        <MainDashboardEvent />
+        <MainDashboardEvent withHeader={false} />
       </div>
     )
   } else if (adminRole?.includes('competition')) {
     return <MainDashboardCompe />
   } else if (adminRole?.includes('event')) {
-    return <MainDashboardEvent />
+    return <MainDashboardEvent withTopBreak />
   }
 }
 
