@@ -60,13 +60,18 @@ function EventSubmissionTable(
                 )}
               </TableCell>
               <TableCell className="text-left">
-                <EventSubmissionEditFeedback
-                  feedback={doc.feedback}
-                  eventId={eventID}
-                  teamID={teamID}
-                  submissionTypeId={doc.req_id}
-                  refetchData={refetchData}
-                />
+                {doc.file_name && doc.file_url ? (
+                  <EventSubmissionEditFeedback
+                    feedback={doc.feedback}
+                    eventId={eventID}
+                    teamID={teamID}
+                    submissionTypeId={doc.req_id}
+                    refetchData={refetchData}
+                  />
+                ) : (
+                  <p className='text-gray-400 text-center'>Belum ada submisi</p>
+                )}
+                
               </TableCell>
               <TableCell className="text-center">
                 <Tag
