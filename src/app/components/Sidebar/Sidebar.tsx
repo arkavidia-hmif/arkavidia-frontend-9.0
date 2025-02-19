@@ -21,7 +21,8 @@ import {
   GetAdminCompetitionsResponse,
   getEvent,
   GetEventResponse,
-  type Event as EventType
+  type Event as EventType,
+  getUser
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useAppSelector } from '~/redux/store'
@@ -178,60 +179,85 @@ function Sidebar({ announcement = false }: SidebarProps) {
       const links: Array<SidebarLink> = [
         {
           name: 'Dashboard',
-          link: '/dashboard'
+          link: '/dashboard/admin'
         }
       ]
 
       // Fetch competition
-      const resComp = await getAdminCompetitions({ client: authAxios })
-
-      if (resComp.error || resComp.status !== 200) {
+      // Check admin
+      const adminRes = await getUser({ client: authAxios })
+      if (!adminRes.data) {
         toast({
           title: 'Failed getting data',
-          description: 'Failed to get competitions',
+          description: '',
           variant: 'destructive'
+        })
+        return
+      }
+
+      const isAdmin =
+        adminRes.data.role?.toLowerCase() === 'admin' ||
+        adminRes.data.role?.toLowerCase().includes('admin')
+      if (!isAdmin) {
+        return null
+      }
+
+      const adminRole = adminRes.data.role
+
+      if (adminRole === 'admin' || adminRole?.includes('competition')) {
+        const resComp = await getAdminCompetitions({ client: authAxios })
+
+        if (resComp.error || resComp.status !== 200) {
+          toast({
+            title: 'Failed getting data',
+            description: 'Failed to get competitions',
+            variant: 'destructive'
+          })
+          return
+        }
+
+        const competitionList = JSON.parse(
+          JSON.stringify(resComp.data)
+        ) as GetAdminCompetitionsResponse
+
+        // Add competition to sidebar
+        competitionList.forEach(competition => {
+          links.push({
+            name: expandCompetitionName(competition.title),
+            link: getSidebarURL({
+              isAdmin: true,
+              competitionName: competition.title
+            }),
+            type: 'competition'
+          })
         })
       }
 
-      const competitionList = JSON.parse(
-        JSON.stringify(resComp.data)
-      ) as GetAdminCompetitionsResponse
+      if (adminRole === 'admin' || adminRole?.includes('event')) {
+        // Fetch all events
+        const resEvents = await getEvent({ client: authAxios })
 
-      // Add competition to sidebar
-      competitionList.forEach(competition => {
-        links.push({
-          name: expandCompetitionName(competition.title),
-          link: getSidebarURL({
-            isAdmin: true,
-            competitionName: competition.title
-          }),
-          type: 'competition'
-        })
-      })
+        if (resEvents.error || resEvents.status !== 200) {
+          toast({
+            title: 'Failed getting data',
+            description: 'Failed to get events',
+            variant: 'destructive'
+          })
+        }
 
-      // Fetch all events
-      const resEvents = await getEvent({ client: authAxios })
+        const eventList = JSON.parse(JSON.stringify(resEvents.data)) as GetEventResponse
 
-      if (resEvents.error || resEvents.status !== 200) {
-        toast({
-          title: 'Failed getting data',
-          description: 'Failed to get events',
-          variant: 'destructive'
+        eventList.forEach(event => {
+          links.push({
+            name: expandEventName(event.title),
+            link: getSidebarURL({
+              isAdmin: true,
+              eventName: event.title
+            }),
+            type: 'event'
+          })
         })
       }
-
-      const eventList = JSON.parse(JSON.stringify(resEvents.data)) as GetEventResponse
-
-      eventList.forEach(event => {
-        links.push({
-          name: expandEventName(event.title),
-          link: getSidebarURL({
-            isAdmin: true,
-            eventName: event.title
-          }),
-          type: 'event'
-        })
-      })
 
       setSidebarLinks(links)
     }

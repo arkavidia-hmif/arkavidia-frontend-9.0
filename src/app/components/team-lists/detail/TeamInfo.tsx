@@ -1,10 +1,13 @@
 import { Check, ExternalLink, Pencil, SendHorizonal, X } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
+  getDownloadPresignedLink,
+  getPresignedLink,
   putAdminCompetitionTeamStatus,
   putAdminCompetitionTeamVerification,
   PutAdminCompetitionTeamVerificationData,
+  self,
   TeamDocument,
   TeamMember,
   TeamMemberDocument,
@@ -19,6 +22,7 @@ import MoonLoader from 'react-spinners/ClipLoader'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
 import { VoucherStatus } from './VoucherStatus'
+import { useRouter } from 'next/navigation'
 
 /* NOTE: NULL verificationStatus should be indicated by no document uploaded yet.
  *  Assumption: frontend won't automatically change any status EXCEPT the user decided to.
@@ -108,6 +112,48 @@ function FileRequirements({
   const [isFeedback, setIsFeedback] = useState(false)
   const [feedback, setFeedback] = useState<string>('')
   const [loading, setLoading] = useState(false)
+  const [fileURL, setURL] = useState<string | undefined>();
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchURL = async () => {
+
+      const selfData = await self({
+        client: axiosAuth
+      })
+
+      // Check access whether its the owner or admin.
+      if(
+        selfData.error ||
+        selfData.data.role !== 'admin' ||
+        selfData.data.id !== file.media.creatorId
+      ) {
+        setURL('/404')
+      } 
+
+      const presigned = await getDownloadPresignedLink({
+        client: axiosAuth,
+        query: {
+          filename: file.media.name,
+          // @ts-ignore
+          bucket: file.media.bucket
+        }
+      });
+
+      if(presigned.error) {
+        toast({
+          title: 'File Error',
+          description: 'Failed to get file URL',
+          variant: 'warning'
+        })
+        return;
+      }
+
+      setURL(presigned.data?.presignedUrl);
+    }
+
+    fetchURL();
+  }, [])
 
   // Submit handler for document status change
   async function submitHandler(isVerified: boolean) {
@@ -173,7 +219,7 @@ function FileRequirements({
         <div className="rounded-lg border border-white px-6 py-3">
           {/* First Row: File URL, File Type and Status */}
           <div className="mb-4 flex justify-between gap-5">
-            <Link href={`https://${file.media.url}`} target="_blank">
+            <Link href={fileURL || '#'} target="_blank">
               <div className="flex items-center gap-4">
                 <ExternalLink size={30} />
                 <p className="text-lg font-semibold text-white underline underline-offset-1 hover:underline">
@@ -532,10 +578,11 @@ export default function TeamInfo({
   competitionID,
   prelim,
   final,
-  onRefetch
+  onRefetch,
+  createdAt
 }: GetTeamDetailResponse & { competitionID: string } & {
   prelim: string
-} & { final: string }) {
+} & { final: string } & {createdAt: string}) {
   if (members?.length === 0) {
     return (
       <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-[2rem] py-[1rem] shadow-lg">
@@ -550,8 +597,9 @@ export default function TeamInfo({
 
   return (
     <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-[2rem] py-[1rem] font-dmsans shadow-lg">
-      <div className="mb-3 mr-2">
+      <div className="mb-4 mr-2">
         <h1 className="font-teachers text-[32px] font-bold">Verification</h1>
+        <p>Created: {createdAt}</p>
       </div>
       {paymentProof ? (
         <PaymentProof

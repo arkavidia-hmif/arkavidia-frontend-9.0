@@ -89,44 +89,46 @@ const RenderVoucherStatus = ({
   }
 
   return (
-    <div className="flex w-full flex-col gap-2">
-      <h1 className="font-teachers text-[28px] font-bold">Voucher</h1>
-      <div className='className="container flex w-full flex-row-reverse justify-between gap-2 rounded-xl border border-white p-4'>
-        <span>
-          <Tag
-            variant={getStatusColor(status)}
-            text={toPascalCase(status.toString().toWellFormed())}
-          />
-        </span>
-        <span className="flex flex-col gap-4">
-          {voucherCode ? (
-            <div className="flex flex-col text-base">
-              <span>
-                <b>Kode Voucher saat ini</b>
-              </span>
-              <span className="font-light">{voucherCode}</span>
-            </div>
-          ) : null}
+    status !== 'unsubmitted' && (
+      <div className="flex w-full flex-col gap-2">
+        <h1 className="font-teachers text-[28px] font-bold">Voucher</h1>
+        <div className='className="container flex w-full flex-row-reverse justify-between gap-2 rounded-xl border border-white p-4'>
+          <span>
+            <Tag
+              variant={getStatusColor(status)}
+              text={toPascalCase(status.toString().toWellFormed())}
+            />
+          </span>
+          <span className="flex flex-col gap-4">
+            {voucherCode ? (
+              <div className="flex flex-col text-base">
+                <span>
+                  <b>Kode Voucher saat ini</b>
+                </span>
+                <span className="font-light">{voucherCode}</span>
+              </div>
+            ) : null}
 
-          {teamCount ? (
-            <div className="flex flex-col text-base">
-              <span>
-                <b>Syarat Jumlah Team minimal yang memiliki voucher yang sama</b>
-              </span>
-              <span className="font-light">{teamCount}</span>
-            </div>
-          ) : null}
+            {teamCount ? (
+              <div className="flex flex-col text-base">
+                <span>
+                  <b>Syarat Jumlah Team minimal yang memiliki voucher yang sama</b>
+                </span>
+                <span className="font-light">{teamCount}</span>
+              </div>
+            ) : null}
 
-          {discount ? (
-            <div className="flex flex-col text-base">
-              <span>
-                <b>Nominal Discount</b>
-              </span>
-              <span className="font-light">Rp. {discount}</span>
-            </div>
-          ) : null}
-        </span>
+            {discount ? (
+              <div className="flex flex-col text-base">
+                <span>
+                  <b>Nominal Discount</b>
+                </span>
+                <span className="font-light">Rp. {discount}</span>
+              </div>
+            ) : null}
+          </span>
+        </div>
       </div>
-    </div>
+    )
   )
 }

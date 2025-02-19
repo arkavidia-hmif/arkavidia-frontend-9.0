@@ -1,29 +1,32 @@
-import React from 'react';
+import React from 'react'
 
 export type TimelineEventProps = {
-  title: string;
-  timeStart?: Date;
-  timeEnd?: Date;
-};
+  title: string
+  timeStart?: Date
+  timeEnd?: Date
+  isTBA?: boolean
+  isUpdated?: boolean
+  isComingSoon?: boolean
+}
 
 export type TimelineProps = {
-  events: TimelineEventProps[];
-  variant: 'horizontal' | 'vertical';
-};
+  events: TimelineEventProps[]
+  variant: 'horizontal' | 'vertical'
+}
 
 const options: Intl.DateTimeFormatOptions = {
   year: 'numeric',
   month: 'long',
-  day: 'numeric',
-};
+  day: 'numeric'
+}
 
 const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
   // Sort the events by timeStart, then by timeEnd
   const sortedEvents = [...events].sort((a, b) => {
-    const timeA = a.timeStart?.getTime() ?? a.timeEnd?.getTime() ?? Infinity;
-    const timeB = b.timeStart?.getTime() ?? b.timeEnd?.getTime() ?? Infinity;
-    return timeA - timeB;
-  });
+    const timeA = a.timeStart?.getTime() ?? a.timeEnd?.getTime() ?? Infinity
+    const timeB = b.timeStart?.getTime() ?? b.timeEnd?.getTime() ?? Infinity
+    return timeA - timeB
+  })
 
   return (
     <div
@@ -31,8 +34,7 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
         variant === 'horizontal'
           ? 'flex-col lg:flex-row lg:flex-wrap lg:gap-y-28'
           : 'flex-col'
-      }`}
-    >
+      }`}>
       {sortedEvents.map((event, index) => (
         <div
           key={index}
@@ -40,16 +42,14 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
             variant === 'horizontal'
               ? 'flex-row lg:w-96 lg:flex-col lg:items-center lg:justify-center'
               : 'w-72 flex-row md:w-96'
-          }`}
-        >
+          }`}>
           {/* Timeline Line */}
           <div
             className={`flex ${
               variant === 'horizontal'
                 ? 'flex-col items-center lg:w-full lg:flex-row lg:items-center'
                 : 'flex-col items-center'
-            }`}
-          >
+            }`}>
             {/* Left Line: Show only for non-first events */}
             <span
               className={`${
@@ -64,7 +64,7 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
             <div
               className="relative h-6 w-6 rounded-full bg-[#D2A0FF]"
               style={{
-                boxShadow: '0 0 15px 5px rgba(210, 160, 255, 0.5)',
+                boxShadow: '0 0 15px 5px rgba(210, 160, 255, 0.5)'
               }}
             />
             {/* Right Line: Hide only for last events */}
@@ -90,22 +90,25 @@ const Timeline: React.FC<TimelineProps> = ({ events, variant }) => {
               variant === 'horizontal'
                 ? 'flex w-96 flex-col justify-center px-8 text-left lg:px-0 lg:text-center'
                 : 'flex flex-col justify-center pl-2 text-left md:pl-8'
-            } space-y-2`}
-          >
-            <h1 className="md:text-2xl text-xl font-bold text-purple-100">
+            } space-y-2`}>
+            <h1 className="text-xl font-bold text-purple-100 md:text-2xl">
               {event.title}
             </h1>
-            <p className="text-md text-gray-400">
-              {event.timeStart &&
+            <p className="text-md w-full text-gray-400">
+              {!event.isTBA &&
+                event.timeStart &&
                 event.timeStart.toLocaleDateString('id-ID', options)}
-              {event.timeEnd && ' - ' + event.timeEnd?.toLocaleDateString('id-ID', options)}
-              {event.timeStart || event.timeEnd ? '' : 'Coming Soon'}
+              {!event.isTBA &&
+                event.timeEnd &&
+                ' - ' + event.timeEnd?.toLocaleDateString('id-ID', options)}
+              {!event.isTBA ? '' : 'TBA'} {event.isUpdated ? '(Updated)' : ''}
+              {event.isComingSoon ? 'Coming Soon' : ''}
             </p>
           </div>
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default Timeline;
+export default Timeline

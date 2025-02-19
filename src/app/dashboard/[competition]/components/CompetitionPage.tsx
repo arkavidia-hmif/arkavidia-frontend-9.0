@@ -11,6 +11,8 @@ import { Button } from '../../../components/ui/button'
 import { Tab } from '../../../components/Tab'
 import { ChevronLeft } from 'lucide-react'
 import {
+  getDownloadPresignedLink,
+  GetDownloadPresignedLinkData,
   GetPresignedLinkData,
   getTeamById,
   getTeams,
@@ -48,7 +50,7 @@ interface Task {
   status: 'notopened' | 'ongoing' | 'completed' | 'past due'
   dueDate: Date
   competitionName?: string
-  submission: {
+  submission?: {
     teamId: string
     typeId: string
     mediaId: string | null
@@ -111,6 +113,130 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
   const hasFetched = useRef(false)
 
+  // Function to get presigned link for Media
+  const getMediaPresignedGetLink = async (
+    filename: string,
+    bucket: GetDownloadPresignedLinkData['query']['bucket'] | undefined
+  ) => {
+    try {
+      if (!filename || !bucket) {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch media: Filename or bucket not found',
+          variant: 'warning',
+          duration: 6000
+        })
+        return
+      }
+
+      const res = await getDownloadPresignedLink({
+        client: axiosInstance,
+        query: {
+          filename: filename,
+          bucket: bucket
+        }
+      })
+
+      if (res.error || !res.data) {
+        toast({
+          title: 'Error',
+          description: `Failed to fetch media: ${filename}. Error: ${res.error}`,
+          variant: 'warning',
+          duration: 6000
+        })
+        return
+      }
+
+      return res.data
+    } catch (err: unknown) {
+      toast({
+        title: 'Error',
+        description: `Failed to fetch media: ${filename}. Error: ${err}`,
+        variant: 'destructive',
+        duration: 6000
+      })
+    }
+  }
+
+  // Function to fetch team submissions
+  async function getTaskList(teamId: string) {
+    try {
+      const newTasks: Task[] = []
+      const requirementsResponse = await getTeamSubmission({
+        client: axiosInstance,
+        path: { teamId }
+      })
+
+      // Submissions
+      if (!requirementsResponse.data) {
+        toast({
+          title: 'Gagal mendapatkan data',
+          description: 'Silakan refresh halaman untuk coba lagi',
+          variant: 'destructive'
+        })
+        return
+      }
+
+      const results = await Promise.allSettled(
+        requirementsResponse.data?.map(async task => {
+          let submissionFile: typeof task.submission = task.submission
+          // If there is a submission
+          if (submissionFile) {
+            const file = await getMediaPresignedGetLink(
+              task.submission?.media.name ?? '',
+              task.submission?.media.bucket
+                ? (task.submission.media
+                    .bucket as GetDownloadPresignedLinkData['query']['bucket'])
+                : undefined
+            )
+
+            if (file) {
+              if (task.submission) {
+                submissionFile = {
+                  ...task.submission,
+                  media: {
+                    ...task.submission.media,
+                    url: file.mediaUrl
+                  }
+                }
+              }
+            }
+          }
+
+          const item = {
+            id: task.requirement.typeId,
+            title: task.requirement.typeName,
+            description: task.requirement.description,
+            dueDate: new Date(task.requirement.deadline ?? ''),
+            status: getStatusTask(task) ?? ('notopened' as Task['status']),
+            competitionName: compeName.toLowerCase(),
+            submission: submissionFile
+          }
+
+          return item
+        })
+      )
+
+      results.forEach(result => {
+        if (result.status === 'fulfilled') {
+          newTasks.push(result.value)
+        }
+      })
+
+      setTasks(prev => [
+        ...prev.filter(t => !newTasks.some(nt => nt.id === t.id)),
+        ...newTasks
+      ])
+    } catch (err: unknown) {
+      toast({
+        title: 'Error',
+        description: 'Gagal mendapatkan submisi. Error: ' + err,
+        variant: 'destructive',
+        duration: 6000
+      })
+    }
+  }
+
   // Call the requirement api
   useEffect(() => {
     if (hasFetched.current) return
@@ -127,6 +253,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           return
         }
 
+        let teamID: string | null = null
         const teamsResponse = await getTeams({ client: axiosInstance })
 
         if (teamsResponse.data && teamsResponse.data.length > 0) {
@@ -144,17 +271,11 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             return
           }
           const teamId = teamData[0].id
+          teamID = teamId
           setCurrentTeamId(teamId)
 
           const currentUserData = await self({ client: axiosInstance })
           setCurrentUserId(currentUserData.data?.id ?? '')
-
-          const requirementsResponse = await getTeamSubmission({
-            client: axiosInstance,
-            path: { teamId }
-          })
-
-          const newTasks: Task[] = []
 
           // Verifications
           let teamVerification: TeamVerification | null
@@ -174,6 +295,23 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               status: 'unsubmitted'
             }
           } else {
+            const presignedFile = await getDownloadPresignedLink({
+              client: axiosInstance,
+              query: {
+                filename: teamVerifData.data?.document?.[0].media.name || '',
+                // @ts-ignore
+                bucket: teamVerifData.data?.document?.[0].media.bucket
+              }
+            })
+
+            if (presignedFile.error) {
+              toast({
+                title: 'File Error',
+                description: 'Failed to get file URL',
+                variant: 'warning'
+              })
+            }
+
             const isVerified = teamVerifData?.data?.document?.[0].isVerified ?? false
             const verificationError = teamVerifData?.data?.document?.[0].verificationError
             const isRejected =
@@ -188,7 +326,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               rejectionMessage:
                 teamVerifData?.data?.document?.[0].verificationError ?? '',
               isVerified: isVerified,
-              mediaLink: teamVerifData.data?.document?.[0].media.url,
+              mediaLink: presignedFile.data?.mediaUrl,
               mediaName: teamVerifData.data?.document?.[0].media.name
             }
           }
@@ -202,29 +340,48 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           // Get current member document
           const currentMemberDocument = currentMemberData?.document
 
-          // Check if member has submitted the required document
-          MemberDocumentRequirement.forEach((docType: string, index: number) => {
-            // @ts-ignore
-            const memberDoc = currentMemberDocument?.find(
-              (doc: any) => doc.type === docType
-            )
+          await Promise.all(
+            MemberDocumentRequirement.map(async (docType: string, index: number) => {
+              // @ts-ignore
+              const memberDoc = currentMemberDocument?.find(
+                (doc: any) => doc.type === docType
+              )
 
-            // If no document found, add to memberVerifications
-            if (!memberDoc) {
-              memberVerifications.push({
-                id: `member-${index}`,
-                userId: currentUserData.data?.id,
-                type: docType as 'poster' | 'twibbon',
-                isVerified: false,
-                status: 'unsubmitted'
+              if (!memberDoc) {
+                memberVerifications.push({
+                  id: `member-${index}`,
+                  userId: currentUserData.data?.id,
+                  type: docType as 'poster' | 'twibbon',
+                  isVerified: false,
+                  status: 'unsubmitted'
+                })
+                return
+              }
+
+              const presignedFile = await getDownloadPresignedLink({
+                client: axiosInstance,
+                query: {
+                  filename: memberDoc.media.name,
+                  // @ts-ignore
+                  bucket: memberDoc.media.bucket
+                }
               })
-            } else {
+
+              if (presignedFile.error) {
+                toast({
+                  title: 'File Error',
+                  description: 'Failed to get file URL',
+                  variant: 'warning'
+                })
+              }
+
               const isVerified = memberDoc.isVerified ?? false
               const verificationError = memberDoc.verificationError
               const isRejected =
                 verificationError !== '' &&
                 verificationError !== null &&
                 verificationError !== undefined
+
               memberVerifications.push({
                 id: `member-${index}`,
                 userId: currentUserData.data?.id,
@@ -232,11 +389,11 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                 isVerified: isVerified,
                 rejectionMessage: memberDoc.verificationError ?? '',
                 status: isVerified ? 'verified' : isRejected ? 'rejected' : 'submitted',
-                mediaLink: memberDoc.media.url,
+                mediaLink: presignedFile.data?.mediaUrl,
                 mediaName: memberDoc.media.name
               })
-            }
-          })
+            })
+          )
 
           if (teamVerification) {
             setVerifications(prev => [...prev, teamVerification])
@@ -244,31 +401,6 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           }
 
           setVerifications(prev => [...prev, ...memberVerifications])
-
-          // Submissions
-          requirementsResponse.data?.forEach(data => {
-            const item = {
-              id: data.requirement.typeId,
-              title: data.requirement.typeName,
-              description: data.requirement.description,
-              dueDate: new Date(data.requirement.deadline ?? ''),
-              status: getStatusTask(data) ?? 'notopened',
-              competitionName: compeName.toLowerCase(),
-              submission: data.submission
-            }
-
-            if (data.requirement.stage === 'verification') {
-            } else {
-              if (!tasks.some(t => t.id === item.id)) {
-                newTasks.push(item as Task)
-              }
-            }
-          })
-
-          setTasks(prev => [
-            ...prev.filter(t => !newTasks.some(nt => nt.id === t.id)),
-            ...newTasks
-          ])
         } else {
           toast({
             title: 'No teams found',
@@ -276,6 +408,10 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
             variant: 'destructive'
           })
           router.push('/')
+        }
+
+        if (teamID) {
+          await getTaskList(teamID ?? '')
         }
       } catch (error) {
         console.error(error)
@@ -464,23 +600,16 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
       }
 
       if (submitReq.data) {
-        const updatedTasks = tasks.map(task => {
-          if (task.id === typeId) {
-            return {
-              ...task,
-              status: 'completed' as 'completed'
-            }
-          }
-          return task
-        })
-        setTasks(updatedTasks)
+        await getTaskList(teamID)
         setSelectedTask(null)
-        toast({
-          title: 'Success',
-          description: 'Document submitted successfully',
-          variant: 'success',
-          duration: 5000
-        })
+        setTimeout(() => {
+          toast({
+            title: 'Success',
+            description: 'File submitted successfully',
+            variant: 'success',
+            duration: 5000
+          })
+        }, 300)
       }
     } catch (err: unknown) {
       toast({
@@ -642,6 +771,17 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
     // Task List Content
     <div className="font-dmsans">
+      <div className="mb-4">
+        <div className="flex w-full items-center gap-x-2">
+          {/* <p className="text-[12px] text-gray-300">Keterangan: </p> */}
+          <div className="flex h-3 w-3 gap-x-1 bg-[#E50000]/80 text-[12px]"></div>
+          <p className="text-[12px]">Past due</p>
+          <div className="flex h-3 w-3 gap-x-1 bg-[#FFCC00CC]/80 text-[12px]"></div>
+          <p className="text-[12px]">Ongoing</p>
+          <div className="flex h-3 w-3 gap-x-1 bg-[#4D06B0CC]/80 text-[12px]"></div>
+          <p className="text-[12px]">Completed</p>
+        </div>
+      </div>
       {selectedTask ? (
         // Specific Task
         <div className="rounded-lg border border-white bg-gradient-to-r from-[#0202024D]/30 to-[#7138C099]/60 px-8 py-8 md:px-16">
