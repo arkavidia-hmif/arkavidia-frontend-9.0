@@ -15,16 +15,17 @@ interface EventHeroProps {
   eventID: string
 }
 
-async function getTeamInfo(
+export async function getTeamInfo(
   axiosInstance: Client,
-  eventHeroProps: EventHeroProps
+  teamID: string,
+  eventID: string
 ): Promise<EventTeam | null> {
   try {
     const res = await getAdminEventTeamInformation({
       client: axiosInstance,
       path: {
-        eventId: eventHeroProps.eventID,
-        teamId: eventHeroProps.teamID
+        eventId: eventID,
+        teamId: teamID
       }
     })
     return res.data ?? null
@@ -45,7 +46,11 @@ const EventHero: React.FC<EventHeroProps> = eventHeroProps => {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const data = await getTeamInfo(axiosInstance, eventHeroProps)
+      const data = await getTeamInfo(
+        axiosInstance,
+        eventHeroProps.teamID,
+        eventHeroProps.eventID
+      )
       setTeamInfo(data)
     }
 
