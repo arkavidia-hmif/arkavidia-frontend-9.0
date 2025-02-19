@@ -112,7 +112,7 @@ const RenderVoucherStatus = ({
             {teamCount ? (
               <div className="flex flex-col text-base">
                 <span>
-                  <b>Syarat Jumlah Team minimal yang memiliki voucher yang sama</b>
+                  <b>Syarat Jumlah Team minimal yang menggunakan voucher yang sama</b>
                 </span>
                 <span className="font-light">{teamCount}</span>
               </div>
