@@ -24,7 +24,7 @@ export const VoucherAccordionItem = ({
 
         {teamCount ? (
           <p className="text-base">
-            Syarat Jumlah Team minimal untuk mendapatkan voucher : <b>{teamCount}</b>
+            Syarat Jumlah Team minimal yang memiliki voucher yang sama: <b>{teamCount}</b>
           </p>
         ) : null}
 

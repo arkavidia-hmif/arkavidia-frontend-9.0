@@ -38,7 +38,6 @@ import { VoucherAccordionItem } from './VoucherAccordionItem'
 import VoucherDropzone from './VoucherDropzone'
 
 function capitalizeFirstLetter(string: string) {
-  console.log('Log: ' + string)
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 // Task interface
@@ -302,7 +301,6 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
     let statusVoucher: 'unsubmitted' | 'submitted' | 'verified' = 'unsubmitted'
     if (!teamData) {
-      console.log('LOG: Team data is empty')
       return
     }
 
@@ -321,7 +319,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
       syarat: teamData.voucer?.requiredTeamCount.toString(),
       nominal: teamData.voucer?.discount?.toString()
     }
-    console.log('LOG: ', teamData)
+
     setVerifications(prev => [...prev, voucherVerification])
 
     return

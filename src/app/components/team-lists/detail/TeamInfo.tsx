@@ -18,6 +18,7 @@ import Dropdown, { MenuItem } from '../../Dropdown'
 import MoonLoader from 'react-spinners/ClipLoader'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { useToast } from '~/hooks/use-toast'
+import { VoucherStatus } from './VoucherStatus'
 
 /* NOTE: NULL verificationStatus should be indicated by no document uploaded yet.
  *  Assumption: frontend won't automatically change any status EXCEPT the user decided to.
@@ -34,7 +35,7 @@ type GetTeamDetailResponse = {
   onRefetch: () => Promise<void>
   submissionsTypeID:
     | {
-        id: string,
+        id: string
         name: string
         studentCard: UserDocument | null
         poster: TeamMemberDocument | null
@@ -545,6 +546,8 @@ export default function TeamInfo({
     )
   }
 
+  const isArkaLogica = competitionID === 'fr44bkra'
+
   return (
     <div className="rounded-lg border border-white/80 bg-gradient-to-r from-white/20 to-white/5 px-[2rem] py-[1rem] font-dmsans shadow-lg">
       <div className="mb-3 mr-2">
@@ -567,9 +570,7 @@ export default function TeamInfo({
         {members &&
           submissionsTypeID &&
           members.map((member, index) => {
-            const data = submissionsTypeID.find(
-              data => data.id === member.user?.id
-            )
+            const data = submissionsTypeID.find(data => data.id === member.user?.id)
             return (
               <MemberCard
                 key={index}
@@ -593,6 +594,8 @@ export default function TeamInfo({
             )
           })}
       </div>
+      {isArkaLogica && <VoucherStatus competitionId={competitionID} teamId={teamID} />}
+
       {/* // TODO: integrate submission for UXVidia and Hackvidia */}
       {!existsSubmission && (
         <>
