@@ -6,13 +6,12 @@ import {
   GetAdminEventTeamSubmissionsResponse,
   getAdminEventTeamInformation,
   EventTeam
-  
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { capitalizeFirstLetter } from '~/lib/utils'
 import EventSubmissionSection from './EventSubmissionSection'
 import { SubmissionDoc } from '../../team-lists/detail/SubmissionTable'
-import { useParams,  useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { EventTeamStatus } from './EventTeamStatus'
 import { useToast } from '~/hooks/use-toast'
 
@@ -40,8 +39,8 @@ export default function EventSubmission({}: {}) {
   const { toast } = useToast()
 
   const [teamData, setTeamData] = useState<EventTeam>()
-  
-  const teamID = params.team as string // If using teamID, change params.team to params.teamID
+
+  const teamID = params.teamId as string // If using teamID, change params.team to params.teamID
   const eventID = params.event as string // Same with event
 
   const fetchTeamData = async () => {
@@ -59,6 +58,7 @@ export default function EventSubmission({}: {}) {
       return
     }
 
+    // @ts-expect-error
     const responseData = response?.data as EventTeam
 
     setTeamData(responseData)
@@ -69,15 +69,15 @@ export default function EventSubmission({}: {}) {
   ) {
     const prelimSubmissions: SubmissionDoc[] = []
     const finalSubmissions: SubmissionDoc[] = []
-  
+
     const preEliminaryData = teamSubmissions?.['pre-eliminary']
     const finalData = teamSubmissions?.final
     // console.log(preEliminaryData, finalData)
     const combinedData = preEliminaryData?.concat(finalData ?? [])
-  
+
     combinedData?.forEach(data => {
       const stage = capitalizeFirstLetter(data.requirement.stage)
-  
+
       let currentDoc: SubmissionDoc = {
         req_id: data.requirement.typeId,
         title: data.requirement.typeName,
@@ -87,7 +87,7 @@ export default function EventSubmission({}: {}) {
         status: 'Not Submitted',
         feedback: ''
       }
-  
+
       if (data.submission && data.submission.media) {
         currentDoc = {
           ...currentDoc,
@@ -97,7 +97,7 @@ export default function EventSubmission({}: {}) {
           status: data.submission.judgeResponse ? 'Change Needed' : 'Submitted'
         }
       }
-  
+
       if (data.requirement.deadline) {
         const deadline = new Date(data.requirement.deadline)
         const currentDate = new Date()
@@ -107,18 +107,17 @@ export default function EventSubmission({}: {}) {
           }
         }
       }
-  
+
       if (stage.toLowerCase().includes('final')) {
         finalSubmissions.push(currentDoc)
       } else {
         prelimSubmissions.push(currentDoc)
       }
     })
-  
+
     setPrelimSubmission(prelimSubmissions)
     setFinalSubmission(finalSubmissions)
   }
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,7 +136,7 @@ export default function EventSubmission({}: {}) {
     fetchData()
     fetchTeamData()
   }, [teamID, axiosAuth])
-  
+
   const refetchData = async () => {
     if (teamID && typeof teamID === 'string') {
       const response = (
@@ -146,7 +145,7 @@ export default function EventSubmission({}: {}) {
           path: { eventId: eventID as string, teamId: teamID }
         })
       )?.data
-      
+
       // TODO: delete grouped result from API
       // ! Delete groupedResult if API fixed
       generateSubmissionData(response)
@@ -154,7 +153,7 @@ export default function EventSubmission({}: {}) {
   }
 
   if (!teamData) {
-    return null;
+    return null
   }
 
   return (
