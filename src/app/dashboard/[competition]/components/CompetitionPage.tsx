@@ -110,6 +110,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
   const hasFetched = useRef(false)
+
   // Call the requirement api
   useEffect(() => {
     if (hasFetched.current) return
@@ -631,6 +632,8 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     }
   }
 
+  const isArkaLogica = compeName === 'Arkalogica'
+
   const contentTypes = ['Team Information', 'Task List', 'Verification']
 
   const contents = [
@@ -811,11 +814,12 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
                         Seabank a.n. Stefany Josefina Santono
                       </p>
                       <p className="md:text-[15px] lg:text-[17px]">901723767417</p>
-
-                      <p className="mb-1 mt-4 font-bold md:text-[16px] lg:text-[19px]">
-                        Untuk team yang memiliki voucher dapat mengupload code voucher
-                        pada input dibawah
-                      </p>
+                      {isArkaLogica && (
+                        <p className="mb-1 mt-4 font-bold md:text-[16px] lg:text-[19px]">
+                          Untuk team yang memiliki voucher dapat mengupload code voucher
+                          pada input dibawah
+                        </p>
+                      )}
                     </div>
                   )}
                   {verif.type === 'poster' && (
