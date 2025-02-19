@@ -25,22 +25,18 @@ function TeamDetailPage() {
     const fetchTeamData = async () => {
       setLoading(true)
       try {
-        const response = await getAdminEventTeamInformation({
+        const response = (await getAdminEventTeamInformation({
           client: axiosAuth,
           path: { teamId: teamId, eventId: event }
-        })
+        })) as any
 
         if (!response || response.error || !response.data) {
           return
         }
 
-        // @ts-expect-error
         if (response.data) {
-          // @ts-expect-error
           setTeamData(response.data as EventTeam)
-          // @ts-expect-error
           setEventMaxTeamMember(response.data.event.maxTeamMember)
-          // @ts-expect-error
           if (response.data.event.maxTeamMember !== 1) {
             setCONTENT_TYPES(['Team Information', 'Submission'])
           }

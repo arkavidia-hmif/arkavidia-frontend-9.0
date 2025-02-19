@@ -44,10 +44,10 @@ export default function EventSubmission({}: {}) {
   const eventID = params.event as string // Same with event
 
   const fetchTeamData = async () => {
-    const response = await getAdminEventTeamInformation({
+    const response = (await getAdminEventTeamInformation({
       client: axiosAuth,
       path: { teamId: teamID, eventId: eventID }
-    })
+    })) as any
 
     if (!response || response.error || response.status !== 200 || !response.data) {
       toast({
@@ -58,7 +58,6 @@ export default function EventSubmission({}: {}) {
       return
     }
 
-    // @ts-ignore
     const responseData = response?.data as EventTeam
 
     setTeamData(responseData)
