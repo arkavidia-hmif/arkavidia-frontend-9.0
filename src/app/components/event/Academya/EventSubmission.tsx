@@ -131,7 +131,7 @@ export default function EventSubmission({}: {}) {
         )?.data
 
         // ! Delete groupedResult if API fixed
-        generateSubmissionData(response?.groupedResult)
+        generateSubmissionData(response)
       }
     }
     fetchData()
@@ -149,7 +149,7 @@ export default function EventSubmission({}: {}) {
       
       // TODO: delete grouped result from API
       // ! Delete groupedResult if API fixed
-      generateSubmissionData(response?.groupedResult)
+      generateSubmissionData(response)
     }
   }
 
