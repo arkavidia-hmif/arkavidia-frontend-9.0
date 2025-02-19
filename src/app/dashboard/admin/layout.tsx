@@ -26,7 +26,7 @@ function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
         })
         setTimeout(() => {
           router.push('/')
-        }, 1000)
+        }, 100)
         return
       }
 
@@ -38,7 +38,7 @@ function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
         })
         setTimeout(() => {
           router.push('/')
-        }, 1000)
+        }, 100)
         return
       }
 
@@ -54,7 +54,7 @@ function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
           })
           setTimeout(() => {
             router.push('/')
-          }, 1000)
+          }, 100)
           return
         }
       } else {
@@ -65,7 +65,7 @@ function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
         })
         setTimeout(() => {
           router.push('/')
-        }, 1000)
+        }, 100)
         return
       }
     } catch (error) {

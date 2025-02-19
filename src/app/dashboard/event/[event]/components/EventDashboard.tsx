@@ -18,6 +18,7 @@ import { getEventNameSlug } from './event-dashboard-utils'
 import Loading from '~/app/components/Loading'
 import { Tab } from '~/app/components/Tab'
 import EventTaskList from './EventTaskList'
+import { AnnouncementEventContent } from './EventAnnouncement'
 
 function EventDashboard({ eventName }: { eventName: string }) {
   const { toast } = useToast()
@@ -70,7 +71,9 @@ function EventDashboard({ eventName }: { eventName: string }) {
 
         setActiveTeamData(teamDataReq.data)
         setTimeout(() => setIsLoading(false), 500)
-      } catch (err: unknown) {}
+      } catch (err: unknown) {
+        console.error(err)
+      }
     }
 
     fetchData()
@@ -84,7 +87,13 @@ function EventDashboard({ eventName }: { eventName: string }) {
     )
   }
 
-  const contentTypes = ['Team Info', 'Material', 'Task List', 'Verification']
+  const contentTypes = [
+    'Team Info',
+    'Announcement',
+    'Material',
+    'Task List',
+    'Verification'
+  ]
 
   return (
     <div>
@@ -101,6 +110,7 @@ function EventDashboard({ eventName }: { eventName: string }) {
             user={userData}
             teamData={activeTeamData}
           />,
+          <AnnouncementEventContent eventId={activeTeamData?.eventId ?? ''} />,
           <div className="mt-12 flex items-center justify-center font-dmsans font-semibold">
             Belum ada materi untuk diakses
           </div>,
