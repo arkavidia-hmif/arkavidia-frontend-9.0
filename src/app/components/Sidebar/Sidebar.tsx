@@ -179,7 +179,7 @@ function Sidebar({ announcement = false }: SidebarProps) {
       const links: Array<SidebarLink> = [
         {
           name: 'Dashboard',
-          link: '/dashboard'
+          link: '/dashboard/admin'
         }
       ]
 
@@ -202,56 +202,62 @@ function Sidebar({ announcement = false }: SidebarProps) {
         return null
       }
 
-      const resComp = await getAdminCompetitions({ client: authAxios })
+      const adminRole = adminRes.data.role
 
-      if (resComp.error || resComp.status !== 200) {
-        toast({
-          title: 'Failed getting data',
-          description: 'Failed to get competitions',
-          variant: 'destructive'
-        })
-        return
-      }
+      if (adminRole === 'admin' || adminRole?.includes('competition')) {
+        const resComp = await getAdminCompetitions({ client: authAxios })
 
-      const competitionList = JSON.parse(
-        JSON.stringify(resComp.data)
-      ) as GetAdminCompetitionsResponse
+        if (resComp.error || resComp.status !== 200) {
+          toast({
+            title: 'Failed getting data',
+            description: 'Failed to get competitions',
+            variant: 'destructive'
+          })
+          return
+        }
 
-      // Add competition to sidebar
-      competitionList.forEach(competition => {
-        links.push({
-          name: expandCompetitionName(competition.title),
-          link: getSidebarURL({
-            isAdmin: true,
-            competitionName: competition.title
-          }),
-          type: 'competition'
-        })
-      })
+        const competitionList = JSON.parse(
+          JSON.stringify(resComp.data)
+        ) as GetAdminCompetitionsResponse
 
-      // Fetch all events
-      const resEvents = await getEvent({ client: authAxios })
-
-      if (resEvents.error || resEvents.status !== 200) {
-        toast({
-          title: 'Failed getting data',
-          description: 'Failed to get events',
-          variant: 'destructive'
+        // Add competition to sidebar
+        competitionList.forEach(competition => {
+          links.push({
+            name: expandCompetitionName(competition.title),
+            link: getSidebarURL({
+              isAdmin: true,
+              competitionName: competition.title
+            }),
+            type: 'competition'
+          })
         })
       }
 
-      const eventList = JSON.parse(JSON.stringify(resEvents.data)) as GetEventResponse
+      if (adminRole === 'admin' || adminRole?.includes('event')) {
+        // Fetch all events
+        const resEvents = await getEvent({ client: authAxios })
 
-      eventList.forEach(event => {
-        links.push({
-          name: expandEventName(event.title),
-          link: getSidebarURL({
-            isAdmin: true,
-            eventName: event.title
-          }),
-          type: 'event'
+        if (resEvents.error || resEvents.status !== 200) {
+          toast({
+            title: 'Failed getting data',
+            description: 'Failed to get events',
+            variant: 'destructive'
+          })
+        }
+
+        const eventList = JSON.parse(JSON.stringify(resEvents.data)) as GetEventResponse
+
+        eventList.forEach(event => {
+          links.push({
+            name: expandEventName(event.title),
+            link: getSidebarURL({
+              isAdmin: true,
+              eventName: event.title
+            }),
+            type: 'event'
+          })
         })
-      })
+      }
 
       setSidebarLinks(links)
     }

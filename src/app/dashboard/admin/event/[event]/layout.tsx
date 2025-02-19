@@ -27,6 +27,7 @@ function AdminEventDashboardLayout({ children }: { children: React.ReactNode }) 
       setTimeout(() => {
         router.push('/')
       }, 500)
+      return
     }
 
     // Redirect if user is competition admins
@@ -40,6 +41,7 @@ function AdminEventDashboardLayout({ children }: { children: React.ReactNode }) 
       setTimeout(() => {
         router.push('/dashboard/admin')
       }, 500)
+      return
     }
 
     if (
