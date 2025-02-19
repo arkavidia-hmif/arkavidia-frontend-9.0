@@ -58,7 +58,7 @@ export default function EventSubmission({}: {}) {
       return
     }
 
-    // @ts-expect-error
+    // @ts-ignore
     const responseData = response?.data as EventTeam
 
     setTeamData(responseData)
