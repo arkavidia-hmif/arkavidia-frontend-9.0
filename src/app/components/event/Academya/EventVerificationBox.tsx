@@ -14,12 +14,12 @@ import {
   EventTeamDocument
 } from '~/api/generated'
 import { cn } from '~/lib/utils'
-import Tag from '../../Tag'
+import Tag from '~/app/components/Tag'
 import { useToast } from '~/hooks/use-toast'
-import { Button } from '../../Button'
+import { Button } from '~/app/components/Button'
 import MoonLoader from 'react-spinners/ClipLoader'
 import { Check, ExternalLink, SendHorizonal, X } from 'lucide-react'
-import { Input } from '../../Input'
+import { Input } from '~/app/components/Input'
 import Link from 'next/link'
 
 interface EventVerificationSectionProps {
