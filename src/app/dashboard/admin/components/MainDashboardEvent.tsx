@@ -54,7 +54,13 @@ const DROPDOWN_DATA = [
   }
 ]
 
-function MainDashboardEvent() {
+function MainDashboardEvent({
+  withHeader = true,
+  withTopBreak = false
+}: {
+  withHeader?: boolean
+  withTopBreak?: boolean
+}) {
   const [loading, setLoading] = useState(true)
   const [overallStats, setOverallStats] = useState<{
     registered: number
@@ -149,32 +155,36 @@ function MainDashboardEvent() {
   return (
     <>
       {/* Dashboard Title */}
-      <div className="relative flex items-center justify-center space-x-4 md:justify-start">
-        <div
-          className="h-8 w-8 md:h-12 md:w-12"
-          style={{
-            background: 'linear-gradient(180deg, #7138C0 0%, #B89BDF 100%)',
-            boxShadow: '0px 0px 8px 0px #F5F5F580',
-            WebkitMaskImage: `url(${IMAGE})`, // kalo masing-masing compe punya logo, bisa diganti
-            maskImage: `url(${IMAGE})`,
-            WebkitMaskSize: 'contain',
-            maskSize: 'contain',
-            WebkitMaskRepeat: 'no-repeat',
-            maskRepeat: 'no-repeat',
-            WebkitMaskPosition: 'center',
-            maskPosition: 'center'
-          }}
-        />
-        <h1 className="font-belanosima text-3xl text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.7)] md:text-5xl">
-          Dashboard
-        </h1>
-      </div>
+      {withHeader && (
+        <div className="relative flex items-center justify-center space-x-4 md:justify-start">
+          <div
+            className="h-8 w-8 md:h-12 md:w-12"
+            style={{
+              background: 'linear-gradient(180deg, #7138C0 0%, #B89BDF 100%)',
+              boxShadow: '0px 0px 8px 0px #F5F5F580',
+              WebkitMaskImage: `url(${IMAGE})`, // kalo masing-masing compe punya logo, bisa diganti
+              maskImage: `url(${IMAGE})`,
+              WebkitMaskSize: 'contain',
+              maskSize: 'contain',
+              WebkitMaskRepeat: 'no-repeat',
+              maskRepeat: 'no-repeat',
+              WebkitMaskPosition: 'center',
+              maskPosition: 'center'
+            }}
+          />
 
-      {/* break line */}
-      <div className="my-3 h-1 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] drop-shadow-[0_0_6px_rgba(255,255,255,0.5)] md:my-4" />
+          <h1 className="font-belanosima text-3xl text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.7)] md:text-5xl">
+            Dashboard
+          </h1>
+        </div>
+      )}
 
+      {withTopBreak && (
+        <div className="my-3 h-1 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] drop-shadow-[0_0_6px_rgba(255,255,255,0.5)] md:my-4" />
+      )}
+      <h1 className="mb-2 mt-4 font-belanosima text-3xl md:text-5xl">Event</h1>
       {/* Overall Participant */}
-      <div className="my-4 flex flex-col items-center justify-between gap-4 md:my-8 md:flex-row md:gap-10">
+      <div className="my-3 flex flex-col items-center justify-between gap-4 md:my-5 md:flex-row md:gap-10">
         {loading ? (
           <>
             <FrameInfoSkeleton />
@@ -196,12 +206,9 @@ function MainDashboardEvent() {
         )}
       </div>
 
-      {/* break line */}
-      <div className="my-3 h-1 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] drop-shadow-[0_0_6px_rgba(255,255,255,0.5)] md:my-4" />
-
       {/* Competition */}
-      <div className="my-4 flex flex-col items-center justify-between gap-4 md:my-8 md:flex-row md:gap-10">
-        <h1 className="font-belanosima text-3xl md:text-5xl">Academya</h1>
+      <div className="my-3 flex flex-col items-center justify-between gap-4 md:my-5 md:flex-row md:gap-10">
+        <h1 className="font-belanosima text-2xl md:text-[40px]">Academya</h1>
         <div className="w-full self-end md:w-auto md:grow">
           <Dropdown
             data={DROPDOWN_DATA}
@@ -213,6 +220,8 @@ function MainDashboardEvent() {
         </div>
       </div>
       <EventContext individualStats={shownStats} />
+      {/* break line */}
+      <div className="my-3 h-1 w-full rounded-full bg-gradient-to-r from-[#FF95B8] via-[#A555CC] to-[#48E6FF] drop-shadow-[0_0_6px_rgba(255,255,255,0.5)] md:my-4" />
     </>
   )
 }

@@ -113,8 +113,8 @@ const CompetitionContext = ({
   return (
     <>
       {/* Competition */}
-      <div className="my-4 flex flex-col items-center justify-between gap-4 md:my-8 md:flex-row md:gap-10">
-        <h1 className="font-belanosima text-3xl md:text-5xl">Competition</h1>
+      <div className="my-3 flex flex-col items-center justify-between gap-4 md:my-5 md:flex-row md:gap-10">
+        <h1 className="font-belanosima text-2xl md:text-[40px]">Details</h1>
         <div className="w-full md:w-auto">
           <Dropdown
             data={DROPDOWN_DATA}
