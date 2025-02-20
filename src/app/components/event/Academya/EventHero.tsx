@@ -3,7 +3,6 @@
 import React from 'react'
 import Tag from '../../Tag'
 import { mapStageTag, mapStatusTag } from '../../registered-teamlist/teamlist'
-import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { getAdminEventTeamInformation } from '~/api/generated'
 
 import { type EventTeam } from '~/api/generated'
@@ -11,8 +10,7 @@ import { useToast } from '~/hooks/use-toast'
 import { Client } from '@hey-api/client-axios'
 
 interface EventHeroProps {
-  teamID: string
-  eventID: string
+  teamData?: EventTeam
 }
 
 export async function getTeamInfo(
@@ -41,21 +39,7 @@ export async function getTeamInfo(
 }
 
 const EventHero: React.FC<EventHeroProps> = eventHeroProps => {
-  const axiosInstance = useAxiosAuth()
-  const [teamInfo, setTeamInfo] = React.useState<EventTeam | null>(null)
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const data = await getTeamInfo(
-        axiosInstance,
-        eventHeroProps.teamID,
-        eventHeroProps.eventID
-      )
-      setTeamInfo(data)
-    }
-
-    fetchData()
-  }, [axiosInstance, eventHeroProps])
+  const teamInfo = eventHeroProps.teamData
 
   const teamName =
     teamInfo?.event?.title === 'Data Science'
@@ -71,7 +55,7 @@ const EventHero: React.FC<EventHeroProps> = eventHeroProps => {
           <h1 className="text-2xl font-bold text-white md:text-4xl">{teamName}</h1>
         </div>
         <h3 className="text-sm text-white opacity-80 md:text-xl">
-          {eventHeroProps.teamID}
+          {eventHeroProps.teamData?.id}
         </h3>
       </div>
 

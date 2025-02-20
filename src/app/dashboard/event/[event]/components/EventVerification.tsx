@@ -289,86 +289,102 @@ function EventVerification({
         </div>
       ) : (
         // Verifications List
-        <Accordion type="multiple" value={openValues} onValueChange={setOpenValues}>
-          {verifications?.map(verif => (
-            <AccordionItem key={verif.id} value={`${verif.id}`}>
-              <AccordionTrigger
-                accType="framed"
-                className={`&[data-state=open]>svg]:rotate-180 mt-2 rounded-xl border border-white px-5 py-5 outline-border hover:no-underline hover:decoration-0 md:py-7 [&>svg]:size-5 [&>svg]:-rotate-90 [&>svg]:text-white md:[&>svg]:size-7 [&[data-state=open]>svg]:rotate-0 ${getVerifTriggerColor(verif.status)}`}>
-                <p className="gap-3 text-lg font-semibold md:text-xl lg:text-[24px]">
-                  {capitalizeFirstLetter(verif.type)
-                    .split('-')
-                    .map(word => capitalizeFirstLetter(word))
-                    .join(' ')}
-                  {/* <span className="ml-3 text-xs font-light md:text-sm">
+        <>
+          <div className="mb-4">
+            <div className="flex w-full items-center gap-x-2">
+              {/* <p className="text-[12px] text-gray-300">Keterangan: </p> */}
+              <div className="flex h-3 w-3 gap-x-1 bg-[#FACCCCCC]/80 text-[12px]"></div>
+              <p className="text-[12px]">Unsubmitted</p>
+              <div className="flex h-3 w-3 gap-x-1 bg-[#FFCC00CC]/80 text-[12px]"></div>
+              <p className="text-[12px]">Submitted</p>
+              <div className="flex h-3 w-3 gap-x-1 bg-[#4D06B0CC]/80 text-[12px]"></div>
+              <p className="text-[12px]">Verified</p>
+              <div className="flex h-3 w-3 gap-x-1 bg-[#E50000]/80 text-[12px]"></div>
+              <p className="text-[12px]">Rejected</p>
+            </div>
+          </div>
+
+          <Accordion type="multiple" value={openValues} onValueChange={setOpenValues}>
+            {verifications?.map(verif => (
+              <AccordionItem key={verif.id} value={`${verif.id}`}>
+                <AccordionTrigger
+                  accType="framed"
+                  className={`&[data-state=open]>svg]:rotate-180 mt-2 rounded-xl border border-white px-5 py-5 outline-border hover:no-underline hover:decoration-0 md:py-7 [&>svg]:size-5 [&>svg]:-rotate-90 [&>svg]:text-white md:[&>svg]:size-7 [&[data-state=open]>svg]:rotate-0 ${getVerifTriggerColor(verif.status)}`}>
+                  <p className="gap-3 text-lg font-semibold md:text-xl lg:text-[24px]">
+                    {capitalizeFirstLetter(verif.type)
+                      .split('-')
+                      .map(word => capitalizeFirstLetter(word))
+                      .join(' ')}
+                    {/* <span className="ml-3 text-xs font-light md:text-sm">
                     {formatDate(verif.dueDate)}
                   </span> */}
-                </p>
-              </AccordionTrigger>
-              <AccordionContent className="-mt-2 rounded-lg border border-white px-5 py-7">
-                {verif.type === 'bukti-pembayaran' && (
-                  <div>
-                    <p className="mb-4 md:text-[18px] lg:text-[21px]">
-                      Silakan upload bukti pembayaran tim di sini
-                    </p>
-                    <p className="mb-1 font-bold md:text-[16px] lg:text-[19px]">
-                      Rekening
-                    </p>
-                    <p className="md:text-[15px] lg:text-[17px]">
-                      Seabank a.n. Stefany Josefina Santono
-                    </p>
-                    <p className="md:text-[15px] lg:text-[17px]">901723767417</p>
-                  </div>
-                )}
-                {verif.type === 'poster' && (
-                  <div>
-                    <p className="mb-4 md:text-[18px] lg:text-[21px]">
-                      Silakan upload poster di sini
-                    </p>
-                  </div>
-                )}
-                {verif.type === 'twibbon' && (
-                  <div>
-                    <p className="mb-4 md:text-[18px] lg:text-[21px]">
-                      Silakan upload twibbon di sini
-                    </p>
-                  </div>
-                )}
-                {/* File URL Preview */}
-                <FilePreview
-                  fileURL={verif.mediaLink ?? undefined}
-                  name={verif.mediaName}
-                />
-                {/* End of File URL Preview */}
-                {verif.status === 'rejected' && (
-                  <div className="pt-2">
-                    <p className="font-teachers text-xl font-bold text-red-400">
-                      Alasan penolakan
-                    </p>
-                    <p className="font-dmsans text-[1rem] text-lg font-normal">
-                      {capitalizeFirstLetter(verif.rejectionMessage!)}
-                    </p>
-                  </div>
-                )}
-                <div className="mt-6 flex w-full items-center gap-3 md:justify-end">
-                  <p
-                    className={`flex h-12 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getVerifStatusColor(verif.status)}`}>
-                    {getVerifStatus(verif.status)}
                   </p>
-                  <Button
-                    onClick={
-                      !verif.isVerified ? () => setSelectedVerif(verif) : undefined
-                    }
-                    size="lg"
-                    disabled={verif.isVerified}
-                    className={`w-[60%] text-center text-sm md:w-auto md:text-base ${verif.isVerified ? 'border-2 border-[#cccccc] bg-transparent text-[#cccccc] hover:text-[#4D06B0CC]' : 'bg-gradient-to-br from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white'}`}>
-                    Submit Verification
-                  </Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+                </AccordionTrigger>
+                <AccordionContent className="-mt-2 rounded-lg border border-white px-5 py-7">
+                  {verif.type === 'bukti-pembayaran' && (
+                    <div>
+                      <p className="mb-4 md:text-[18px] lg:text-[21px]">
+                        Silakan upload bukti pembayaran tim di sini
+                      </p>
+                      <p className="mb-1 font-bold md:text-[16px] lg:text-[19px]">
+                        Rekening
+                      </p>
+                      <p className="md:text-[15px] lg:text-[17px]">
+                        Seabank a.n. Stefany Josefina Santono
+                      </p>
+                      <p className="md:text-[15px] lg:text-[17px]">901723767417</p>
+                    </div>
+                  )}
+                  {verif.type === 'poster' && (
+                    <div>
+                      <p className="mb-4 md:text-[18px] lg:text-[21px]">
+                        Silakan upload poster di sini
+                      </p>
+                    </div>
+                  )}
+                  {verif.type === 'twibbon' && (
+                    <div>
+                      <p className="mb-4 md:text-[18px] lg:text-[21px]">
+                        Silakan upload twibbon di sini
+                      </p>
+                    </div>
+                  )}
+                  {/* File URL Preview */}
+                  <FilePreview
+                    fileURL={verif.mediaLink ?? undefined}
+                    name={verif.mediaName}
+                  />
+                  {/* End of File URL Preview */}
+                  {verif.status === 'rejected' && (
+                    <div className="pt-2">
+                      <p className="font-teachers text-xl font-bold text-red-400">
+                        Alasan penolakan
+                      </p>
+                      <p className="font-dmsans text-[1rem] text-lg font-normal">
+                        {capitalizeFirstLetter(verif.rejectionMessage!)}
+                      </p>
+                    </div>
+                  )}
+                  <div className="mt-6 flex w-full items-center gap-3 md:justify-end">
+                    <p
+                      className={`flex h-12 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getVerifStatusColor(verif.status)}`}>
+                      {getVerifStatus(verif.status)}
+                    </p>
+                    <Button
+                      onClick={
+                        !verif.isVerified ? () => setSelectedVerif(verif) : undefined
+                      }
+                      size="lg"
+                      disabled={verif.isVerified}
+                      className={`w-[60%] text-center text-sm md:w-auto md:text-base ${verif.isVerified ? 'border-2 border-[#cccccc] bg-transparent text-[#cccccc] hover:text-[#4D06B0CC]' : 'bg-gradient-to-br from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white'}`}>
+                      Submit Verification
+                    </Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </>
       )}
     </div>
   )

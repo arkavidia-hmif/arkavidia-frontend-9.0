@@ -1,17 +1,16 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { getTeamInfo } from './EventHero'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import {
   EventTeam,
   getDownloadPresignedLink,
   self,
   putAdminEventTeamVerification,
-  PutAdminEventTeamVerificationData,
   TeamMemberDocument,
   UserDocument,
-  EventTeamDocument
+  EventTeamDocument,
+  PutAdminEventTeamVerificationData
 } from '~/api/generated'
 import { cn } from '~/lib/utils'
 import Tag from '~/app/components/Tag'
@@ -23,6 +22,8 @@ import { Input } from '~/app/components/Input'
 import Link from 'next/link'
 
 interface EventVerificationSectionProps {
+  teamData?: EventTeam
+  refetchData: () => Promise<void>
   teamID: string
   eventID: string
 }
@@ -369,22 +370,17 @@ function FileRequirements({
   )
 }
 
-const EventVerificationSection = ({ teamID, eventID }: EventVerificationSectionProps) => {
-  const axiosInstance = useAxiosAuth()
-  const [teamInfo, setTeamInfo] = useState<EventTeam | null>(null)
-
-  const fetchData = async () => {
-    const data = await getTeamInfo(axiosInstance, teamID, eventID)
-    setTeamInfo(data)
-  }
+const EventVerificationSection = ({
+  teamData,
+  eventID,
+  teamID,
+  refetchData
+}: EventVerificationSectionProps) => {
+  const teamInfo = teamData
 
   const handleRefetch = async () => {
-    await fetchData()
+    await refetchData()
   }
-
-  useEffect(() => {
-    fetchData()
-  }, [axiosInstance, teamID, eventID])
 
   const createdAt = teamInfo?.createdAt
     ? new Date(teamInfo.createdAt).toLocaleDateString()
