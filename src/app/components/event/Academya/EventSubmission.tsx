@@ -5,7 +5,9 @@ import {
   getAdminEventTeamSubmissions,
   GetAdminEventTeamSubmissionsResponse,
   getAdminEventTeamInformation,
-  EventTeam
+  EventTeam,
+  getDownloadPresignedLink,
+  GetDownloadPresignedLinkData
 } from '~/api/generated'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import { capitalizeFirstLetter } from '~/lib/utils'
@@ -43,6 +45,50 @@ export default function EventSubmission({}: {}) {
   const teamID = params.teamId as string // If using teamID, change params.team to params.teamID
   const eventID = params.event as string // Same with event
 
+  const getMediaPresignedGetLink = async (
+    filename: string,
+    bucket: GetDownloadPresignedLinkData['query']['bucket'] | undefined
+  ) => {
+    try {
+      if (!filename || !bucket) {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch media: Filename or bucket not found',
+          variant: 'warning',
+          duration: 6000
+        })
+        return
+      }
+
+      const res = await getDownloadPresignedLink({
+        client: axiosAuth,
+        query: {
+          filename: filename,
+          bucket: bucket
+        }
+      })
+
+      if (res.error || !res.data) {
+        toast({
+          title: 'Error',
+          description: `Failed to fetch media: ${filename}. Error: ${res.error}`,
+          variant: 'warning',
+          duration: 6000
+        })
+        return
+      }
+
+      return res.data
+    } catch (err: unknown) {
+      toast({
+        title: 'Error',
+        description: `Failed to fetch media: ${filename}. Error: ${err}`,
+        variant: 'destructive',
+        duration: 6000
+      })
+    }
+  }
+
   const fetchTeamData = async () => {
     const response = (await getAdminEventTeamInformation({
       client: axiosAuth,
@@ -63,7 +109,7 @@ export default function EventSubmission({}: {}) {
     setTeamData(responseData)
   }
 
-  function generateSubmissionData(
+  async function generateSubmissionData(
     teamSubmissions?: GetAdminEventTeamSubmissionsResponse
   ) {
     const prelimSubmissions: SubmissionDoc[] = []
@@ -73,44 +119,63 @@ export default function EventSubmission({}: {}) {
     const finalData = teamSubmissions?.final
     // console.log(preEliminaryData, finalData)
     const combinedData = preEliminaryData?.concat(finalData ?? [])
+    if (!combinedData) {
+      return
+    }
 
-    combinedData?.forEach(data => {
-      const stage = capitalizeFirstLetter(data.requirement.stage)
+    const results = await Promise.allSettled(
+      combinedData.map(async data => {
+        const stage = capitalizeFirstLetter(data.requirement.stage)
 
-      let currentDoc: SubmissionDoc = {
-        req_id: data.requirement.typeId,
-        title: data.requirement.typeName,
-        stage: capitalizeFirstLetter(data.requirement.stage) as 'Final' | 'Pre-eliminary',
-        file_name: '-',
-        file_url: '',
-        status: 'Not Submitted',
-        feedback: ''
-      }
-
-      if (data.submission && data.submission.media) {
-        currentDoc = {
-          ...currentDoc,
-          file_name: data.submission.media.name,
-          file_url: data.submission.media.url,
-          feedback: data.submission.judgeResponse || undefined,
-          status: data.submission.judgeResponse ? 'Change Needed' : 'Submitted'
+        let currentDoc: SubmissionDoc = {
+          req_id: data.requirement.typeId,
+          title: data.requirement.typeName,
+          stage: capitalizeFirstLetter(data.requirement.stage) as
+            | 'Final'
+            | 'Pre-eliminary',
+          file_name: '-',
+          file_url: '',
+          status: 'Not Submitted',
+          feedback: ''
         }
-      }
 
-      if (data.requirement.deadline) {
-        const deadline = new Date(data.requirement.deadline)
-        const currentDate = new Date()
-        if (currentDate > deadline) {
-          if (currentDoc.status === 'Waiting') {
-            currentDoc.status = 'Not Submitted'
+        if (data.submission && data.submission.media) {
+          const mediaURL = await getMediaPresignedGetLink(
+            data.submission.media.name,
+            data.submission.media
+              .bucket as GetDownloadPresignedLinkData['query']['bucket']
+          )
+          currentDoc = {
+            ...currentDoc,
+            file_name: data.submission.media.name,
+            file_url: mediaURL?.mediaUrl ?? '',
+            feedback: data.submission.judgeResponse || undefined,
+            status: data.submission.judgeResponse ? 'Change Needed' : 'Submitted'
           }
         }
-      }
 
-      if (stage.toLowerCase().includes('final')) {
-        finalSubmissions.push(currentDoc)
-      } else {
-        prelimSubmissions.push(currentDoc)
+        if (data.requirement.deadline) {
+          const deadline = new Date(data.requirement.deadline)
+          const currentDate = new Date()
+          if (currentDate > deadline) {
+            if (currentDoc.status === 'Waiting') {
+              currentDoc.status = 'Not Submitted'
+            }
+          }
+        }
+
+        return currentDoc
+      })
+    )
+
+    results.forEach(result => {
+      if (result.status === 'fulfilled') {
+        const data = result.value as SubmissionDoc
+        if (data.stage?.includes('final')) {
+          finalSubmissions.push(data)
+        } else {
+          prelimSubmissions.push(data)
+        }
       }
     })
 
@@ -129,7 +194,7 @@ export default function EventSubmission({}: {}) {
         )?.data
 
         // ! Delete groupedResult if API fixed
-        generateSubmissionData(response)
+        await generateSubmissionData(response)
       }
     }
     fetchData()
@@ -147,7 +212,7 @@ export default function EventSubmission({}: {}) {
 
       // TODO: delete grouped result from API
       // ! Delete groupedResult if API fixed
-      generateSubmissionData(response)
+      await generateSubmissionData(response)
     }
   }
 
