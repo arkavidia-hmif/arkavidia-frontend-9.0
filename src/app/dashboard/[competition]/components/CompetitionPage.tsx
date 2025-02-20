@@ -20,6 +20,7 @@ import {
   getTeamSubmission,
   GetTeamSubmissionResponse,
   Media,
+  postApplyVoucerCTeam,
   postTeamDocument,
   putTeamSubmission,
   self,
@@ -35,6 +36,8 @@ import TeamInformationContent from '~/app/components/competition/TeamInformation
 import Dropdown, { MenuItem } from '~/app/components/Dropdown'
 import { toast, useToast } from '~/hooks/use-toast'
 import FilePreview from './FilePreview'
+import { VoucherAccordionItem } from './VoucherAccordionItem'
+import VoucherDropzone from './VoucherDropzone'
 
 function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
@@ -62,7 +65,7 @@ interface Task {
 interface Verification {
   id: string
   isVerified: boolean
-  type: 'bukti-pembayaran' | 'poster' | 'twibbon'
+  type: 'bukti-pembayaran' | 'poster' | 'twibbon' | 'arkalogica-voucher'
   status: 'unsubmitted' | 'submitted' | 'verified' | 'rejected'
   mediaLink?: string
   mediaName?: string
@@ -75,6 +78,12 @@ interface TeamVerification extends Verification {
 
 interface MemberVerification extends Verification {
   userId?: string
+}
+
+interface VoucherVerification extends Verification {
+  voucherCode?: string
+  syarat?: string
+  nominal?: string
 }
 
 const MemberDocumentRequirement = ['poster', 'twibbon']
@@ -246,6 +255,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
         let teamID: string | null = null
         const teamsResponse = await getTeams({ client: axiosInstance })
+
         if (teamsResponse.data && teamsResponse.data.length > 0) {
           const teamData: GetTeamsResponse = []
 
@@ -263,6 +273,7 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           const teamId = teamData[0].id
           teamID = teamId
           setCurrentTeamId(teamId)
+
           const currentUserData = await self({ client: axiosInstance })
           setCurrentUserId(currentUserData.data?.id ?? '')
 
@@ -386,7 +397,9 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
           if (teamVerification) {
             setVerifications(prev => [...prev, teamVerification])
+            await setVoucherVerification(teamId)
           }
+
           setVerifications(prev => [...prev, ...memberVerifications])
         } else {
           toast({
@@ -412,6 +425,42 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
     fetchSubmissionRequirements()
   }, [])
+
+  async function setVoucherVerification(teamId: string) {
+    const teamsResponse = getTeamById({
+      client: axiosInstance,
+      path: {
+        teamId: teamId
+      }
+    })
+
+    const teamData = (await teamsResponse)?.data
+
+    let statusVoucher: 'unsubmitted' | 'submitted' | 'verified' = 'unsubmitted'
+    if (!teamData) {
+      return
+    }
+
+    if (teamData.voucer) {
+      statusVoucher = 'submitted'
+    }
+    if (teamData.eligibleForVoucer && teamData.eligibleForVoucer === true) {
+      statusVoucher = 'verified'
+    }
+    const voucherVerification: VoucherVerification = {
+      id: 'voucher-0',
+      isVerified: statusVoucher === 'verified',
+      type: 'arkalogica-voucher',
+      status: statusVoucher,
+      voucherCode: teamData.voucer?.code,
+      syarat: teamData.voucer?.requiredTeamCount.toString(),
+      nominal: teamData.voucer?.discount?.toString()
+    }
+
+    setVerifications(prev => [...prev, voucherVerification])
+
+    return
+  }
 
   const getStatusTask = (
     data: GetTeamSubmissionResponse extends (infer ElementType)[] ? ElementType : never
@@ -656,6 +705,64 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
     }
   }
 
+  async function onSubmitVoucher(voucherCode: string) {
+    try {
+      const response = await postApplyVoucerCTeam({
+        client: axiosInstance,
+        body: {
+          code: voucherCode
+        },
+        path: {
+          teamId: currentTeamId ?? ''
+        }
+      })
+
+      if (response.error) {
+        toast({
+          title: 'Error',
+          description: 'Gagal mengupload voucher coba sesaat lagi',
+          variant: 'destructive',
+          duration: 5000
+        })
+        return
+      }
+
+      const newFilteredVerifications = verifications.filter(
+        verif => verif.type !== 'arkalogica-voucher'
+      )
+
+      const status: 'unsubmitted' | 'submitted' | 'verified' = response.data
+        ?.eligibleForVoucer
+        ? 'verified'
+        : 'submitted'
+
+      const newVerifData: VoucherVerification = {
+        id: 'voucher-0',
+        isVerified: status === 'submitted',
+        type: 'arkalogica-voucher',
+        status: status,
+        voucherCode: voucherCode,
+        syarat: response.data?.voucer?.requiredTeamCount.toString(),
+        nominal: response.data?.voucer?.discount?.toString()
+      }
+
+      newFilteredVerifications.push(newVerifData)
+
+      setVerifications(newFilteredVerifications)
+      setSelectedVerif(null)
+    } catch (e) {
+      console.error(e)
+      toast({
+        title: 'Error',
+        description: 'Gagal mengupload voucher coba sesaat lagi',
+        variant: 'destructive',
+        duration: 5000
+      })
+    }
+  }
+
+  const isArkaLogica = compeName === 'Arkalogica'
+
   const contentTypes = ['Team Information', 'Task List', 'Verification']
 
   const contents = [
@@ -664,6 +771,17 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
 
     // Task List Content
     <div className="font-dmsans">
+      <div className="mb-4">
+        <div className="flex w-full items-center gap-x-2">
+          {/* <p className="text-[12px] text-gray-300">Keterangan: </p> */}
+          <div className="flex h-3 w-3 gap-x-1 bg-[#E50000]/80 text-[12px]"></div>
+          <p className="text-[12px]">Past due</p>
+          <div className="flex h-3 w-3 gap-x-1 bg-[#FFCC00CC]/80 text-[12px]"></div>
+          <p className="text-[12px]">Ongoing</p>
+          <div className="flex h-3 w-3 gap-x-1 bg-[#4D06B0CC]/80 text-[12px]"></div>
+          <p className="text-[12px]">Completed</p>
+        </div>
+      </div>
       {selectedTask ? (
         // Specific Task
         <div className="rounded-lg border border-white bg-gradient-to-r from-[#0202024D]/30 to-[#7138C099]/60 px-8 py-8 md:px-16">
@@ -770,10 +888,16 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
               </Button>
               <div className="flex flex-col">
                 <h1 className="text-xl font-bold md:text-2xl">
-                  {capitalizeFirstLetter(selectedVerif.type)
-                    .split('-')
-                    .map(word => capitalizeFirstLetter(word))
-                    .join(' ')}
+                  {selectedVerif.type === 'arkalogica-voucher' ? (
+                    'Masukkan Code Voucher'
+                  ) : (
+                    <>
+                      {capitalizeFirstLetter(selectedVerif.type)
+                        .split('-')
+                        .map(word => capitalizeFirstLetter(word))
+                        .join(' ')}
+                    </>
+                  )}
                 </h1>
               </div>
             </div>
@@ -786,93 +910,119 @@ const CompetitionPage = ({ compeName }: { compeName: string }) => {
           </div>
           {/* <p className="mt-10">{selectedVerif.description}</p> */}
           {/* Task Dropzone */}
-          <TaskDropzone bucket={selectedVerif.type} onSubmitMedia={handleMediaSubmit} />
+          {selectedVerif.type === 'arkalogica-voucher' ? (
+            <VoucherDropzone onSubmitVoucher={onSubmitVoucher} />
+          ) : (
+            <TaskDropzone bucket={selectedVerif.type} onSubmitMedia={handleMediaSubmit} />
+          )}
         </div>
       ) : (
         // Task List
         <Accordion type="multiple" defaultValue={verifications.map(verif => verif.id)}>
-          {verifications?.map(verif => (
-            <AccordionItem key={verif.id} value={`${verif.id}`}>
-              <AccordionTrigger
-                accType="framed"
-                className={`&[data-state=open]>svg]:rotate-180 mt-2 rounded-xl border border-white px-5 py-5 outline-border hover:no-underline hover:decoration-0 md:py-7 [&>svg]:size-5 [&>svg]:-rotate-90 [&>svg]:text-white md:[&>svg]:size-7 [&[data-state=open]>svg]:rotate-0 ${getVerifTriggerColor(verif.status)}`}>
-                <p className="gap-3 text-lg font-semibold md:text-xl lg:text-[24px]">
-                  {capitalizeFirstLetter(verif.type)
-                    .split('-')
-                    .map(word => capitalizeFirstLetter(word))
-                    .join(' ')}
-                  {/* <span className="ml-3 text-xs font-light md:text-sm">
-                    {formatDate(verif.dueDate)}
-                  </span> */}
-                </p>
-              </AccordionTrigger>
-              <AccordionContent className="-mt-2 rounded-lg border border-white px-5 py-7">
-                {verif.type === 'bukti-pembayaran' && (
-                  <div>
-                    <p className="mb-4 md:text-[18px] lg:text-[21px]">
-                      Silakan upload bukti pembayaran tim di sini
-                    </p>
-                    <p className="mb-1 font-bold md:text-[16px] lg:text-[19px]">
-                      Rekening
-                    </p>
-                    <p className="md:text-[15px] lg:text-[17px]">
-                      Seabank a.n. Stefany Josefina Santono
-                    </p>
-                    <p className="md:text-[15px] lg:text-[17px]">901723767417</p>
-                  </div>
-                )}
-                {verif.type === 'poster' && (
-                  <div>
-                    <p className="mb-4 md:text-[18px] lg:text-[21px]">
-                      Silakan upload poster di sini. Poster yang perlu diupload hanyalah
-                      poster anda saja.{' '}
-                      <b>(Poster diupload oleh masing-masing anggota tim)</b>
-                    </p>
-                  </div>
-                )}
-                {verif.type === 'twibbon' && (
-                  <div>
-                    <p className="mb-4 md:text-[18px] lg:text-[21px]">
-                      Silakan upload twibbon di sini. Twibbon yang perlu diupload hanyalah
-                      twibbon anda saja.{' '}
-                      <b>(Twibbon diupload oleh masing-masing anggota tim)</b>
-                    </p>
-                  </div>
-                )}
-                {/* File URL Preview */}
-                <FilePreview
-                  fileURL={verif.mediaLink ?? undefined}
-                  name={verif.mediaName}
-                />
-                {/* End of File URL Preview */}
-                {verif.status === 'rejected' && (
-                  <div className="pt-2">
-                    <p className="font-teachers text-xl font-bold text-red-400">
-                      Alasan penolakan
-                    </p>
-                    <p className="font-dmsans text-[1rem] text-lg font-normal">
-                      {capitalizeFirstLetter(verif.rejectionMessage!)}
-                    </p>
-                  </div>
-                )}
-                <div className="mt-5 flex w-full items-center gap-3 md:justify-end">
-                  <p
-                    className={`flex h-10 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getVerifStatusColor(verif.status)}`}>
-                    {getVerifStatus(verif.status)}
+          {verifications?.map(verif =>
+            verif.type === 'arkalogica-voucher' && compeName !== 'Arkalogica' ? null : (
+              <AccordionItem key={verif.id} value={`${verif.id}`}>
+                <AccordionTrigger
+                  accType="framed"
+                  className={`&[data-state=open]>svg]:rotate-180 mt-2 rounded-xl border border-white px-5 py-5 outline-border hover:no-underline hover:decoration-0 md:py-7 [&>svg]:size-5 [&>svg]:-rotate-90 [&>svg]:text-white md:[&>svg]:size-7 [&[data-state=open]>svg]:rotate-0 ${getVerifTriggerColor(verif.status)}`}>
+                  <p className="gap-3 text-lg font-semibold md:text-xl lg:text-[24px]">
+                    {verif.type === 'arkalogica-voucher' ? (
+                      'Voucher (Optional) '
+                    ) : (
+                      <>
+                        {capitalizeFirstLetter(verif.type)
+                          .split('-')
+                          .map(word => capitalizeFirstLetter(word))
+                          .join(' ')}
+                        {/* <span className="ml-3 text-xs font-light md:text-sm">
+                      {formatDate(verif.dueDate)}
+                    </span> */}
+                      </>
+                    )}
                   </p>
-                  <Button
-                    onClick={
-                      !verif.isVerified ? () => setSelectedVerif(verif) : undefined
-                    }
-                    size="lg"
-                    disabled={verif.isVerified}
-                    className={`w-[60%] text-center text-sm md:w-auto md:text-base ${verif.isVerified ? 'border-2 border-[#cccccc] bg-transparent text-[#cccccc] hover:text-[#4D06B0CC]' : 'bg-gradient-to-br from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white'}`}>
-                    Submit Verification
-                  </Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+                </AccordionTrigger>
+                <AccordionContent className="-mt-2 rounded-lg border border-white px-5 py-7">
+                  {verif.type === 'bukti-pembayaran' && (
+                    <div>
+                      <p className="mb-4 md:text-[18px] lg:text-[21px]">
+                        Silakan upload bukti pembayaran tim di sini
+                      </p>
+                      <p className="mb-1 font-bold md:text-[16px] lg:text-[19px]">
+                        Rekening
+                      </p>
+                      <p className="md:text-[15px] lg:text-[17px]">
+                        Seabank a.n. Stefany Josefina Santono
+                      </p>
+                      <p className="md:text-[15px] lg:text-[17px]">901723767417</p>
+                      {isArkaLogica && (
+                        <p className="mb-1 mt-4 font-bold md:text-[16px] lg:text-[19px]">
+                          Untuk team yang memiliki voucher dapat mengupload code voucher
+                          pada input dibawah
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {verif.type === 'poster' && (
+                    <div>
+                      <p className="mb-4 md:text-[18px] lg:text-[21px]">
+                        Silakan upload poster di sini. Poster yang perlu diupload hanyalah
+                        poster anda saja.{' '}
+                        <b>(Poster diupload oleh masing-masing anggota tim)</b>
+                      </p>
+                    </div>
+                  )}
+                  {verif.type === 'twibbon' && (
+                    <div>
+                      <p className="mb-4 md:text-[18px] lg:text-[21px]">
+                        Silakan upload twibbon di sini. Twibbon yang perlu diupload
+                        hanyalah twibbon anda saja.{' '}
+                        <b>(Twibbon diupload oleh masing-masing anggota tim)</b>
+                      </p>
+                    </div>
+                  )}
+                  {verif.type === 'arkalogica-voucher' && (
+                    <VoucherAccordionItem
+                      discount={(verif as VoucherVerification).nominal}
+                      isVerified={verif.isVerified}
+                      teamCount={(verif as VoucherVerification).syarat}
+                      voucherCode={(verif as VoucherVerification).voucherCode}
+                    />
+                  )}
+                  {/* File URL Preview */}
+                  <FilePreview
+                    fileURL={verif.mediaLink ?? undefined}
+                    name={verif.mediaName}
+                  />
+                  {/* End of File URL Preview */}
+                  {verif.status === 'rejected' && (
+                    <div className="pt-2">
+                      <p className="font-teachers text-xl font-bold text-red-400">
+                        Alasan penolakan
+                      </p>
+                      <p className="font-dmsans text-[1rem] text-lg font-normal">
+                        {capitalizeFirstLetter(verif.rejectionMessage!)}
+                      </p>
+                    </div>
+                  )}
+                  <div className="mt-5 flex w-full items-center gap-3 md:justify-end">
+                    <p
+                      className={`flex h-10 w-[40%] items-center justify-center rounded-md border bg-gradient-to-r from-white/25 to-[#999999]/25 py-2 text-xs md:w-auto md:px-8 md:text-base ${getVerifStatusColor(verif.status)}`}>
+                      {getVerifStatus(verif.status)}
+                    </p>
+                    <Button
+                      onClick={
+                        !verif.isVerified ? () => setSelectedVerif(verif) : undefined
+                      }
+                      size="lg"
+                      disabled={verif.isVerified}
+                      className={`w-[60%] text-center text-sm md:w-auto md:text-base ${verif.isVerified ? 'border-2 border-[#cccccc] bg-transparent text-[#cccccc] hover:text-[#4D06B0CC]' : 'bg-gradient-to-br from-[#48E6FF] via-[#9274FF] to-[#C159D8] text-white'}`}>
+                      Submit Verification
+                    </Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )
+          )}
         </Accordion>
       )}
     </div>
