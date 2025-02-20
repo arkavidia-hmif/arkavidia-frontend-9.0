@@ -30,8 +30,11 @@ import { useToast } from '~/hooks/use-toast'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
 import FilePreview from '../../../[competition]/components/FilePreview'
 import {
+  getDownloadPresignedLink,
+  GetDownloadPresignedLinkData,
   GetEventTeamByTeamIdResponse,
   getEventTeamMemberById,
+  getPresignedLink,
   updateEventTeamMemberDocument,
   User
 } from '~/api/generated'
@@ -54,6 +57,50 @@ function EventVerification({
 
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
+
+  const getMediaPresignedGetLink = async (
+    filename: string,
+    bucket: GetDownloadPresignedLinkData['query']['bucket'] | undefined
+  ) => {
+    try {
+      if (!filename || !bucket) {
+        toast({
+          title: 'Error',
+          description: 'Failed to fetch media: Filename or bucket not found',
+          variant: 'warning',
+          duration: 6000
+        })
+        return
+      }
+
+      const res = await getDownloadPresignedLink({
+        client: axiosAuth,
+        query: {
+          filename: filename,
+          bucket: bucket
+        }
+      })
+
+      if (res.error || !res.data) {
+        toast({
+          title: 'Error',
+          description: `Failed to fetch media: ${filename}. Error: ${res.error}`,
+          variant: 'warning',
+          duration: 6000
+        })
+        return
+      }
+
+      return res.data
+    } catch (err: unknown) {
+      toast({
+        title: 'Error',
+        description: `Failed to fetch media: ${filename}. Error: ${err}`,
+        variant: 'destructive',
+        duration: 6000
+      })
+    }
+  }
 
   // ADD Verifications API Integration HERE
   async function fetchVerifications() {
@@ -126,41 +173,58 @@ function EventVerification({
       const documentRequirement = ['poster', 'twibbon'] as Array<'poster' | 'twibbon'>
 
       // Check if user has submitted the required documents
-      documentRequirement.forEach(doc => {
-        const foundDocument = userDocument?.find(userDoc => userDoc.type === doc)
-        if (!foundDocument) {
-          verificationTempStorage.push({
-            id: `${doc}-verification`,
-            userId: user.id,
-            type: doc,
-            isVerified: false,
-            status: 'unsubmitted'
-          })
-        } else {
-          const isDocumentVerified = foundDocument.isVerified
-          const verificationError = foundDocument.verificationError
-          const isRejected =
-            verificationError !== '' &&
-            verificationError !== null &&
-            verificationError !== undefined
+      const documents = await Promise.allSettled(
+        documentRequirement.map(async doc => {
+          const foundDocument = userDocument?.find(userDoc => userDoc.type === doc)
+          let tempDocument: EventVerificationAll
 
-          verificationTempStorage.push({
-            id: `${doc}-verification`,
-            userId: user.id,
-            type: doc,
-            isVerified: isDocumentVerified,
-            rejectionMessage: foundDocument.verificationError ?? '',
-            status: isDocumentVerified
-              ? 'verified'
-              : isRejected
-                ? 'rejected'
-                : 'submitted',
-            mediaLink: foundDocument.media.url,
-            mediaName: foundDocument.media.name
-          })
+          if (!foundDocument) {
+            tempDocument = {
+              id: `${doc}-verification`,
+              userId: user.id,
+              type: doc,
+              isVerified: false,
+              status: 'unsubmitted'
+            }
+          } else {
+            const isDocumentVerified = foundDocument.isVerified
+            const verificationError = foundDocument.verificationError
+            const isRejected =
+              verificationError !== '' &&
+              verificationError !== null &&
+              verificationError !== undefined
+
+            const documentURL = await getMediaPresignedGetLink(
+              foundDocument.media.name,
+              foundDocument.media
+                .bucket as GetDownloadPresignedLinkData['query']['bucket']
+            )
+
+            tempDocument = {
+              id: `${doc}-verification`,
+              userId: user.id,
+              type: doc,
+              isVerified: isDocumentVerified,
+              rejectionMessage: foundDocument.verificationError ?? '',
+              status: isDocumentVerified
+                ? 'verified'
+                : isRejected
+                  ? 'rejected'
+                  : 'submitted',
+              mediaLink: documentURL?.mediaUrl ?? undefined,
+              mediaName: foundDocument.media.name
+            }
+          }
+
+          return tempDocument
+        })
+      )
+
+      documents.forEach(doc => {
+        if (doc.status === 'fulfilled') {
+          verificationTempStorage.push(doc.value)
         }
       })
-
       setVerifications(verificationTempStorage)
     } catch (err: unknown) {
       toast({
