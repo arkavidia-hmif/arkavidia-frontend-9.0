@@ -87,21 +87,43 @@ export const CompetitionLandingPage: React.FC<CompetitionLandingPageProps> = pro
       const startTime = event.timeStart
         ? new Date(event.timeStart).getTime()
         : Number.MAX_SAFE_INTEGER
-      const endTime = event.timeEnd
-        ? new Date(event.timeEnd).getTime()
-        : Number.MAX_SAFE_INTEGER
-      return startTime > now.getTime() || endTime > now.getTime()
+      const endTime = event.timeEnd ? new Date(event.timeEnd).getTime() : null
+      return startTime > now.getTime()
     })
 
-    const currentEvent = props.registrationDeadline.find(event => {
-      const startTime = event.timeStart
-        ? new Date(event.timeStart).getTime()
-        : Number.MIN_SAFE_INTEGER
-      const endTime = event.timeEnd
-        ? new Date(event.timeEnd).getTime()
-        : Number.MAX_SAFE_INTEGER
-      return now.getTime() >= startTime && now.getTime() <= endTime
-    })
+    let currentEvent: TimelineEventProps | null = null
+    for (let i = 0; i < props.registrationDeadline.length; i++) {
+      const event = props.registrationDeadline[i]
+      if (event.timeStart && event.timeEnd) {
+        const startTime = new Date(event.timeStart).getTime()
+        const endTime = new Date(event.timeEnd).getTime()
+        if (now.getTime() >= startTime && now.getTime() <= endTime) {
+          currentEvent = event
+          break
+        }
+      }
+    }
+    // const currentEvent = props.registrationDeadline.find(event => {
+    //   const startTime = event.timeStart
+    //     ? new Date(event.timeStart).getTime()
+    //     : Number.MIN_SAFE_INTEGER
+    //   const endTime = event.timeEnd ? new Date(event.timeEnd).getTime() : null
+    //   // console.log('CURRENT EVENT: ', event)
+    //   // console.log(
+    //   //   event.title,
+    //   //   ', STATUS: ',
+    //   //   now.getTime() >= startTime && now.getTime() <= endTime,
+    //   //   now.getTime(),
+    //   //   startTime,
+    //   //   endTime
+    //   // )
+    //   if (event.isTBA) return false
+    //   if (endTime) {
+    //     return now.getTime() >= startTime && now.getTime() <= endTime
+    //   }
+
+    //   return now.getTime() >= startTime
+    // })
 
     if (currentEvent) {
       setCurrentOrClosestEvent(currentEvent)

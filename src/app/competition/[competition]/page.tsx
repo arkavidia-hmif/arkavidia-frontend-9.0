@@ -116,6 +116,19 @@ const transformToTimelineEvents = (
 
     data.push(arr)
   })
+  data.sort((a, b) => {
+    if (a.isTBA) {
+      return 1
+    } else if (b.isTBA) {
+      return -1
+    }
+
+    if (a.timeStart && b.timeStart) {
+      return a.timeStart.getTime() - b.timeStart.getTime()
+    }
+
+    return 0
+  })
   return data
 }
 
