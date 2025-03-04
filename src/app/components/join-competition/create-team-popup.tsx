@@ -99,7 +99,8 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
 export const CreateTeamPopup: React.FC<{
   competitionID: string
   competitionType: CompetitionType
-}> = ({ competitionID, competitionType }) => {
+  disabled?: boolean
+}> = ({ competitionID, competitionType, disabled }) => {
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
   const [teamName, setTeamName] = useState('')
@@ -199,7 +200,8 @@ export const CreateTeamPopup: React.FC<{
         <DialogTrigger asChild>
           <Button
             size="sm"
-            onClick={() => setIsOpen(true)}
+            onClick={!disabled ? () => setIsOpen(true) : undefined}
+            disabled={disabled}
             className="flex w-[250px] items-center justify-center gap-[2rem]">
             <div>
               <p className="text-xl">Create Team</p>

@@ -88,7 +88,7 @@ export default function CompetitionRegistration({
             side="bottom"
             sideOffset={10}
             className="z-10 bg-black font-dmsans text-white">
-            <p className="text-[15px]">Registrasi belum dapat dilakukan</p>
+            <p className="text-[15px]">Masa registrasi telah selesai</p>
           </TooltipContent>
         )
       } else if (isUserSMA) {
@@ -168,10 +168,7 @@ export default function CompetitionRegistration({
                 onClick={() => setIsTooltipOpen(!isTooltipOpen)}>
                 <Button
                   size="sm"
-                  onClick={() => {
-                    !disabled ? handleOpenDialog() : () => {}
-                  }}
-                  disabled={disabled}
+                  onClick={() => handleOpenDialog()}
                   className="cursor-pointer">
                   <div className="flex items-center justify-center gap-2 lg:w-[200px] lg:gap-5 lg:text-base">
                     <p>Register Now </p>
@@ -206,6 +203,7 @@ export default function CompetitionRegistration({
                 <CreateTeamPopup
                   competitionID={competitionID}
                   competitionType={competitionType}
+                  disabled={disabled}
                 />
               </div>
               <div className="flex flex-col items-center gap-4">
