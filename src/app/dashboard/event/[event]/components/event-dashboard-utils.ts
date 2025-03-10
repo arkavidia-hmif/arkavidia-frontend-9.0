@@ -40,7 +40,7 @@ const getEventNameSlug = (slug: string) => {
     } else if (firstEventName === 'ui') {
       return 'Academya - UI UX'
     } else if (firstEventName === 'product') {
-      return 'Academya - Product Manager'
+      return 'Academya - Product Management'
     }
   }
 }
