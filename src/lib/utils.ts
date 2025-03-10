@@ -22,7 +22,7 @@ export function getAcademyaEventName(eventName: string) {
   } else if (eventName === 'datascience') {
     return 'Academya - Data Science'
   } else if (eventName === 'pm') {
-    return 'Academya - Product Manager'
+    return 'Academya - Product Management'
   } else if (eventName === 'uiux') {
     return 'Academya - UI UX'
   } else {
