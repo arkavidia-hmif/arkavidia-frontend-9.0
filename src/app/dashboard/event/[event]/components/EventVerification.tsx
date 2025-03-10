@@ -50,6 +50,7 @@ function EventVerification({
 }) {
   const [selectedVerif, setSelectedVerif] = useState<EventVerificationAll | null>(null)
   const [verifications, setVerifications] = useState<EventVerificationAll[]>([])
+  const [openValues, setOpenValues] = useState<string[]>([])
 
   const { toast } = useToast()
   const axiosAuth = useAxiosAuth()
@@ -243,6 +244,16 @@ function EventVerification({
     fetch()
   }, [])
 
+  useEffect(() => {
+    if (verifications.length > 0) {
+      setOpenValues(
+        verifications
+          .filter(verif => verif.status === 'unsubmitted')
+          .map(filtered => filtered.id)
+      ) // Convert IDs to strings
+    }
+  }, [verifications])
+
   return (
     <div className="font-dmsans">
       {selectedVerif ? (
@@ -278,7 +289,7 @@ function EventVerification({
         </div>
       ) : (
         // Verifications List
-        <Accordion type="multiple" defaultValue={verifications.map(verif => verif.id)}>
+        <Accordion type="multiple" value={openValues} onValueChange={setOpenValues}>
           {verifications?.map(verif => (
             <AccordionItem key={verif.id} value={`${verif.id}`}>
               <AccordionTrigger

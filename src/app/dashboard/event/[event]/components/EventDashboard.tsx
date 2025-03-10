@@ -17,6 +17,7 @@ import {
 import { getEventNameSlug } from './event-dashboard-utils'
 import Loading from '~/app/components/Loading'
 import { Tab } from '~/app/components/Tab'
+import EventTaskList from './EventTaskList'
 
 function EventDashboard({ eventName }: { eventName: string }) {
   const { toast } = useToast()
@@ -100,8 +101,10 @@ function EventDashboard({ eventName }: { eventName: string }) {
             user={userData}
             teamData={activeTeamData}
           />,
-          null,
-          null,
+          <div className="mt-12 flex items-center justify-center font-dmsans font-semibold">
+            Belum ada materi untuk diakses
+          </div>,
+          <EventTaskList teamId={activeTeamData?.id} eventName={eventName} />,
           <EventVerification activeTeamData={activeTeamData} user={userData} />
         ]}
       />
