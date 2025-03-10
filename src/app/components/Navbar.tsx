@@ -33,7 +33,7 @@ type NavItemReactNode = {
 
 const eventLinks = [
   {
-    title: 'Academya - Software Engineer',
+    title: 'Academya - Software Engineering',
     link: '/event/academya/softeng'
   },
   {
@@ -41,7 +41,7 @@ const eventLinks = [
     link: '/event/academya/datascience'
   },
   {
-    title: 'Academya - Project Manager',
+    title: 'Academya - Product Management',
     link: '/event/academya/pm'
   },
   {

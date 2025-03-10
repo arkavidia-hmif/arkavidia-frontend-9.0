@@ -18,11 +18,11 @@ export function expandCompetitionName(competitionName: string) {
 
 export function getAcademyaEventName(eventName: string) {
   if (eventName === 'softeng') {
-    return 'Academya - Software Engineer'
+    return 'Academya - Software Engineering'
   } else if (eventName === 'datascience') {
     return 'Academya - Data Science'
   } else if (eventName === 'pm') {
-    return 'Academya - Project Manager'
+    return 'Academya - Product Manager'
   } else if (eventName === 'uiux') {
     return 'Academya - UI UX'
   } else {
@@ -36,7 +36,7 @@ export function getAcademyaEventType(eventName: string) {
   } else if (eventName === 'datascience') {
     return 'Data'
   } else if (eventName === 'pm') {
-    return 'Project'
+    return 'Product'
   } else if (eventName === 'uiux') {
     return 'UI'
   } else {

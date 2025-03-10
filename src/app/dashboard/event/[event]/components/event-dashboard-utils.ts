@@ -34,13 +34,13 @@ const getEventNameSlug = (slug: string) => {
     // ex: Academya - Software Engineering
     const firstEventName = eventSplit[1].toLowerCase()
     if (firstEventName === 'software') {
-      return 'Academya - Software Engineer'
+      return 'Academya - Software Engineering'
     } else if (firstEventName === 'data') {
       return 'Academya - Data Science'
     } else if (firstEventName === 'ui') {
       return 'Academya - UI UX'
-    } else if (firstEventName === 'project') {
-      return 'Academya - Project Manager'
+    } else if (firstEventName === 'product') {
+      return 'Academya - Product Manager'
     }
   }
 }
@@ -52,7 +52,7 @@ const getBucketEventKeyword = (pathName: string) => {
     return 'datsci'
   } else if (pathName.includes('ui')) {
     return 'uiux'
-  } else if (pathName.includes('project')) {
+  } else if (pathName.includes('product')) {
     return 'pm'
   }
 }
