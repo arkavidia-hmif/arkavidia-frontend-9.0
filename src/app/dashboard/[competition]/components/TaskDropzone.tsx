@@ -8,6 +8,7 @@ import { FaTrash } from 'react-icons/fa'
 import { getPresignedLink, GetPresignedLinkData } from '~/api/generated'
 import { Button } from '~/app/components/Button'
 import useAxiosAuth from '~/lib/hooks/useAxiosAuth'
+import { fileTypeFromBuffer, FileTypeResult } from 'file-type'
 
 interface TaskDropzoneProps {
   bucket: GetPresignedLinkData['query']['bucket']
@@ -35,7 +36,25 @@ const TaskDropzone: React.FC<TaskDropzoneProps> = ({
   const [error, setError] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
 
-  const validateInputFile = (file: File) => {
+  const checkType = (fileType: FileTypeResult | undefined) => {
+    if (!fileType) return false
+
+    const valid = [
+      { ext: 'zip', mime: 'application/zip' },
+      { ext: 'zip', mime: 'application/x-zip-compressed' },
+      { ext: 'pdf', mime: 'application/pdf' },
+      {
+        ext: 'docx',
+        mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      },
+      { ext: 'jpeg', mime: 'image/jpeg' },
+      { ext: 'png', mime: 'image/png' }
+    ]
+
+    return valid.some(type => fileType.ext === type.ext || fileType.mime === type.mime)
+  }
+
+  const validateInputFile = async (file: File) => {
     const validTypes = [
       'image/jpeg',
       'image/png',
@@ -47,8 +66,17 @@ const TaskDropzone: React.FC<TaskDropzoneProps> = ({
     const maxSizeMB = 20
 
     if (!validTypes.includes(file.type)) {
-      setError('Unsupported file type. Please upload JPEG, PNG, PDF, or DOCX files.')
-      return
+      // Secondary checking
+      const arrayBuffer = await file.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+      const fileType = await fileTypeFromBuffer(buffer)
+
+      if (!(fileType && checkType(fileType))) {
+        setError(
+          'Unsupported file type. Please upload JPEG, PNG, PDF, DOCX, or ZIP files.'
+        )
+        return
+      }
     }
 
     if (file.size > maxSizeMB * 1024 * 1024) {
@@ -59,17 +87,17 @@ const TaskDropzone: React.FC<TaskDropzoneProps> = ({
     setSelectedFile(file)
   }
 
-  const handleFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleFileDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     setError(null)
     const file = event.dataTransfer.files?.[0]
-    if (file) validateInputFile(file)
+    if (file) await validateInputFile(file)
   }
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setError(null)
     const file = event.target.files?.[0]
-    if (file) validateInputFile(file)
+    if (file) await validateInputFile(file)
   }
 
   const handleUpload = async () => {
